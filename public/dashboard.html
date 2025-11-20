@@ -1,1 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel – DFL Motoboy</title>
 
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Chart.js para o gráfico -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+  <header>
+    <img src="https://dafamilialanches.com.br/wp-content/uploads/2023/12/DFLLogoBranco.png" class="logo-sm">
+    <button id="logoutBtn">Sair</button>
+  </header>
+
+  <main>
+
+    <h2>Painel – Lucas Hiago</h2>
+    <p class="saldo-label">Saldo atual:</p>
+    <h1 id="saldoAtual" class="saldo-valor">R$ 0,00</h1>
+
+    <div class="form-card">
+      <h3>Lançar fechamento do dia</h3>
+
+      <label>Quantidade de entregas:</label>
+      <input id="entregas" type="number" placeholder="0">
+
+      <label>Dinheiro recebido (R$):</label>
+      <input id="dinheiro" type="number" placeholder="0">
+
+      <label>Consumo (R$):</label>
+      <input id="consumo" type="number" placeholder="0">
+
+      <button id="btnSalvar">Registrar dia</button>
+    </div>
+
+    <div class="grafico-card">
+      <h3>Evolução do saldo diário</h3>
+      <canvas id="graficoSaldo"></canvas>
+    </div>
+
+  </main>
+
+  <script type="module" src="js/dashboard.js"></script>
+</body>
+</html>
