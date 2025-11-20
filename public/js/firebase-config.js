@@ -1,7 +1,7 @@
-// ============================================
-// 🔥 Firebase Config — DFL Painel do Motoboy
-// Arquivo ÚNICO responsável pela inicialização
-// ============================================
+// =====================================================
+// 🔥 Firebase Config – DFL Painel do Motoboy
+// ÚNICO arquivo responsável por inicializar o Firebase
+// =====================================================
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
@@ -9,15 +9,15 @@ import { getFirestore } from "https://www.gstatic.com/firebasejs/10.14.1/firebas
 
 // ⚠️ Use exatamente os dados mostrados no Firebase Console
 const firebaseConfig = {
-  apiKey: "AIzaSyBOuIdV4uhDtCXmJQzKdrLEjZEk5LB98Zc",
+  apiKey: "AIzaSyBOu1vdh0wDtCk3nJ2gKrlLEjZEk5L898zc",
   authDomain: "dfl-painel.firebaseapp.com",
   projectId: "dfl-painel",
   storageBucket: "dfl-painel.appspot.com",
-  messagingSenderId: "773967662232",
-  appId: "1:773967662232:web:f125e02ebdfcd0690d94ed"
+  messagingSenderId: "777396766322",
+  appId: "1:777396766322:web:f1229e0abfcd69009d9aed"
 };
 
-// 🔥 Inicializa Firebase (apenas 1 vez!)
+// 🚀 Inicializa Firebase (somente 1 vez)
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
