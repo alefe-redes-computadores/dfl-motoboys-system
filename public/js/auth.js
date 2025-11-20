@@ -2,7 +2,7 @@
 // Lida com login no “DFL – Painel do Motoboy”
 
 // ===============================================
-// 🔹 1. Importa app, auth e db da configuração nova
+// 1. Importa app, auth, db da configuração única
 // ===============================================
 import { app, auth, db } from "./firebase-config-v2.js";
 
@@ -17,7 +17,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 // ===============================================
-// 🔹 2. Helpers de UI
+// 2. Helpers de UI
 // ===============================================
 
 const form = document.getElementById("login-form");
@@ -61,7 +61,7 @@ function clearError() {
 }
 
 // ===============================================
-// 🔹 3. Se já estiver logado → redireciona
+// 3. Se já estiver logado, manda direto pro painel
 // ===============================================
 onAuthStateChanged(auth, (user) => {
   if (user && window.location.pathname.endsWith("index.html")) {
@@ -70,7 +70,7 @@ onAuthStateChanged(auth, (user) => {
 });
 
 // ===============================================
-// 🔹 4. Lógica de login
+// 4. Lógica de login
 // ===============================================
 if (form) {
   form.addEventListener("submit", async (event) => {
@@ -88,11 +88,11 @@ if (form) {
     try {
       setLoading(true);
 
-      // 🔥 Autenticação
+      // Autentica no Firebase Auth
       const credentials = await signInWithEmailAndPassword(auth, email, password);
       const user = credentials.user;
 
-      // 🔥 Verifica se está autorizado no painel
+      // Verifica se o usuário está liberado no painel
       try {
         const userDocRef = doc(db, "usuariosPainel", user.uid);
         const snap = await getDoc(userDocRef);
@@ -102,6 +102,7 @@ if (form) {
         }
 
         const data = snap.data();
+
         if (!data.ativo) {
           throw new Error("Seu usuário está inativo no painel.");
         }
@@ -113,7 +114,7 @@ if (form) {
         return;
       }
 
-      // 🔥 Login OK → redireciona
+      // Login OK → redireciona
       window.location.href = "dashboard.html";
 
     } catch (error) {
