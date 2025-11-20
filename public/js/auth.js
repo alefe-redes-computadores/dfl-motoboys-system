@@ -1,10 +1,10 @@
 // public/js/auth.js
-// Lida com login no DFL – Painel do Motoboy
+// Lida com login no “DFL – Painel do Motoboy”
 
 // ===============================================
-// 1. Importa app, auth e db da configuração única
+// 🔹 1. Importa app, auth e db da configuração nova
 // ===============================================
-import { app, auth, db } from "./firebase-config.js";
+import { app, auth, db } from "./firebase-config-v2.js";
 
 import {
   signInWithEmailAndPassword,
@@ -17,7 +17,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 // ===============================================
-// 2. Helpers de UI
+// 🔹 2. Helpers de UI
 // ===============================================
 
 const form = document.getElementById("login-form");
@@ -32,11 +32,7 @@ function ensureOverlay() {
   if (!overlay) {
     overlay = document.createElement("div");
     overlay.id = "motopanel-overlay";
-    overlay.innerHTML = `
-      <div class="motopanel-overlay">
-        <div class="motopanel-spinner"></div>
-      </div>
-    `;
+    overlay.innerHTML = `<div class="motopanel-overlay"><div class="motopanel-spinner"></div></div>`;
     document.body.appendChild(overlay);
   }
 }
@@ -65,7 +61,7 @@ function clearError() {
 }
 
 // ===============================================
-// 3. Se já estiver logado, vai para o painel
+// 🔹 3. Se já estiver logado → redireciona
 // ===============================================
 onAuthStateChanged(auth, (user) => {
   if (user && window.location.pathname.endsWith("index.html")) {
@@ -74,7 +70,7 @@ onAuthStateChanged(auth, (user) => {
 });
 
 // ===============================================
-// 4. Lógica de login
+// 🔹 4. Lógica de login
 // ===============================================
 if (form) {
   form.addEventListener("submit", async (event) => {
@@ -92,11 +88,11 @@ if (form) {
     try {
       setLoading(true);
 
-      // Login no Firebase Auth
+      // 🔥 Autenticação
       const credentials = await signInWithEmailAndPassword(auth, email, password);
       const user = credentials.user;
 
-      // Checar permissão no painel
+      // 🔥 Verifica se está autorizado no painel
       try {
         const userDocRef = doc(db, "usuariosPainel", user.uid);
         const snap = await getDoc(userDocRef);
@@ -117,13 +113,13 @@ if (form) {
         return;
       }
 
-      // Autorizado
+      // 🔥 Login OK → redireciona
       window.location.href = "dashboard.html";
 
     } catch (error) {
       console.error("Erro ao fazer login:", error);
 
-      let message = "Não foi possível entrar. Verifique e-mail e senha.";
+      let message = "Não foi possível entrar. Verifique seu e-mail e senha.";
       if (error.code) message += ` (${error.code})`;
 
       showError(message);
