@@ -1,8 +1,8 @@
 // public/js/auth.js
-// Lida com login no “DFL – Painel do Motoboy”
+// Lida com login no DFL – Painel do Motoboy
 
 // ===============================================
-// 1. Importa app, auth, db da configuração única
+// 1. Importa app, auth e db da configuração única
 // ===============================================
 import { app, auth, db } from "./firebase-config.js";
 
@@ -32,7 +32,11 @@ function ensureOverlay() {
   if (!overlay) {
     overlay = document.createElement("div");
     overlay.id = "motopanel-overlay";
-    overlay.innerHTML = `<div class="motopanel-overlay"><div class="motopanel-spinner"></div></div>`;
+    overlay.innerHTML = `
+      <div class="motopanel-overlay">
+        <div class="motopanel-spinner"></div>
+      </div>
+    `;
     document.body.appendChild(overlay);
   }
 }
@@ -61,7 +65,7 @@ function clearError() {
 }
 
 // ===============================================
-// 3. Se já estiver logado, manda direto pro painel
+// 3. Se já estiver logado, vai para o painel
 // ===============================================
 onAuthStateChanged(auth, (user) => {
   if (user && window.location.pathname.endsWith("index.html")) {
@@ -88,11 +92,11 @@ if (form) {
     try {
       setLoading(true);
 
-      // Autentica no Firebase Auth
+      // Login no Firebase Auth
       const credentials = await signInWithEmailAndPassword(auth, email, password);
       const user = credentials.user;
 
-      // Verifica se o usuário está liberado no painel
+      // Checar permissão no painel
       try {
         const userDocRef = doc(db, "usuariosPainel", user.uid);
         const snap = await getDoc(userDocRef);
@@ -102,7 +106,6 @@ if (form) {
         }
 
         const data = snap.data();
-
         if (!data.ativo) {
           throw new Error("Seu usuário está inativo no painel.");
         }
@@ -114,13 +117,13 @@ if (form) {
         return;
       }
 
-      // Login OK → redireciona
+      // Autorizado
       window.location.href = "dashboard.html";
 
     } catch (error) {
       console.error("Erro ao fazer login:", error);
 
-      let message = "Não foi possível entrar. Verifique seu e-mail e senha.";
+      let message = "Não foi possível entrar. Verifique e-mail e senha.";
       if (error.code) message += ` (${error.code})`;
 
       showError(message);
