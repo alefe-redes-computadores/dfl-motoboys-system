@@ -1,1 +1,82 @@
+/* ===========================
+   🎨 Estilo Premium – DFL Painel
+   =========================== */
 
+body {
+  margin: 0;
+  background: #111;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+header {
+  background: #000;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo, .logo-sm {
+  width: 120px;
+  display: block;
+  margin: auto;
+}
+
+.logo-sm {
+  width: 70px;
+}
+
+.login-container {
+  max-width: 350px;
+  margin: 60px auto;
+  background: #1b1b1b;
+  padding: 25px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 6px 0 12px;
+  border: none;
+  border-radius: 6px;
+  background: #222;
+  color: #fff;
+  font-size: 16px;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  background: #ffb400;
+  border: none;
+  border-radius: 6px;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #ffc833;
+}
+
+main {
+  padding: 20px;
+}
+
+.form-card, .grafico-card {
+  background: #1f1f1f;
+  padding: 20px;
+  border-radius: 12px;
+  margin-top: 20px;
+}
+
+.saldo-valor {
+  font-size: 40px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+}
