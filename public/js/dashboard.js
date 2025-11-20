@@ -1,9 +1,12 @@
+// public/js/dashboard.js
 // =======================================
 // 📊 Painel Motoboy – DFL
 // =======================================
 
+// Importa auth e db da mesma config usada no login
 import { auth, db } from "./firebase-config-v2.js";
 
+// Importa Auth e Firestore via CDN (mesma versão)
 import {
   signOut,
   onAuthStateChanged
@@ -25,17 +28,27 @@ const MOTOBOY_ID = "lucas_hiago";
 
 // Botão sair
 document.getElementById("logoutBtn")?.addEventListener("click", async () => {
-  await signOut(auth);
+  try {
+    await signOut(auth);
+  } catch (e) {
+    console.error("Erro ao deslogar:", e);
+  }
   window.location.href = "index.html";
 });
 
 // Verificar login
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
+    // Se não estiver autenticado, volta para o login
     window.location.href = "index.html";
   } else {
-    carregarSaldo();
-    carregarGrafico();
+    // Se estiver logado, carrega dados do painel
+    try {
+      await carregarSaldo();
+      await carregarGrafico();
+    } catch (e) {
+      console.error("Erro ao carregar painel:", e);
+    }
   }
 });
 
@@ -44,72 +57,107 @@ onAuthStateChanged(auth, async (user) => {
 // ===========================
 async function carregarSaldo() {
   const snap = await getDoc(doc(db, "motoboys", MOTOBOY_ID));
+
+  if (!snap.exists()) {
+    console.warn("Motoboy não encontrado na coleção motoboys.");
+    return;
+  }
+
   const dados = snap.data();
-  document.getElementById("saldoAtual").innerText =
-    "R$ " + dados.saldo.toFixed(2).replace(".", ",");
+  const saldo = Number(dados.saldo || 0);
+
+  const elemSaldo = document.getElementById("saldoAtual");
+  if (elemSaldo) {
+    elemSaldo.innerText = "R$ " + saldo.toFixed(2).replace(".", ",");
+  }
 }
 
 // ===========================
 // 🔹 Registrar fechamento
 // ===========================
 document.getElementById("btnSalvar")?.addEventListener("click", async () => {
+  try {
+    const entregas = Number(document.getElementById("entregas").value || 0);
+    const dinheiro = Number(document.getElementById("dinheiro").value || 0);
+    const consumo  = Number(document.getElementById("consumo").value || 0);
 
-  const entregas = Number(document.getElementById("entregas").value);
-  const dinheiro = Number(document.getElementById("dinheiro").value);
-  const consumo  = Number(document.getElementById("consumo").value);
+    const motoboyRef = doc(db, "motoboys", MOTOBOY_ID);
+    const mbSnap = await getDoc(motoboyRef);
 
-  const motoboyRef = doc(db, "motoboys", MOTOBOY_ID);
-  const mbSnap = await getDoc(motoboyRef);
-  const dadosMB = mbSnap.data();
+    if (!mbSnap.exists()) {
+      alert("Motoboy não encontrado na base de dados.");
+      return;
+    }
 
-  const saldoAnterior = dadosMB.saldo;
-  const ganhoEntregas = entregas * dadosMB.taxaEntrega;
+    const dadosMB = mbSnap.data();
 
-  const saldoFinal = saldoAnterior + ganhoEntregas - dinheiro - consumo;
+    const saldoAnterior = Number(dadosMB.saldo || 0);
+    const taxaEntrega = Number(dadosMB.taxaEntrega || 0);
+    const ganhoEntregas = entregas * taxaEntrega;
 
-  await updateDoc(motoboyRef, {
-    saldo: saldoFinal
-  });
+    const saldoFinal = saldoAnterior + ganhoEntregas - dinheiro - consumo;
 
-  await addDoc(collection(db, "historico"), {
-    motoboyid: MOTOBOY_ID,
-    data: new Date().toISOString().split("T")[0],
-    entregas,
-    dinheiroRecebido: dinheiro,
-    consumo,
-    saldoAnterior,
-    saldoFinal,
-    timestamp: new Date()
-  });
+    // Atualiza saldo do motoboy
+    await updateDoc(motoboyRef, {
+      saldo: saldoFinal
+    });
 
-  alert("Registro salvo!");
-  carregarSaldo();
-  carregarGrafico();
+    // Registra histórico do dia
+    await addDoc(collection(db, "historico"), {
+      motoboyid: MOTOBOY_ID,
+      data: new Date().toISOString().split("T")[0],
+      entregas,
+      dinheiroRecebido: dinheiro,
+      consumo,
+      saldoAnterior,
+      saldoFinal,
+      timestamp: new Date()
+    });
+
+    alert("Registro salvo com sucesso!");
+    await carregarSaldo();
+    await carregarGrafico();
+
+  } catch (e) {
+    console.error("Erro ao salvar registro:", e);
+    alert("Erro ao salvar registro. Tente novamente.");
+  }
 });
 
 // ===========================
 // 🔹 Gráfico Chart.js
 // ===========================
 async function carregarGrafico() {
-  const q = query(collection(db, "historico"), where("motoboyid", "==", MOTOBOY_ID));
+  const q = query(
+    collection(db, "historico"),
+    where("motoboyid", "==", MOTOBOY_ID)
+  );
   const snap = await getDocs(q);
 
   let datas = [];
   let valores = [];
 
   snap.forEach((d) => {
-    datas.push(d.data().data);
-    valores.push(d.data().saldoFinal);
+    const dado = d.data();
+    datas.push(dado.data);
+    valores.push(Number(dado.saldoFinal || 0));
   });
 
-  // ordenar por data
+  // Ordena por data (string ISO yyyy-mm-dd)
   const combinado = datas.map((d, i) => ({ d, v: valores[i] }))
     .sort((a, b) => a.d.localeCompare(b.d));
 
   datas = combinado.map(x => x.d);
   valores = combinado.map(x => x.v);
 
-  new Chart(document.getElementById("graficoSaldo"), {
+  const ctx = document.getElementById("graficoSaldo");
+  if (!ctx) {
+    console.warn("Elemento #graficoSaldo não encontrado.");
+    return;
+  }
+
+  // eslint-disable-next-line no-undef
+  new Chart(ctx, {
     type: "line",
     data: {
       labels: datas,
@@ -118,7 +166,8 @@ async function carregarGrafico() {
         data: valores,
         borderColor: "#ffb400",
         backgroundColor: "rgba(255,180,0,0.3)",
-        borderWidth: 3
+        borderWidth: 3,
+        tension: 0.3
       }]
     },
     options: {
