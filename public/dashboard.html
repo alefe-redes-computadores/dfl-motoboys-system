@@ -1,51 +1,92 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel – DFL Motoboy</title>
+  <meta charset="UTF-8" />
+  <title>DFL – Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="./css/style.css" />
 
-  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Logo no Dashboard */
+    .dash-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
 
-  <!-- Chart.js para o gráfico -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    .dash-logo {
+      width: 50px;   /* tamanho ideal */
+      height: 50px;
+      object-fit: contain;
+      border-radius: 10px;
+    }
+
+    .dash-title {
+      display: flex;
+      flex-direction: column;
+      color: #fff;
+      line-height: 1.1;
+    }
+
+    .dash-title span:first-child {
+      font-size: 12px;
+      opacity: 0.7;
+      text-transform: uppercase;
+    }
+
+    .dash-title span:last-child {
+      font-size: 20px;
+      font-weight: 700;
+    }
+  </style>
 </head>
 
-<body>
+<body class="dashboard-body">
 
-  <header>
-    <img src="https://dafamilialanches.com.br/wp-content/uploads/2023/12/DFLLogoBranco.png" class="logo-sm">
-    <button id="logoutBtn">Sair</button>
-  </header>
+  <div class="dashboard-container">
 
-  <main>
-
-    <h2>Painel – Lucas Hiago</h2>
-    <p class="saldo-label">Saldo atual:</p>
-    <h1 id="saldoAtual" class="saldo-valor">R$ 0,00</h1>
-
-    <div class="form-card">
-      <h3>Lançar fechamento do dia</h3>
-
-      <label>Quantidade de entregas:</label>
-      <input id="entregas" type="number" placeholder="0">
-
-      <label>Dinheiro recebido (R$):</label>
-      <input id="dinheiro" type="number" placeholder="0">
-
-      <label>Consumo (R$):</label>
-      <input id="consumo" type="number" placeholder="0">
-
-      <button id="btnSalvar">Registrar dia</button>
+    <!-- 🔥 HEADER COM LOGO -->
+    <div class="dash-header">
+      <img src="./img/logo-dfl.png" alt="Logo DFL" class="dash-logo">
+      
+      <div class="dash-title">
+        <span>Da Família Lanches</span>
+        <span>Painel do Motoboy</span>
+      </div>
     </div>
 
-    <div class="grafico-card">
-      <h3>Evolução do saldo diário</h3>
-      <canvas id="graficoSaldo"></canvas>
+    <!-- Saldo Atual -->
+    <h2 style="color:white;margin-top:0">Saldo Atual</h2>
+    <div id="saldoAtual" class="dash-card">R$ 0,00</div>
+
+    <!-- Entradas -->
+    <h2 style="color:white">Registrar Fechamento</h2>
+
+    <div class="dash-input-group">
+      <label>Entregas do dia</label>
+      <input id="entregas" type="number" placeholder="0" />
     </div>
 
-  </main>
+    <div class="dash-input-group">
+      <label>Dinheiro recebido do cliente</label>
+      <input id="dinheiro" type="number" placeholder="0.00" />
+    </div>
 
-  <script type="module" src="js/dashboard.js"></script>
+    <div class="dash-input-group">
+      <label>Consumo (Coca, Lanches, etc)</label>
+      <input id="consumo" type="number" placeholder="0.00" />
+    </div>
+
+    <button id="btnSalvar" class="dash-button">Salvar Fechamento</button>
+
+    <button id="logoutBtn" class="dash-button logout">Sair</button>
+
+    <h2 style="color:white;margin-top:30px">Histórico (Gráfico)</h2>
+    <canvas id="graficoSaldo" height="120"></canvas>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module" src="./js/dashboard.js"></script>
 </body>
 </html>
