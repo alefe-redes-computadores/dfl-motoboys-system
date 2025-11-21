@@ -39,10 +39,8 @@ document.getElementById("logoutBtn")?.addEventListener("click", async () => {
 // Verificar login
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
-    // Se não estiver autenticado, volta para o login
-    window.location.href = "index.html";
+    window.location.href = "index.html"; // Redireciona se não estiver logado
   } else {
-    // Se estiver logado, carrega dados do painel
     try {
       await carregarSaldo();
       await carregarGrafico();
@@ -115,6 +113,8 @@ document.getElementById("btnSalvar")?.addEventListener("click", async () => {
     });
 
     alert("Registro salvo com sucesso!");
+
+    // Recarregar painel
     await carregarSaldo();
     await carregarGrafico();
 
@@ -124,9 +124,11 @@ document.getElementById("btnSalvar")?.addEventListener("click", async () => {
   }
 });
 
-// ===========================
-// 🔹 Gráfico Chart.js
-// ===========================
+// ======================================================
+// 🔹 Gráfico Chart.js — CORRIGIDO (sem o bug do reload)
+// ======================================================
+let graficoInstancia = null;
+
 async function carregarGrafico() {
   const q = query(
     collection(db, "historico"),
@@ -143,7 +145,7 @@ async function carregarGrafico() {
     valores.push(Number(dado.saldoFinal || 0));
   });
 
-  // Ordena por data (string ISO yyyy-mm-dd)
+  // Ordenar datas
   const combinado = datas.map((d, i) => ({ d, v: valores[i] }))
     .sort((a, b) => a.d.localeCompare(b.d));
 
@@ -156,8 +158,13 @@ async function carregarGrafico() {
     return;
   }
 
+  // 🔥 Destrói gráfico anterior para evitar erro
+  if (graficoInstancia !== null) {
+    graficoInstancia.destroy();
+  }
+
   // eslint-disable-next-line no-undef
-  new Chart(ctx, {
+  graficoInstancia = new Chart(ctx, {
     type: "line",
     data: {
       labels: datas,
