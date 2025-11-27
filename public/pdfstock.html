@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF – Estoque do Dia</title>
+
+  <!-- JSPDF CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { db } from "./firebase-config-v2.js";
+    import {
+      collection,
+      getDocs
+    } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+    window.gerarPDF = async function gerarPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      const estoqueSnap = await getDocs(collection(db, "estoqueDia"));
+      
+      let y = 20;
+      doc.setFont("Helvetica", "bold");
+      doc.text("Relatório – Estoque do Dia", 10, 10);
+      doc.setFont("Helvetica", "normal");
+
+      estoqueSnap.forEach((item) => {
+        const d = item.data();
+        doc.text(
+          `Categoria: ${d.categoria} | Item: ${d.item} | Qtd: ${d.quantidade} | Data: ${d.data}`,
+          10,
+          y
+        );
+        y += 10;
+      });
+
+      doc.save("estoque-dia.pdf");
+    };
+  </script>
+
+  <style>
+    body {
+      background: #111;
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    button {
+      background: #1e88e5;
+      color: #fff;
+      padding: 14px 20px;
+      width: 100%;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background: #1565c0;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+  </style>
+</head>
+
+<body>
+  <h2>Gerar PDF – Estoque do Dia</h2>
+
+  <button onclick="gerarPDF()">📄 Baixar PDF</button>
+
+</body>
+</html>
