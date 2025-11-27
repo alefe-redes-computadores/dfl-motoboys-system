@@ -1,5 +1,6 @@
-// public/js/dashboard-admin.js
-// Painel Administrativo – DFL
+// =========================================
+//  DFL — DASHBOARD ADMIN (VERSÃO ATUALIZADA)
+// =========================================
 
 import { auth, db } from "./firebase-config-v2.js";
 
@@ -10,25 +11,23 @@ import {
 
 import {
   doc,
+  getDoc,
+  updateDoc,
   addDoc,
   collection,
-  getDocs,
-  query,
-  where
+  getDocs
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-// =======================
-// UIDs dos administradores
-// =======================
+// UID dos administradores
 const ADMINS = [
-  "6YczX4gLpUStlBVdQOXWc3uEYGG2", // kalebhstanley650@gmail.com
-  "LYu3M8gyRdMCqhE90vmH9Jh5Ksj1", // contato@dafamilialanches.com.br
-  "plSHKV043gTpEYfx7I3TI6FsJG93", // vendas@dafamilialanches.com.br
-  "zIfbMxD1SQNvtlX9y6YUsEz2TXC3"  // alefejohsefe@gmail.com
+  "6YczX4gLpUStlBVdQOXWc3uEYGG2",
+  "LYu3M8gyRdMCqhE90vmH9Jh5Ksj1",
+  "plSHKV043gTpEYfx7I3TI6FsJG93",
+  "zIfbMxD1SQNvtlX9y6YUsEz2TXC3"
 ];
 
 // =======================
-// Autenticação / Roteamento
+// VERIFICA LOGIN
 // =======================
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
@@ -38,370 +37,178 @@ onAuthStateChanged(auth, async (user) => {
 
   if (!ADMINS.includes(user.uid)) {
     alert("Acesso restrito a administradores.");
-    window.location.href = "dashboard.html"; // painel do motoboy
+    window.location.href = "dashboard.html";
     return;
   }
 
-  try {
-    await carregarSaldos();
-    await carregarGraficoDespesas();
-    configurarFormularios();
-  } catch (e) {
-    console.error("Erro ao carregar painel admin:", e);
-  }
+  carregarSaldoMotoboy();
 });
 
-// Logout
+// =======================
+// LOGOUT
+// =======================
 document.getElementById("logoutAdmin")?.addEventListener("click", async () => {
-  try {
-    await signOut(auth);
-  } catch (e) {
-    console.error("Erro ao deslogar admin:", e);
-  }
+  await signOut(auth);
   window.location.href = "index.html";
 });
 
 // =======================
-// SALDOS – Motoboy + Geral
+// SALDO DO MOTOBOY + GERAL
 // =======================
-async function carregarSaldos() {
+async function carregarSaldoMotoboy() {
   const saldoLucasEl = document.getElementById("saldo_lucas_hiago");
   const saldoGeralEl = document.getElementById("saldoGeral");
 
+  const snap = await getDoc(doc(db, "motoboys", "lucas_hiago"));
+  let saldo = 0;
+
+  if (snap.exists()) {
+    saldo = Number(snap.data().saldo || 0);
+  }
+
+  saldoLucasEl.textContent = "R$ " + saldo.toFixed(2).replace(".", ",");
+  saldoLucasEl.className = "motoboy-saldo " + (saldo > 0 ? "negativo" : "positivo");
+
+  // Saldo geral = soma de todos os motoboys
+  const snapAll = await getDocs(collection(db, "motoboys"));
   let total = 0;
 
-  const snap = await getDocs(collection(db, "motoboys"));
+  snapAll.forEach(d => total += Number(d.data().saldo || 0));
 
-  snap.forEach((docSnap) => {
-    const dados = docSnap.data();
-    const saldo = Number(dados.saldo || 0);
-
-    total += saldo;
-
-    // Atualiza linha do Lucas Hiago
-    if (docSnap.id === "lucas_hiago" && saldoLucasEl) {
-      atualizarSaldoVisual(saldoLucasEl, saldo);
-    }
-  });
-
-  if (saldoGeralEl) {
-    atualizarSaldoVisual(saldoGeralEl, total);
-  }
-}
-
-// valor > 0 = dívida com motoboy => vermelho
-function atualizarSaldoVisual(el, valor) {
-  const numero = Number(valor || 0);
-  const texto = `R$ ${numero.toFixed(2).replace(".", ",")}`;
-
-  el.textContent = texto;
-  el.classList.remove("positivo", "negativo", "neutral");
-
-  if (numero > 0) {
-    el.classList.add("negativo"); // empresa deve ao motoboy
-  } else if (numero < 0) {
-    el.classList.add("positivo"); // empresa está “no verde”
-  } else {
-    el.classList.add("neutral");
-  }
+  saldoGeralEl.textContent = "R$ " + total.toFixed(2).replace(".", ",");
+  saldoGeralEl.className = total > 0 ? "admin-value negativo" : "admin-value positivo";
 }
 
 // =======================
-// FORMULÁRIOS
+// CATEGORIAS + SUBITENS
 // =======================
-function configurarFormularios() {
-  configurarFormularioDespesas();
-  configurarFormularioEstoque();
-  configurarFormularioEntregas();
-  configurarBotaoPdfEstoque();
-}
-
-// ----------  DESPESAS  ----------
-function configurarFormularioDespesas() {
-  const btn = document.getElementById("btnSalvarDespesa");
-  if (!btn) return;
-
-  btn.addEventListener("click", async () => {
-    const desc = document.getElementById("descDespesa").value.trim();
-    const valor = Number(
-      (document.getElementById("valorDespesa").value || "0").replace(",", ".")
-    );
-    const data = document.getElementById("dataDespesa").value;
-
-    if (!desc || !data || !valor) {
-      alert("Preencha descrição, valor e data.");
-      return;
-    }
-
-    try {
-      await addDoc(collection(db, "despesas"), {
-        desc,
-        valor,
-        data,
-        timestamp: new Date()
-      });
-
-      alert("Despesa registrada com sucesso!");
-
-      document.getElementById("descDespesa").value = "";
-      document.getElementById("valorDespesa").value = "";
-      document.getElementById("dataDespesa").value = "";
-
-      await carregarGraficoDespesas();
-    } catch (e) {
-      console.error("Erro ao salvar despesa:", e);
-      alert("Erro ao salvar despesa.");
-    }
-  });
-}
-
-// ----------  ESTOQUE  ----------
-const MAPA_ITENS = {
+const SUBITENS = {
   frios: [
-    "Bacon",
-    "Carne Moida/Artesanais",
-    "Cheddar",
-    "Filé de Frango",
-    "Hambúrguer",
-    "Mussarela",
-    "Presunto",
-    "Salsicha"
+    "Bacon", "Carne Moída/Artesanais", "Cheddar", "Filé de Frango",
+    "Hambúrguer", "Mussarela", "Presunto", "Salsicha"
   ],
+
   refrigerantes: [
-    "Coca 200ml",
-    "Coca 310ml",
-    "Coca 310ml Zero",
-    "Coca 1L",
-    "Coca 1L Zero",
-    "Coca 2L",
-    "Del Valle 450ml Laranja",
-    "Del Valle 450ml Uva",
-    "Fanta 1L",
-    "Kuat 2L"
+    "Coca 200ml", "Coca 310ml", "Coca 310ml Zero", "Coca 1L",
+    "Coca 1L Zero", "Coca 2L", "Del Valle 450ml Uva",
+    "Del Valle 450ml Laranja", "Fanta 1L", "Kuat 2L"
   ],
+
   embalagens: [
-    "Bobina",
-    "Dogueira",
-    "Hamburgueira",
-    "Papel Kraft",
-    "Saco Plástico",
-    "Sacola 30x40",
-    "Sacola 38x48"
+    "Bobina", "Dogueira", "Hamburgueira",
+    "Papel Kraft", "Saco Plástico",
+    "Sacola 30x40", "Sacola 38x48"
   ],
+
   paes: [
-    "Hambúrguer",
-    "Hot Dog"
+    "Pão Hambúrguer", "Pão Hot Dog"
   ],
+
   outros: [
-    "Alface",
-    "Batata Palha",
-    "Cebola",
-    "Cebolinha",
-    "Milho",
-    "Oleo",
-    "Ovo",
-    "Tomate"
+    "Alface", "Batata Palha", "Cebola", "Cebolinha",
+    "Milho", "Óleo", "Ovo", "Tomate"
   ]
 };
 
-function configurarFormularioEstoque() {
-  const selCategoria = document.getElementById("estoqueCategoria");
-  const selItem = document.getElementById("estoqueItem");
-  const btnSalvar = document.getElementById("btnSalvarEstoque");
+// Preenche subitens ao trocar categoria
+const categoriaSel = document.getElementById("estoqueCategoria");
+const itemSel = document.getElementById("estoqueItem");
 
-  if (!selCategoria || !selItem || !btnSalvar) return;
+function atualizarItens() {
+  const categoria = categoriaSel.value;
+  const itens = SUBITENS[categoria] || [];
 
-  // Preenche itens conforme categoria
-  function atualizarItens() {
-    const cat = selCategoria.value;
-    const lista = MAPA_ITENS[cat] || [];
-    selItem.innerHTML = "";
+  itemSel.innerHTML = itens
+    .sort()
+    .map(i => `<option value="${i}">${i}</option>`)
+    .join("");
+}
 
-    lista.forEach((item) => {
-      const opt = document.createElement("option");
-      opt.value = item;
-      opt.textContent = item;
-      selItem.appendChild(opt);
-    });
+categoriaSel.addEventListener("change", atualizarItens);
+atualizarItens(); // inicia preenchido
+
+// =======================
+// SALVAR ESTOQUE
+// =======================
+document.getElementById("btnSalvarEstoque").addEventListener("click", async () => {
+  const categoria = categoriaSel.value;
+  const item = itemSel.value;
+  const qtd = document.getElementById("estoqueQtd").value;
+  const data = document.getElementById("estoqueData").value;
+
+  if (!categoria || !item || !qtd || !data) {
+    alert("Preencha todos os campos.");
+    return;
   }
 
-  selCategoria.addEventListener("change", atualizarItens);
-  atualizarItens(); // primeira carga
-
-  btnSalvar.addEventListener("click", async () => {
-    const categoria = selCategoria.value;
-    const item = selItem.value;
-    const quantidade = document.getElementById("estoqueQtd").value.trim();
-    const data = document.getElementById("estoqueData").value;
-
-    if (!categoria || !item || !quantidade || !data) {
-      alert("Preencha categoria, item, quantidade e data.");
-      return;
-    }
-
-    try {
-      await addDoc(collection(db, "estoque"), {
-        categoria,
-        item,
-        quantidade,
-        data,
-        timestamp: new Date()
-      });
-
-      alert("Estoque registrado!");
-      document.getElementById("estoqueQtd").value = "";
-    } catch (e) {
-      console.error("Erro ao salvar estoque:", e);
-      alert("Erro ao salvar estoque.");
-    }
+  await addDoc(collection(db, "estoqueDia"), {
+    categoria,
+    item,
+    quantidade: qtd,
+    data
   });
-}
 
-// ----------  ENTREGAS MANUAIS  ----------
-function configurarFormularioEntregas() {
-  const btn = document.getElementById("btnSalvarEntregaManual");
-  if (!btn) return;
-
-  btn.addEventListener("click", async () => {
-    const motoboy = document.getElementById("entregaMotoboy").value;
-    const qtd = Number(document.getElementById("entregaQtd").value || 0);
-    const data = document.getElementById("entregaData").value;
-
-    if (!motoboy || !qtd || !data) {
-      alert("Preencha motoboy, quantidade e data.");
-      return;
-    }
-
-    try {
-      await addDoc(collection(db, "entregasManuais"), {
-        motoboy,
-        qtd,
-        data,
-        timestamp: new Date()
-      });
-
-      alert("Entrega registrada!");
-      document.getElementById("entregaQtd").value = "";
-    } catch (e) {
-      console.error("Erro ao salvar entrega manual:", e);
-      alert("Erro ao salvar entrega.");
-    }
-  });
-}
+  alert("Estoque salvo com sucesso!");
+});
 
 // =======================
-// GRÁFICO DE DESPESAS
+// GERAR PDF – ESTOQUE
 // =======================
-async function carregarGraficoDespesas() {
-  const canvas = document.getElementById("graficoDespesas");
-  if (!canvas) return;
-
-  const snap = await getDocs(collection(db, "despesas"));
-
-  let datas = [];
-  let valores = [];
-
-  snap.forEach((d) => {
-    const dado = d.data();
-    datas.push(dado.data);
-    valores.push(Number(dado.valor || 0));
-  });
-
-  const combinado = datas.map((d, i) => ({ d, v: valores[i] }))
-    .sort((a, b) => a.d.localeCompare(b.d));
-
-  datas = combinado.map(x => x.d);
-  valores = combinado.map(x => x.v);
-
-  // eslint-disable-next-line no-undef
-  new Chart(canvas, {
-    type: "bar",
-    data: {
-      labels: datas,
-      datasets: [{
-        label: "Despesas (R$)",
-        data: valores,
-        backgroundColor: "#ffca28"
-      }]
-    },
-    options: {
-      responsive: true
-    }
-  });
-}
+document.getElementById("btnGerarPdfEstoque").addEventListener("click", () => {
+  window.location.href = "pdf-estoque.html";
+});
 
 // =======================
-// GERAR PDF – ESTOQUE DO DIA
+// SALVAR DESPESA
 // =======================
-function configurarBotaoPdfEstoque() {
-  const btnPdf = document.getElementById("btnGerarPdfEstoque");
-  if (!btnPdf) return;
+document.getElementById("btnSalvarDespesa").addEventListener("click", async () => {
+  const desc = document.getElementById("descDespesa").value;
+  const valor = document.getElementById("valorDespesa").value;
+  const data = document.getElementById("dataDespesa").value;
 
-  btnPdf.addEventListener("click", async () => {
-    const data = document.getElementById("estoqueData").value;
+  if (!desc || !valor || !data) {
+    alert("Preencha todos os campos.");
+    return;
+  }
 
-    if (!data) {
-      alert("Escolha uma data para gerar o PDF do estoque.");
-      return;
-    }
-
-    try {
-      const qEstoque = query(
-        collection(db, "estoque"),
-        where("data", "==", data)
-      );
-      const snap = await getDocs(qEstoque);
-
-      if (snap.empty) {
-        alert("Não há registros de estoque para essa data.");
-        return;
-      }
-
-      const linhas = [];
-      snap.forEach((docu) => {
-        const { categoria, item, quantidade } = docu.data();
-        linhas.push({ categoria, item, quantidade });
-      });
-
-      linhas.sort((a, b) =>
-        (a.categoria + a.item).localeCompare(b.categoria + b.item)
-      );
-
-      // jsPDF via CDN (UMD)
-      const jsPDFLib = window.jspdf?.jsPDF;
-      if (!jsPDFLib) {
-        console.warn("jsPDF não carregado. Abrindo visualização simples.");
-        let texto = `Estoque do dia ${data}\n\n`;
-        linhas.forEach((l) => {
-          texto += `${l.categoria} - ${l.item}: ${l.quantidade}\n`;
-        });
-        const win = window.open("", "_blank");
-        win.document.write(`<pre>${texto}</pre>`);
-        win.print();
-        return;
-      }
-
-      const docPdf = new jsPDFLib();
-      docPdf.setFontSize(14);
-      docPdf.text(`Estoque do dia ${data}`, 10, 15);
-
-      docPdf.setFontSize(11);
-      let y = 25;
-
-      linhas.forEach((l) => {
-        const line = `${l.categoria} - ${l.item}: ${l.quantidade}`;
-        docPdf.text(line, 10, y);
-        y += 7;
-        if (y > 280) {
-          docPdf.addPage();
-          y = 20;
-        }
-      });
-
-      docPdf.save(`estoque-${data}.pdf`);
-    } catch (e) {
-      console.error("Erro ao gerar PDF de estoque:", e);
-      alert("Erro ao gerar PDF.");
-    }
+  await addDoc(collection(db, "despesas"), {
+    descricao: desc,
+    valor: Number(valor),
+    data
   });
-}
+
+  alert("Despesa salva!");
+});
+
+// =======================
+// ENTREGAS MANUAIS
+// =======================
+document.getElementById("btnSalvarEntregaManual").addEventListener("click", async () => {
+  const motoboy = document.getElementById("entregaMotoboy").value;
+  const qtd = Number(document.getElementById("entregaQtd").value);
+  const data = document.getElementById("entregaData").value;
+
+  if (!motoboy || !qtd || !data) {
+    alert("Preencha todos os campos.");
+    return;
+  }
+
+  // salva no Firebase
+  await addDoc(collection(db, "entregasManuais"), {
+    motoboy,
+    quantidade: qtd,
+    data
+  });
+
+  // atualiza saldo do motoboy
+  const ref = doc(db, "motoboys", motoboy);
+  const snap = await getDoc(ref);
+
+  let saldoAtual = snap.exists() ? Number(snap.data().saldo || 0) : 0;
+  saldoAtual += qtd * 2; // Exemplo: R$2 por entrega, pode mudar depois
+
+  await updateDoc(ref, { saldo: saldoAtual });
+
+  alert("Entrega registrada!");
+  carregarSaldoMotoboy();
+});
