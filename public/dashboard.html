@@ -2,91 +2,195 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>DFL – Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="./css/style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel Administrativo – DFL</title>
+
+  <link rel="stylesheet" href="dashboard-admin.css" />
 
   <style>
-    /* Logo no Dashboard */
-    .dash-header {
+    body {
+      margin: 0;
+      background: #0d0d0d;
+      font-family: system-ui, sans-serif;
+      color: #fff;
+    }
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #111;
+      padding: 15px 22px;
+      border-bottom: 2px solid #ffca28;
+    }
+    .admin-header-left {
       display: flex;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 20px;
+      gap: 14px;
     }
-
-    .dash-logo {
-      width: 50px;   /* tamanho ideal */
-      height: 50px;
-      object-fit: contain;
-      border-radius: 10px;
+    .admin-logo {
+      width: 45px;
+      height: 45px;
+      border-radius: 12px;
+      border: 2px solid #ffca28;
     }
-
-    .dash-title {
-      display: flex;
-      flex-direction: column;
+    .admin-logout {
+      background: #ffca28;
+      color: #111;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .admin-container {
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+      gap: 20px;
+    }
+    .admin-card {
+      background: #1a1a1a;
+      padding: 22px;
+      border-radius: 14px;
+      border: 1px solid #333;
+    }
+    .admin-card h2 {
+      margin-top: 0;
+    }
+    .admin-value {
+      font-size: 28px;
+      font-weight: bold;
+      color: #ffca28;
+    }
+    input, select {
+      width: 100%;
+      padding: 9px 12px;
+      margin-top: 6px;
+      margin-bottom: 12px;
+      border: 1px solid #444;
+      background: #0f0f0f;
       color: #fff;
-      line-height: 1.1;
+      border-radius: 8px;
+      font-size: 15px;
     }
-
-    .dash-title span:first-child {
-      font-size: 12px;
-      opacity: 0.7;
-      text-transform: uppercase;
+    .admin-btn {
+      width: 100%;
+      background: #ffca28;
+      color: #111;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 5px;
     }
-
-    .dash-title span:last-child {
-      font-size: 20px;
-      font-weight: 700;
+    .admin-btn-pdf {
+      background: #1e88e5;
+      color: white;
+      border: none;
+      padding: 10px;
+      margin-top: 10px;
+      width: 100%;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
     }
+    .motoboy-item { 
+      margin-top: 8px; 
+      padding: 8px 0; 
+      border-bottom: 1px solid #333;
+    }
+    .negativo { color: #e53935 !important; font-weight: bold; }
+    .positivo { color: #43a047 !important; font-weight: bold; }
   </style>
 </head>
 
-<body class="dashboard-body">
+<body>
 
-  <div class="dashboard-container">
+  <header class="admin-header">
+    <div class="admin-header-left">
+      <img src="./img/logo-dfl.png" class="admin-logo" />
+      <h1>Painel Administrativo – DFL</h1>
+    </div>
+    <button id="logoutAdmin" class="admin-logout">Sair</button>
+  </header>
 
-    <!-- 🔥 HEADER COM LOGO -->
-    <div class="dash-header">
-      <img src="./img/logo-dfl.png" alt="Logo DFL" class="dash-logo">
-      
-      <div class="dash-title">
-        <span>Da Família Lanches</span>
-        <span>Painel do Motoboy</span>
+  <div class="admin-container">
+
+    <!-- SALDO POR MOTOBOY -->
+    <div class="admin-card">
+      <h2>Saldo por Motoboy</h2>
+
+      <div class="motoboy-item">
+        <strong>Lucas Hiago</strong> —
+        <span id="saldo_lucas_hiago">R$ 0,00</span>
       </div>
     </div>
 
-    <!-- Saldo Atual -->
-    <h2 style="color:white;margin-top:0">Saldo Atual</h2>
-    <div id="saldoAtual" class="dash-card">R$ 0,00</div>
-
-    <!-- Entradas -->
-    <h2 style="color:white">Registrar Fechamento</h2>
-
-    <div class="dash-input-group">
-      <label>Entregas do dia</label>
-      <input id="entregas" type="number" placeholder="0" />
+    <!-- SALDO GERAL -->
+    <div class="admin-card">
+      <h2>Saldo Geral</h2>
+      <p id="saldoGeral" class="admin-value">R$ 0,00</p>
     </div>
 
-    <div class="dash-input-group">
-      <label>Dinheiro recebido do cliente</label>
-      <input id="dinheiro" type="number" placeholder="0.00" />
+    <!-- DESPESAS -->
+    <div class="admin-card">
+      <h2>Registrar Despesa</h2>
+      <input id="descDespesa" placeholder="Descrição da despesa" />
+      <input id="valorDespesa" type="number" placeholder="Ex: 45.90" />
+      <input id="dataDespesa" type="date" />
+      <button class="admin-btn" id="btnSalvarDespesa">Salvar Despesa</button>
     </div>
 
-    <div class="dash-input-group">
-      <label>Consumo (Coca, Lanches, etc)</label>
-      <input id="consumo" type="number" placeholder="0.00" />
+    <!-- ESTOQUE -->
+    <div class="admin-card">
+      <h2>Registrar Estoque do Dia</h2>
+
+      <label>Categoria</label>
+      <select id="estoqueCategoria">
+        <option value="frios">Frios</option>
+        <option value="refrigerantes">Refrigerantes</option>
+        <option value="embalagens">Embalagens</option>
+        <option value="paes">Pães</option>
+        <option value="outros">Outros</option>
+      </select>
+
+      <label>Item</label>
+      <select id="estoqueItem"></select>
+
+      <label>Quantidade Restante</label>
+      <input id="estoqueQtd" placeholder="Ex: 12 unidades / 3 kg" />
+
+      <label>Data</label>
+      <input id="estoqueData" type="date" />
+
+      <button class="admin-btn" id="btnSalvarEstoque">Salvar Estoque</button>
+
+      <button class="admin-btn-pdf" id="btnGerarPdfEstoque">
+        📄 Gerar PDF – Estoque do Dia
+      </button>
     </div>
 
-    <button id="btnSalvar" class="dash-button">Salvar Fechamento</button>
+    <!-- ENTREGAS MANUAIS -->
+    <div class="admin-card">
+      <h2>Registrar Entregas Manuais</h2>
 
-    <button id="logoutBtn" class="dash-button logout">Sair</button>
+      <label>Motoboy</label>
+      <select id="entregaMotoboy">
+        <option value="lucas_hiago">Lucas Hiago</option>
+      </select>
 
-    <h2 style="color:white;margin-top:30px">Histórico (Gráfico)</h2>
-    <canvas id="graficoSaldo" height="120"></canvas>
+      <label>Qtd. Entregas</label>
+      <input id="entregaQtd" type="number" placeholder="Ex: 3" />
+
+      <label>Data</label>
+      <input id="entregaData" type="date" />
+
+      <button class="admin-btn" id="btnSalvarEntregaManual">Salvar Registro</button>
+    </div>
+
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script type="module" src="./js/dashboard.js"></script>
+  <script type="module" src="dashboard-admin.js"></script>
 </body>
 </html>
