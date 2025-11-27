@@ -1,5 +1,5 @@
 // =========================================
-//  DFL — DASHBOARD ADMIN (VERSÃO ATUALIZADA)
+//  DFL — DASHBOARD ADMIN (VERSÃO FINAL)
 // =========================================
 
 import { auth, db } from "./firebase-config-v2.js";
@@ -15,7 +15,9 @@ import {
   updateDoc,
   addDoc,
   collection,
-  getDocs
+  getDocs,
+  query,
+  where
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 // UID dos administradores
@@ -42,6 +44,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   carregarSaldoMotoboy();
+  verificarEstoqueHoje();
 });
 
 // =======================
@@ -69,10 +72,8 @@ async function carregarSaldoMotoboy() {
   saldoLucasEl.textContent = "R$ " + saldo.toFixed(2).replace(".", ",");
   saldoLucasEl.className = "motoboy-saldo " + (saldo > 0 ? "negativo" : "positivo");
 
-  // Saldo geral = soma de todos os motoboys
   const snapAll = await getDocs(collection(db, "motoboys"));
   let total = 0;
-
   snapAll.forEach(d => total += Number(d.data().saldo || 0));
 
   saldoGeralEl.textContent = "R$ " + total.toFixed(2).replace(".", ",");
@@ -84,14 +85,16 @@ async function carregarSaldoMotoboy() {
 // =======================
 const SUBITENS = {
   frios: [
-    "Bacon", "Carne Moída/Artesanais", "Cheddar", "Filé de Frango",
-    "Hambúrguer", "Mussarela", "Presunto", "Salsicha"
+    "Bacon", "Carne Moída/Artesanais", "Cheddar",
+    "Filé de Frango", "Hambúrguer", "Mussarela",
+    "Presunto", "Salsicha"
   ],
 
   refrigerantes: [
-    "Coca 200ml", "Coca 310ml", "Coca 310ml Zero", "Coca 1L",
-    "Coca 1L Zero", "Coca 2L", "Del Valle 450ml Uva",
-    "Del Valle 450ml Laranja", "Fanta 1L", "Kuat 2L"
+    "Coca 200ml", "Coca 310ml", "Coca 310ml Zero",
+    "Coca 1L", "Coca 1L Zero", "Coca 2L",
+    "Del Valle 450ml Uva", "Del Valle 450ml Laranja",
+    "Fanta 1L", "Kuat 2L"
   ],
 
   embalagens: [
@@ -105,18 +108,17 @@ const SUBITENS = {
   ],
 
   outros: [
-    "Alface", "Batata Palha", "Cebola", "Cebolinha",
-    "Milho", "Óleo", "Ovo", "Tomate"
+    "Alface", "Batata Palha", "Cebola",
+    "Cebolinha", "Milho", "Óleo", "Ovo", "Tomate"
   ]
 };
 
-// Preenche subitens ao trocar categoria
 const categoriaSel = document.getElementById("estoqueCategoria");
 const itemSel = document.getElementById("estoqueItem");
 
 function atualizarItens() {
-  const categoria = categoriaSel.value;
-  const itens = SUBITENS[categoria] || [];
+  const cat = categoriaSel.value;
+  const itens = SUBITENS[cat] || [];
 
   itemSel.innerHTML = itens
     .sort()
@@ -125,7 +127,7 @@ function atualizarItens() {
 }
 
 categoriaSel.addEventListener("change", atualizarItens);
-atualizarItens(); // inicia preenchido
+atualizarItens();
 
 // =======================
 // SALVAR ESTOQUE
@@ -148,11 +150,29 @@ document.getElementById("btnSalvarEstoque").addEventListener("click", async () =
     data
   });
 
-  alert("Estoque salvo com sucesso!");
+  alert("Estoque salvo!");
+  verificarEstoqueHoje();
 });
 
 // =======================
-// GERAR PDF – ESTOQUE
+// MOSTRAR BOTÃO PDF SE EXISTIR ESTOQUE NO DIA
+// =======================
+async function verificarEstoqueHoje() {
+  const hoje = new Date().toISOString().slice(0, 10);
+
+  const q = query(
+    collection(db, "estoqueDia"),
+    where("data", "==", hoje)
+  );
+
+  const snap = await getDocs(q);
+
+  const btn = document.getElementById("btnGerarPdfEstoque");
+  btn.style.display = snap.size > 0 ? "block" : "none";
+}
+
+// =======================
+// ABRIR PÁGINA DO PDF
 // =======================
 document.getElementById("btnGerarPdfEstoque").addEventListener("click", () => {
   window.location.href = "pdf-estoque.html";
@@ -193,19 +213,17 @@ document.getElementById("btnSalvarEntregaManual").addEventListener("click", asyn
     return;
   }
 
-  // salva no Firebase
   await addDoc(collection(db, "entregasManuais"), {
     motoboy,
     quantidade: qtd,
     data
   });
 
-  // atualiza saldo do motoboy
   const ref = doc(db, "motoboys", motoboy);
   const snap = await getDoc(ref);
 
   let saldoAtual = snap.exists() ? Number(snap.data().saldo || 0) : 0;
-  saldoAtual += qtd * 2; // Exemplo: R$2 por entrega, pode mudar depois
+  saldoAtual += qtd * 2;
 
   await updateDoc(ref, { saldo: saldoAtual });
 
