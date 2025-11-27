@@ -4,10 +4,7 @@
   <meta charset="UTF-8" />
   <title>DFL — Painel Administrativo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
   <link rel="stylesheet" href="./css/dashboard-admin.css" />
-
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
@@ -17,40 +14,29 @@
       <img src="./img/logo-dfl.png" class="admin-logo" />
       <h1>Painel Administrativo – DFL</h1>
     </div>
-
     <button id="logoutAdmin" class="admin-logout">Sair</button>
   </header>
 
   <main class="admin-container">
 
-    <!-- SALDO POR MOTOBOY -->
+    <!-- 🔹 SALDO DO MOTOBOY -->
     <section class="admin-card">
       <h2>Saldo por Motoboy</h2>
-
       <div class="motoboy-item">
         <span class="motoboy-nome">Lucas Hiago</span>
         <span id="saldo_lucas_hiago" class="motoboy-saldo neutral">R$ 0,00</span>
       </div>
-
-      <!-- Se no futuro tiver mais motoboys, basta duplicar: -->
-      <!--
-      <div class="motoboy-item">
-        <span class="motoboy-nome">Nome</span>
-        <span id="saldo_id" class="motoboy-saldo neutral">R$ 0,00</span>
-      </div>
-      -->
     </section>
 
-    <!-- SALDO GERAL -->
+    <!-- 🔹 SALDO GERAL -->
     <section class="admin-card">
       <h2>Saldo Geral</h2>
       <p id="saldoGeral" class="admin-value">R$ 0,00</p>
     </section>
 
-    <!-- REGISTRO DE DESPESA -->
+    <!-- 🔹 REGISTRAR DESPESA -->
     <section class="admin-card">
       <h2>Registrar Despesa</h2>
-
       <label>Descrição</label>
       <input id="descDespesa" placeholder="Ex: Compra no supermercado" />
 
@@ -63,43 +49,71 @@
       <button id="btnSalvarDespesa" class="admin-btn">Salvar Despesa</button>
     </section>
 
-    <!-- REGISTRO DE ESTOQUE -->
+    <!-- 🔹 REGISTRAR ESTOQUE COM ACORDEÕES -->
     <section class="admin-card">
-      <h2>Registrar Estoque do Dia</h2>
+      <h2>Estoque do Dia</h2>
 
-      <label>Categoria</label>
-      <select id="estoqueCategoria">
-        <option value="frios">Frios</option>
-        <option value="refrigerantes">Refrigerantes</option>
-        <option value="embalagens">Embalagens</option>
-        <option value="pães">Pães</option>
-      </select>
+      <!-- ACORDEÃO: FRIOS -->
+      <button class="accordion">🧀 Frios</button>
+      <div class="panel">
+        <div class="estoque-item"><label>Bacon</label><input id="frios_bacon" type="number"></div>
+        <div class="estoque-item"><label>Cheddar</label><input id="frios_cheddar" type="number"></div>
+        <div class="estoque-item"><label>Carne Moída / Artesanais</label><input id="frios_carne" type="number"></div>
+        <div class="estoque-item"><label>Filé de Frango</label><input id="frios_frango" type="number"></div>
+        <div class="estoque-item"><label>Hambúrguer</label><input id="frios_hamburguer" type="number"></div>
+        <div class="estoque-item"><label>Mussarela</label><input id="frios_mussarela" type="number"></div>
+        <div class="estoque-item"><label>Presunto</label><input id="frios_presunto" type="number"></div>
+        <div class="estoque-item"><label>Salsicha</label><input id="frios_salsicha" type="number"></div>
+      </div>
 
-      <label>Quantidade Restante</label>
-      <input id="estoqueQtd" type="number" placeholder="Ex: 12" />
+      <!-- ACORDEÃO: REFRIGERANTES -->
+      <button class="accordion">🥤 Refrigerantes</button>
+      <div class="panel">
+        <div class="estoque-item"><label>Coca 200ml</label><input id="refri_c200" type="number"></div>
+        <div class="estoque-item"><label>Coca 310ml</label><input id="refri_c310" type="number"></div>
+        <div class="estoque-item"><label>Coca 310ml Zero</label><input id="refri_c310zero" type="number"></div>
+        <div class="estoque-item"><label>Coca 1L</label><input id="refri_c1l" type="number"></div>
+        <div class="estoque-item"><label>Coca 1L Zero</label><input id="refri_c1lzero" type="number"></div>
+        <div class="estoque-item"><label>Coca 2L</label><input id="refri_c2l" type="number"></div>
+        <div class="estoque-item"><label>Del Valle Laranja 450ml</label><input id="refri_laranja" type="number"></div>
+        <div class="estoque-item"><label>Del Valle Uva 450ml</label><input id="refri_uva" type="number"></div>
+        <div class="estoque-item"><label>Fanta 1L</label><input id="refri_fanta1l" type="number"></div>
+        <div class="estoque-item"><label>Kuat 2L</label><input id="refri_kuat2l" type="number"></div>
+      </div>
 
-      <label>Data</label>
-      <input id="estoqueData" type="date" />
+      <!-- ACORDEÃO: EMBALAGENS -->
+      <button class="accordion">📦 Embalagens</button>
+      <div class="panel">
+        <div class="estoque-item"><label>Bobina</label><input id="emb_bobina" type="number"></div>
+        <div class="estoque-item"><label>Dogueira</label><input id="emb_dogueira" type="number"></div>
+        <div class="estoque-item"><label>Hamburgueira</label><input id="emb_hamburgueira" type="number"></div>
+        <div class="estoque-item"><label>Papel Kraft</label><input id="emb_pkraft" type="number"></div>
+        <div class="estoque-item"><label>Saco Plástico</label><input id="emb_sacop" type="number"></div>
+        <div class="estoque-item"><label>Sacola 30x40</label><input id="emb_30x40" type="number"></div>
+        <div class="estoque-item"><label>Sacola 38x48</label><input id="emb_38x48" type="number"></div>
+      </div>
 
-      <button id="btnSalvarEstoque" class="admin-btn">Salvar Estoque</button>
-    </section>
+      <!-- ACORDEÃO: PÃES -->
+      <button class="accordion">🥖 Pães</button>
+      <div class="panel">
+        <div class="estoque-item"><label>Hambúrguer</label><input id="pao_hamburguer" type="number"></div>
+        <div class="estoque-item"><label>Hot Dog</label><input id="pao_hotdog" type="number"></div>
+      </div>
 
-    <!-- REGISTRO DE ENTREGA MANUAL -->
-    <section class="admin-card">
-      <h2>Registrar Entregas Manuais</h2>
+      <!-- ACORDEÃO: OUTROS -->
+      <button class="accordion">🍅 Outros</button>
+      <div class="panel">
+        <div class="estoque-item"><label>Alface</label><input id="out_alface" type="number"></div>
+        <div class="estoque-item"><label>Batata Palha</label><input id="out_batata" type="number"></div>
+        <div class="estoque-item"><label>Cebola</label><input id="out_cebola" type="number"></div>
+        <div class="estoque-item"><label>Cebolinha</label><input id="out_cebolinha" type="number"></div>
+        <div class="estoque-item"><label>Milho</label><input id="out_milho" type="number"></div>
+        <div class="estoque-item"><label>Óleo</label><input id="out_oleo" type="number"></div>
+        <div class="estoque-item"><label>Ovo</label><input id="out_ovo" type="number"></div>
+        <div class="estoque-item"><label>Tomate</label><input id="out_tomate" type="number"></div>
+      </div>
 
-      <label>Motoboy</label>
-      <select id="entregaMotoboy">
-        <option value="lucas_hiago">Lucas Hiago</option>
-      </select>
-
-      <label>Qtd. Entregas</label>
-      <input id="entregaQtd" type="number" />
-
-      <label>Data</label>
-      <input id="entregaData" type="date" />
-
-      <button id="btnSalvarEntregaManual" class="admin-btn">Salvar Registro</button>
+      <button id="btnSalvarEstoqueCompleto" class="admin-btn">Salvar Estoque do Dia</button>
     </section>
 
     <!-- GRÁFICO DE DESPESAS -->
