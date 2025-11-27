@@ -5,6 +5,9 @@ body {
   color: #fff;
 }
 
+/* ==============================
+   HEADER
+================================= */
 .admin-header {
   display: flex;
   justify-content: space-between;
@@ -37,6 +40,9 @@ body {
   cursor: pointer;
 }
 
+/* ==============================
+   CONTAINER
+================================= */
 .admin-container {
   padding: 20px;
   display: grid;
@@ -55,12 +61,18 @@ body {
   margin-top: 0;
 }
 
+/* ==============================
+   VALORES
+================================= */
 .admin-value {
   font-size: 28px;
   font-weight: bold;
   color: #ffca28;
 }
 
+/* ==============================
+   INPUTS / SELECTS / BUTTONS
+================================= */
 input,
 select {
   width: 100%;
@@ -86,19 +98,44 @@ select {
   margin-top: 5px;
 }
 
+/* ==============================
+   CORES DE SALDO
+================================= */
 .negativo {
-  color: #e53935 !important;
+  color: #e53935 !important; /* vermelho */
   font-weight: bold;
 }
 
 .positivo {
-  color: #43a047 !important;
+  color: #43a047 !important; /* verde */
   font-weight: bold;
 }
 
+.neutral {
+  color: #bbbbbb !important; /* cinza */
+  font-weight: bold;
+}
+
+/* ==============================
+   LISTA DE MOTOBOYS
+================================= */
 .motoboy-item {
-  margin-top: 8px;
-  padding: 8px 0;
+  margin-top: 10px;
+  padding: 10px 4px;
   border-bottom: 1px solid #333;
-  font-size: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.motoboy-nome {
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffca28;
+}
+
+.motoboy-saldo {
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
 }
