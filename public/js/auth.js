@@ -1,10 +1,10 @@
 // public/js/auth.js
-// Lida com login no “DFL – Painel do Motoboy”
+// Lida com login no “DFL – Painel do Motoboy / Admin”
 
 // ===============================================
 // 1. Importa app, auth, db da configuração única
 // ===============================================
-import { app, auth, db } from "./firebase-config-v2.js";
+import { app, auth, db } from "./firebase-config.js";
 
 import {
   signInWithEmailAndPassword,
@@ -17,7 +17,18 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 // ===============================================
-// 2. Helpers de UI
+// 2. Lista de administradores autorizados
+// (UIDs reais passados por você)
+// ===============================================
+const ADMINS = [
+  "6YczX4gLpUStlBVdQOXWc3uEYGG2",
+  "LYu3M8gyRdMCqhE90vmH9Jh5Ksj1",
+  "plSHKV043gTpEYfx7I3TI6FsJG93",
+  "zIfbMxD1SQNvtlX9y6YUsEz2TXC3"
+];
+
+// ===============================================
+// 3. Helpers de UI
 // ===============================================
 
 const form = document.getElementById("login-form");
@@ -61,16 +72,20 @@ function clearError() {
 }
 
 // ===============================================
-// 3. Se já estiver logado, manda direto pro painel
+// 4. Se já estiver logado → direção correta
 // ===============================================
-onAuthStateChanged(auth, (user) => {
-  if (user && window.location.pathname.endsWith("index.html")) {
+onAuthStateChanged(auth, async (user) => {
+  if (!user) return;
+
+  if (ADMINS.includes(user.uid)) {
+    window.location.href = "dashboard-admin.html";
+  } else {
     window.location.href = "dashboard.html";
   }
 });
 
 // ===============================================
-// 4. Lógica de login
+// 5. Lógica de login
 // ===============================================
 if (form) {
   form.addEventListener("submit", async (event) => {
@@ -92,7 +107,7 @@ if (form) {
       const credentials = await signInWithEmailAndPassword(auth, email, password);
       const user = credentials.user;
 
-      // Verifica se o usuário está liberado no painel
+      // Verifica autorização no painel (usuariosPainel)
       try {
         const userDocRef = doc(db, "usuariosPainel", user.uid);
         const snap = await getDoc(userDocRef);
@@ -102,7 +117,6 @@ if (form) {
         }
 
         const data = snap.data();
-
         if (!data.ativo) {
           throw new Error("Seu usuário está inativo no painel.");
         }
@@ -114,8 +128,14 @@ if (form) {
         return;
       }
 
-      // Login OK → redireciona
-      window.location.href = "dashboard.html";
+      // ===========================================
+      // REDIRECIONAMENTO CORRETO
+      // ===========================================
+      if (ADMINS.includes(user.uid)) {
+        window.location.href = "dashboard-admin.html";
+      } else {
+        window.location.href = "dashboard.html";
+      }
 
     } catch (error) {
       console.error("Erro ao fazer login:", error);
