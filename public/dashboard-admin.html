@@ -4,7 +4,10 @@
   <meta charset="UTF-8" />
   <title>DFL — Painel Administrativo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <link rel="stylesheet" href="./css/dashboard-admin.css" />
+
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
@@ -36,7 +39,7 @@
       <p id="saldoGeral" class="admin-value">R$ 0,00</p>
     </section>
 
-    <!-- REGISTRAR DESPESAS -->
+    <!-- REGISTRO DE DESPESA -->
     <section class="admin-card">
       <h2>Registrar Despesa</h2>
 
@@ -52,7 +55,7 @@
       <button id="btnSalvarDespesa" class="admin-btn">Salvar Despesa</button>
     </section>
 
-    <!-- REGISTRAR ESTOQUE -->
+    <!-- REGISTRO DE ESTOQUE -->
     <section class="admin-card">
       <h2>Registrar Estoque do Dia</h2>
 
@@ -69,19 +72,21 @@
       <select id="estoqueItem"></select>
 
       <label>Quantidade</label>
-      <input id="estoqueQtd" placeholder="Ex: 12 unidades, 3kg..." />
+      <input id="estoqueQtd" placeholder="Ex: 12 unidades / 3 kg" />
 
       <label>Data</label>
       <input id="estoqueData" type="date" />
 
       <button id="btnSalvarEstoque" class="admin-btn">Salvar Estoque</button>
 
-      <button id="btnGerarPdfEstoque" class="admin-btn admin-btn-secondary">
-        📄 Gerar PDF – Estoque do Dia
+      <button id="btnGerarPdfEstoque"
+              class="admin-btn"
+              style="background:#1976d2; margin-top:12px; display:none;">
+        Gerar PDF do Estoque
       </button>
     </section>
 
-    <!-- REGISTRAR ENTREGAS MANUAIS -->
+    <!-- REGISTRO DE ENTREGA MANUAL -->
     <section class="admin-card">
       <h2>Registrar Entregas Manuais</h2>
 
