@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>DFL — Painel Administrativo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="stylesheet" href="./css/dashboard-admin.css" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+  <header class="admin-header">
+    <div class="admin-header-left">
+      <img src="./img/logo-dfl.png" class="admin-logo" />
+      <h1>Painel Administrativo – DFL</h1>
+    </div>
+
+    <button id="logoutAdmin" class="admin-logout">Sair</button>
+  </header>
+
+  <main class="admin-container">
+
+    <!-- SALDO GERAL -->
+    <section class="admin-card">
+      <h2>Saldo Geral</h2>
+      <p id="saldoGeral" class="admin-value">R$ 0,00</p>
+    </section>
+
+    <!-- REGISTRO DE DESPESA -->
+    <section class="admin-card">
+      <h2>Registrar Despesa</h2>
+
+      <label>Descrição</label>
+      <input id="descDespesa" placeholder="Ex: Compra no supermercado" />
+
+      <label>Valor (R$)</label>
+      <input id="valorDespesa" type="number" placeholder="Ex: 45.90" />
+
+      <label>Data</label>
+      <input id="dataDespesa" type="date" />
+
+      <button id="btnSalvarDespesa" class="admin-btn">Salvar Despesa</button>
+    </section>
+
+    <!-- REGISTRO DE ESTOQUE -->
+    <section class="admin-card">
+      <h2>Registrar Estoque do Dia</h2>
+
+      <label>Categoria</label>
+      <select id="estoqueCategoria">
+        <option value="frios">Frios</option>
+        <option value="refrigerantes">Refrigerantes</option>
+        <option value="embalagens">Embalagens</option>
+        <option value="pães">Pães</option>
+      </select>
+
+      <label>Quantidade Restante</label>
+      <input id="estoqueQtd" type="number" placeholder="Ex: 12" />
+
+      <label>Data</label>
+      <input id="estoqueData" type="date" />
+
+      <button id="btnSalvarEstoque" class="admin-btn">Salvar Estoque</button>
+    </section>
+
+    <!-- REGISTRO DE ENTREGA MANUAL -->
+    <section class="admin-card">
+      <h2>Registrar Entregas Manuais</h2>
+
+      <label>Motoboy</label>
+      <select id="entregaMotoboy">
+        <option value="lucas_hiago">Lucas Hiago</option>
+      </select>
+
+      <label>Qtd. Entregas</label>
+      <input id="entregaQtd" type="number" />
+
+      <label>Data</label>
+      <input id="entregaData" type="date" />
+
+      <button id="btnSalvarEntregaManual" class="admin-btn">Salvar Registro</button>
+    </section>
+
+    <!-- GRÁFICO DE DESPESAS -->
+    <section class="admin-card">
+      <h2>Histórico de Despesas</h2>
+      <canvas id="graficoDespesas"></canvas>
+    </section>
+
+  </main>
+
+  <script type="module" src="./js/dashboard-admin.js"></script>
+</body>
+</html>
