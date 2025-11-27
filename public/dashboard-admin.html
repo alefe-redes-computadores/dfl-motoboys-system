@@ -9,6 +9,9 @@
 
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- jsPDF para gerar PDF do estoque -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 
 <body>
@@ -36,42 +39,7 @@
     <!-- SALDO GERAL -->
     <section class="admin-card">
       <h2>Saldo Geral</h2>
-      <p id="saldoGeral" class="admin-value">R$ 0,00</p>
-    </section>
-
-    <!-- REGISTRO DE ESTOQUE -->
-    <section class="admin-card">
-      <h2>Registrar Estoque do Dia</h2>
-
-      <label>Categoria</label>
-      <select id="estoqueCategoria">
-        <option value="" disabled selected>Selecione...</option>
-        <option value="frios">Frios</option>
-        <option value="refrigerantes">Refrigerantes</option>
-        <option value="embalagens">Embalagens</option>
-        <option value="pães">Pães</option>
-        <option value="outros">Outros</option>
-      </select>
-
-      <label>Item</label>
-      <select id="estoqueItem">
-        <option value="" disabled selected>Selecione uma categoria primeiro</option>
-      </select>
-
-      <label>Quantidade</label>
-      <input id="estoqueQtd" placeholder="Ex: 12 unidades, 3kg" />
-
-      <label>Data</label>
-      <input id="estoqueData" type="date" />
-
-      <button id="btnSalvarEstoque" class="admin-btn">Salvar Estoque</button>
-
-      <hr style="margin:15px 0; opacity:0.2;">
-
-      <h3>Estoque Registrado</h3>
-      <input type="date" id="filtroEstoqueData" />
-
-      <div id="listaEstoque" class="lista-estoque"></div>
+      <p id="saldoGeral" class="admin-value neutral">R$ 0,00</p>
     </section>
 
     <!-- REGISTRO DE DESPESA -->
@@ -82,12 +50,42 @@
       <input id="descDespesa" placeholder="Ex: Compra no supermercado" />
 
       <label>Valor (R$)</label>
-      <input id="valorDespesa" type="number" placeholder="Ex: 45.90" />
+      <input id="valorDespesa" type="number" step="0.01" placeholder="Ex: 45.90" />
 
       <label>Data</label>
       <input id="dataDespesa" type="date" />
 
       <button id="btnSalvarDespesa" class="admin-btn">Salvar Despesa</button>
+    </section>
+
+    <!-- REGISTRO DE ESTOQUE -->
+    <section class="admin-card">
+      <h2>Registrar Estoque do Dia</h2>
+
+      <label>Categoria</label>
+      <select id="estoqueCategoria">
+        <option value="frios">Frios</option>
+        <option value="refrigerantes">Refrigerantes</option>
+        <option value="embalagens">Embalagens</option>
+        <option value="paes">Pães</option>
+        <option value="outros">Outros</option>
+      </select>
+
+      <label>Item</label>
+      <select id="estoqueItem">
+        <!-- preenchido via JS -->
+      </select>
+
+      <label>Quantidade</label>
+      <input id="estoqueQtd" placeholder="Ex: 12 unidades, 3kg..." />
+
+      <label>Data</label>
+      <input id="estoqueData" type="date" />
+
+      <button id="btnSalvarEstoque" class="admin-btn">Salvar Estoque</button>
+      <button id="btnGerarPdfEstoque" class="admin-btn admin-btn-secondary">
+        📄 Gerar PDF – Estoque do Dia
+      </button>
     </section>
 
     <!-- REGISTRO DE ENTREGA MANUAL -->
