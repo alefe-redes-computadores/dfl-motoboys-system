@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Painel Administrativo – DFL</title>
 
-  <link rel="stylesheet" href="dashboard-admin.css" />
+  <!-- CSS CORRETO -->
+  <link rel="stylesheet" href="./css/dashboard-admin.css" />
 
   <style>
     body {
@@ -32,6 +33,7 @@
       height: 45px;
       border-radius: 12px;
       border: 2px solid #ffca28;
+      object-fit: cover;
     }
     .admin-logout {
       background: #ffca28;
@@ -111,7 +113,7 @@
   <!-- TOPO -->
   <header class="admin-header">
     <div class="admin-header-left">
-      <img src="logo.png" class="admin-logo" />
+      <img src="./img/logo-dfl.png" class="admin-logo" />
       <h1>Painel Administrativo – DFL</h1>
     </div>
     <button id="logoutAdmin" class="admin-logout">Sair</button>
@@ -191,6 +193,7 @@
 
   </div>
 
-  <script type="module" src="dashboard-admin.js"></script>
+  <!-- JS CORRETO -->
+  <script type="module" src="./js/dashboard-admin.js"></script>
 </body>
 </html>
