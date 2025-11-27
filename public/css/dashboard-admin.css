@@ -1,17 +1,9 @@
-/* ===========================
-   BASE
-=========================== */
-
 body {
   margin: 0;
   background: #0d0d0d;
   font-family: system-ui, sans-serif;
   color: #fff;
 }
-
-/* ===========================
-   CABEÇALHO
-=========================== */
 
 .admin-header {
   display: flex;
@@ -45,20 +37,12 @@ body {
   cursor: pointer;
 }
 
-/* ===========================
-   GRID PRINCIPAL
-=========================== */
-
 .admin-container {
   padding: 20px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
   gap: 20px;
 }
-
-/* ===========================
-   CARTÕES
-=========================== */
 
 .admin-card {
   background: #1a1a1a;
@@ -71,47 +55,11 @@ body {
   margin-top: 0;
 }
 
-/* ===========================
-   VALORES / SALDOS
-=========================== */
-
 .admin-value {
   font-size: 28px;
   font-weight: bold;
   color: #ffca28;
 }
-
-.motoboy-item {
-  margin-top: 8px;
-  padding: 8px 0;
-  border-bottom: 1px solid #333;
-  font-size: 15px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.motoboy-saldo {
-  font-weight: bold;
-}
-
-.negativo {
-  color: #e53935 !important;
-  font-weight: bold;
-}
-
-.positivo {
-  color: #43a047 !important;
-  font-weight: bold;
-}
-
-.neutral {
-  color: #ffca28 !important;
-}
-
-/* ===========================
-   INPUTS E BOTÕES
-=========================== */
 
 input,
 select {
@@ -138,57 +86,24 @@ select {
   margin-top: 5px;
 }
 
-/* ===========================
-   ACORDEÕES
-=========================== */
-
-.accordion {
-  background-color: #111;
-  color: #ffca28;
-  cursor: pointer;
-  padding: 14px;
-  width: 100%;
-  border: 1px solid #333;
-  text-align: left;
-  outline: none;
-  font-size: 17px;
-  transition: 0.3s;
-  border-radius: 6px;
-  margin-top: 10px;
+.pdf-btn {
+  background: #008cff;
+  margin-top: 12px;
 }
 
-.accordion:hover {
-  background-color: #1c1c1c;
+.negativo {
+  color: #e53935 !important;
+  font-weight: bold;
 }
 
-.accordion.active {
-  background-color: #222;
+.positivo {
+  color: #43a047 !important;
+  font-weight: bold;
 }
 
-.panel {
-  background-color: #141414;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.25s ease-out;
-  border: 1px solid #333;
-  border-top: none;
-  border-radius: 0 0 10px 10px;
-  padding: 0 12px;
-}
-
-.estoque-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid #222;
-}
-
-.estoque-item label {
+.motoboy-item {
+  margin-top: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid #333;
   font-size: 15px;
-}
-
-.estoque-item input {
-  width: 80px;
-  text-align: right;
 }
