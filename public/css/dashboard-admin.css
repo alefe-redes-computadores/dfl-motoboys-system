@@ -85,3 +85,20 @@ select {
   cursor: pointer;
   margin-top: 5px;
 }
+
+.negativo {
+  color: #e53935 !important;
+  font-weight: bold;
+}
+
+.positivo {
+  color: #43a047 !important;
+  font-weight: bold;
+}
+
+.motoboy-item {
+  margin-top: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid #333;
+  font-size: 15px;
+}
