@@ -79,14 +79,13 @@
 
       <button id="btnSalvarEstoque" class="admin-btn">Salvar Estoque</button>
 
-      <button id="btnGerarPdfEstoque"
-              class="admin-btn"
-              style="background:#1976d2; margin-top:12px; display:none;">
-        Gerar PDF do Estoque
+      <!-- 🔵 BOTÃO DE GERAR PDF (RESTAURADO) -->
+      <button id="btnGerarPdfEstoque" class="admin-btn-pdf">
+        📄 Gerar PDF – Estoque do Dia
       </button>
     </section>
 
-    <!-- REGISTRO DE ENTREGA MANUAL -->
+    <!-- REGISTRAR ENTREGA MANUAL -->
     <section class="admin-card">
       <h2>Registrar Entregas Manuais</h2>
 
@@ -96,18 +95,12 @@
       </select>
 
       <label>Qtd. Entregas</label>
-      <input id="entregaQtd" type="number" />
+      <input id="entregaQtd" />
 
       <label>Data</label>
       <input id="entregaData" type="date" />
 
       <button id="btnSalvarEntregaManual" class="admin-btn">Salvar Registro</button>
-    </section>
-
-    <!-- GRÁFICO DE DESPESAS -->
-    <section class="admin-card">
-      <h2>Histórico de Despesas</h2>
-      <canvas id="graficoDespesas"></canvas>
     </section>
 
   </main>
