@@ -69,9 +69,12 @@ async function carregarSaldoMotoboy() {
     saldo = Number(snap.data().saldo || 0);
   }
 
-  saldoLucasEl.textContent = "R$ " + saldo.toFixed(2).replace(".", ",");
-  saldoLucasEl.className = "motoboy-saldo " + (saldo > 0 ? "negativo" : "positivo");
+  // 🔥 Restaurado: Nome + valor
+  const valorFormatado = saldo.toFixed(2).replace(".", ",");
+  saldoLucasEl.textContent = `Lucas Hiago — R$ ${valorFormatado}`;
+  saldoLucasEl.className = saldo > 0 ? "motoboy-item negativo" : "motoboy-item positivo";
 
+  // =============== SALDO GERAL ===============
   const snapAll = await getDocs(collection(db, "motoboys"));
   let total = 0;
   snapAll.forEach(d => total += Number(d.data().saldo || 0));
@@ -155,7 +158,7 @@ document.getElementById("btnSalvarEstoque").addEventListener("click", async () =
 });
 
 // =======================
-// MOSTRAR BOTÃO PDF SE EXISTIR ESTOQUE NO DIA
+// MOSTRAR BOTÃO PDF SE EXISTIR ESTOQUE DO DIA
 // =======================
 async function verificarEstoqueHoje() {
   const hoje = new Date().toISOString().slice(0, 10);
@@ -172,7 +175,7 @@ async function verificarEstoqueHoje() {
 }
 
 // =======================
-// ABRIR PÁGINA DO PDF
+// ABRIR GERADOR DE PDF
 // =======================
 document.getElementById("btnGerarPdfEstoque").addEventListener("click", () => {
   window.location.href = "pdf-estoque.html";
