@@ -102,3 +102,39 @@ select {
 .lista-estoque {
   margin-top: 10px;
 }
+
+.motoboy-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid #333;
+  font-size: 15px;
+}
+
+.motoboy-nome {
+  font-weight: 600;
+}
+
+.motoboy-saldo {
+  font-weight: 700;
+}
+
+.negativo {
+  color: #e53935 !important; /* vermelho – dívida com motoboy */
+}
+
+.positivo {
+  color: #43a047 !important; /* verde – empresa no positivo */
+}
+
+.neutral {
+  color: #ffffff !important;
+}
+
+.admin-btn-secondary {
+  margin-top: 8px;
+  background: #1976d2;
+  color: #fff;
+}
