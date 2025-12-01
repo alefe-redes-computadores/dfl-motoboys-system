@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>DFL — PDF Estoque</title>
 
+  <!-- jsPDF + AutoTable -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
@@ -14,8 +15,11 @@
       color: #fff;
       padding: 20px;
     }
-
-    h1 { color: #ffca28; }
+    h1 {
+      color: #ffca28;
+      font-size: 20px;
+      margin: 0;
+    }
   </style>
 </head>
 
@@ -23,7 +27,11 @@
   <h1>Gerando PDF do Estoque...</h1>
 
   <script type="module">
+    /* ================================
+       IMPORTAÇÃO CERTA — FIREBASE 10
+    =================================*/
     import { db } from "./js/firebase-config-v2.js";
+
     import {
       collection,
       getDocs,
@@ -31,42 +39,59 @@
       where
     } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
+    /* ================================
+       GERAR PDF
+    =================================*/
     async function gerarPDF() {
-      const hoje = new Date().toISOString().slice(0,10);
+      try {
+        const hoje = new Date().toISOString().slice(0,10);
 
-      const q = query(
-        collection(db, "estoqueDia"),
-        where("data", "==", hoje)
-      );
+        const q = query(
+          collection(db, "estoqueDia"),
+          where("data", "==", hoje)
+        );
 
-      const snap = await getDocs(q);
+        const snap = await getDocs(q);
 
-      const itens = [];
-      snap.forEach(d => {
-        const x = d.data();
-        itens.push([x.categoria, x.item, x.quantidade, x.data]);
-      });
+        const itens = [];
+        snap.forEach(docu => {
+          const x = docu.data();
+          itens.push([
+            x.categoria,
+            x.item,
+            x.quantidade,
+            x.data
+          ]);
+        });
 
-      if (itens.length === 0) {
-        alert("Nenhum registro encontrado para hoje.");
+        if (itens.length === 0) {
+          alert("Nenhum registro encontrado para hoje.");
+          window.location.href = "dashboard-admin.html";
+          return;
+        }
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        doc.setFontSize(18);
+        doc.text("Relatório de Estoque — " + hoje, 10, 15);
+
+        doc.autoTable({
+          startY: 25,
+          head: [["Categoria", "Item", "Quantidade", "Data"]],
+          body: itens
+        });
+
+        doc.save("estoque_" + hoje + ".pdf");
+
         window.location.href = "dashboard-admin.html";
-        return;
       }
 
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-
-      doc.setFontSize(18);
-      doc.text("Relatório de Estoque - " + hoje, 10, 15);
-
-      doc.autoTable({
-        startY: 25,
-        head: [["Categoria", "Item", "Quantidade", "Data"]],
-        body: itens
-      });
-
-      doc.save("estoque_" + hoje + ".pdf");
-      window.location.href = "dashboard-admin.html";
+      catch (e) {
+        console.error("Erro ao gerar PDF:", e);
+        alert("Erro inesperado ao gerar PDF. Veja o console.");
+        window.location.href = "dashboard-admin.html";
+      }
     }
 
     gerarPDF();
