@@ -69,12 +69,12 @@ async function carregarSaldoMotoboy() {
     saldo = Number(snap.data().saldo || 0);
   }
 
-  // 🔥 Restaurado: Nome + valor
+  // Nome + valor
   const valorFormatado = saldo.toFixed(2).replace(".", ",");
   saldoLucasEl.textContent = `Lucas Hiago — R$ ${valorFormatado}`;
   saldoLucasEl.className = saldo > 0 ? "motoboy-item negativo" : "motoboy-item positivo";
 
-  // =============== SALDO GERAL ===============
+  // SALDO GERAL
   const snapAll = await getDocs(collection(db, "motoboys"));
   let total = 0;
   snapAll.forEach(d => total += Number(d.data().saldo || 0));
