@@ -4,12 +4,27 @@
   <meta charset="UTF-8">
   <title>DFL — PDF Estoque</title>
 
-  <!-- jsPDF + AutoTable (ESM) -->
+  <style>
+    body {
+      background: #000;
+      color: #ffca28;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Gerando PDF do Estoque...</h1>
+
+  <!-- jsPDF + AutoTable + Firebase -->
   <script type="module">
     import jsPDF from "https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.es.min.js";
     import autoTable from "https://cdn.jsdelivr.net/npm/jspdf-autotable@3.5.28/dist/jspdf.plugin.autotable.es.js";
 
-    import { db } from "./js/firebase-config-v2.js";
+    // 🔥 Caminho ABSOLUTO para evitar erro no Vercel
+    import { db } from "/js/firebase-config-v2.js";
+
     import {
       collection,
       getDocs,
@@ -27,8 +42,8 @@
         );
 
         const snap = await getDocs(q);
-        const itens = [];
 
+        const itens = [];
         snap.forEach(docu => {
           const x = docu.data();
           itens.push([x.categoria, x.item, x.quantidade, x.data]);
@@ -53,8 +68,8 @@
         doc.save(`estoque_${hoje}.pdf`);
         window.location.href = "dashboard-admin.html";
 
-      } catch (err) {
-        console.error(err);
+      } catch (e) {
+        console.error("ERRO PDF:", e);
         alert("Erro ao gerar PDF.");
       }
     }
@@ -62,17 +77,5 @@
     gerarPDF();
   </script>
 
-  <style>
-    body {
-      background: #000;
-      color: #ffca28;
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-  </style>
-</head>
-
-<body>
-  <h1>Gerando PDF do Estoque...</h1>
 </body>
 </html>
