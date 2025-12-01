@@ -4,34 +4,12 @@
   <meta charset="UTF-8">
   <title>DFL — PDF Estoque</title>
 
-  <!-- jsPDF + AutoTable -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: #fff;
-      padding: 20px;
-    }
-    h1 {
-      color: #ffca28;
-      font-size: 20px;
-      margin: 0;
-    }
-  </style>
-</head>
-
-<body>
-  <h1>Gerando PDF do Estoque...</h1>
-
+  <!-- jsPDF + AutoTable (ESM) -->
   <script type="module">
-    /* ================================
-       IMPORTAÇÃO CERTA — FIREBASE 10
-    =================================*/
-    import { db } from "./js/firebase-config-v2.js";
+    import jsPDF from "https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.es.min.js";
+    import autoTable from "https://cdn.jsdelivr.net/npm/jspdf-autotable@3.5.28/dist/jspdf.plugin.autotable.es.js";
 
+    import { db } from "./js/firebase-config-v2.js";
     import {
       collection,
       getDocs,
@@ -39,9 +17,6 @@
       where
     } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-    /* ================================
-       GERAR PDF
-    =================================*/
     async function gerarPDF() {
       try {
         const hoje = new Date().toISOString().slice(0,10);
@@ -52,16 +27,11 @@
         );
 
         const snap = await getDocs(q);
-
         const itens = [];
+
         snap.forEach(docu => {
           const x = docu.data();
-          itens.push([
-            x.categoria,
-            x.item,
-            x.quantidade,
-            x.data
-          ]);
+          itens.push([x.categoria, x.item, x.quantidade, x.data]);
         });
 
         if (itens.length === 0) {
@@ -70,31 +40,39 @@
           return;
         }
 
-        const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-
         doc.setFontSize(18);
-        doc.text("Relatório de Estoque — " + hoje, 10, 15);
+        doc.text(`Relatório de Estoque - ${hoje}`, 10, 15);
 
-        doc.autoTable({
+        autoTable(doc, {
           startY: 25,
           head: [["Categoria", "Item", "Quantidade", "Data"]],
           body: itens
         });
 
-        doc.save("estoque_" + hoje + ".pdf");
-
+        doc.save(`estoque_${hoje}.pdf`);
         window.location.href = "dashboard-admin.html";
-      }
 
-      catch (e) {
-        console.error("Erro ao gerar PDF:", e);
-        alert("Erro inesperado ao gerar PDF. Veja o console.");
-        window.location.href = "dashboard-admin.html";
+      } catch (err) {
+        console.error(err);
+        alert("Erro ao gerar PDF.");
       }
     }
 
     gerarPDF();
   </script>
+
+  <style>
+    body {
+      background: #000;
+      color: #ffca28;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Gerando PDF do Estoque...</h1>
 </body>
 </html>
