@@ -1,69 +1,122 @@
-// =============================================
-// 📄 RELATÓRIO DE ENTREGAS – DFL (COMPLETO)
-// Compatível com entregas antigas e novas
-// =============================================
+// ===================================================================
+// 📊 RELATÓRIO PROFISSIONAL — ENTREGAS & PAGAMENTOS MOTOBOYS
+// ===================================================================
 
 import { db } from "./firebase-config-v2.js";
 
 import {
   collection,
   getDocs,
-  orderBy,
-  query
+  query,
+  orderBy
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-// Elemento onde o relatório será exibido
-const container = document.getElementById("relatorioEntregasContainer");
 
-async function carregarRelatorioEntregas() {
-  container.innerHTML = "<p>Carregando entregas...</p>";
+// ===============================
+// ELEMENTOS DA PÁGINA
+// ===============================
+const resumoTotalEntregas = document.getElementById("resumoTotalEntregas");
+const resumoTotalPago = document.getElementById("resumoTotalPago");
+const rankingMotoboys = document.getElementById("rankingMotoboys");
 
-  const q = query(collection(db, "entregasManuais"), orderBy("timestamp", "desc"));
+const tabelaBody = document.getElementById("tabelaEntregas");
+
+
+// ===============================
+// FORMATADOR DE MOEDA
+// ===============================
+function money(n) {
+  return "R$ " + Number(n || 0).toFixed(2).replace(".", ",");
+}
+
+
+// ===============================
+// CARREGAR RELATÓRIO
+// ===============================
+async function carregarRelatorio() {
+
+  // Carrega todas as entregas
+  const q = query(
+    collection(db, "entregasManuais"),
+    orderBy("timestamp", "desc")
+  );
+
   const snap = await getDocs(q);
 
-  if (snap.empty) {
-    container.innerHTML = "<p>Nenhuma entrega registrada.</p>";
+  if (snap.size === 0) {
+    tabelaBody.innerHTML = `
+      <tr>
+        <td colspan="5" style="text-align:center;">Nenhuma entrega registrada.</td>
+      </tr>
+    `;
     return;
   }
 
-  let html = `
-    <table class="tabela-relatorio">
-      <thead>
-        <tr>
-          <th>Data</th>
-          <th>Motoboy</th>
-          <th>Entregas</th>
-          <th>Valor Pago</th>
-        </tr>
-      </thead>
-      <tbody>
-  `;
+  // Estrutura para resumo
+  let totalEntregas = 0;
+  let totalPago = 0;
+
+  let motoboysResumo = {};  
+  // Exemplo:
+  // {
+  //   lucas_hiago: { nome: "Lucas Hiago", entregas: 12, recebido: 84 }
+  // }
+
+  tabelaBody.innerHTML = "";
 
   snap.forEach(doc => {
     const d = doc.data();
 
+    const motox = d.motoboyNome || d.motoboy;
+    const qtd = Number(d.qtd || 0);
+    const valor = Number(d.valorPago || 0);
     const data = d.data || "-";
-    const motoboy = d.motoboy || "-";
-    const qtd = d.qtd || 0;
 
-    // Compatibilidade com o novo campo
-    const valorPago = d.valorPago
-      ? `R$ ${Number(d.valorPago).toFixed(2).replace(".", ",")}`
-      : "—";
+    totalEntregas += qtd;
+    totalPago += valor;
 
-    html += `
+    if (!motoboysResumo[motox]) {
+      motoboysResumo[motox] = { entregas: 0, recebido: 0 };
+    }
+
+    motoboysResumo[motox].entregas += qtd;
+    motoboysResumo[motox].recebido += valor;
+
+    // Preenche tabela
+    tabelaBody.innerHTML += `
       <tr>
-        <td>${data}</td>
-        <td>${motoboy}</td>
+        <td>${motox}</td>
         <td>${qtd}</td>
-        <td>${valorPago}</td>
+        <td>${money(valor)}</td>
+        <td>${data}</td>
       </tr>
     `;
   });
 
-  html += "</tbody></table>";
+  // ===============================
+  // PREENCHER RESUMO SUPERIOR
+  // ===============================
+  resumoTotalEntregas.textContent = totalEntregas;
+  resumoTotalPago.textContent = money(totalPago);
 
-  container.innerHTML = html;
+  // Ranking
+  const rankingArray = Object.entries(motoboysResumo).sort(
+    (a, b) => b[1].entregas - a[1].entregas
+  );
+
+  rankingMotoboys.innerHTML = rankingArray
+    .map(([nome, info], pos) => {
+      return `
+        <div class="ranking-item">
+          <strong>${pos + 1}º — ${nome}</strong>
+          <span>${info.entregas} entregas • ${money(info.recebido)}</span>
+        </div>
+      `;
+    })
+    .join("");
+
 }
 
-carregarRelatorioEntregas();
+
+// Carrega relatório ao abrir página
+carregarRelatorio();
