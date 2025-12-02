@@ -1,74 +1,73 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Relatórios – DFL</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relatório de Entregas – DFL</title>
 
-  <link rel="stylesheet" href="./css/dashboard-admin.css" />
+  <!-- CSS PRINCIPAL DO PAINEL -->
+  <link rel="stylesheet" href="./css/dashboard-admin.css">
 
   <style>
-    .relatorios-container {
-      padding: 25px;
+    .tabela-relatorio {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 25px;
+      background: #1e1e1e;
+      border-radius: 12px;
+      overflow: hidden;
     }
-    .relatorios-title {
-      font-size: 28px;
+
+    .tabela-relatorio thead {
+      background: #ffca28;
+    }
+
+    .tabela-relatorio th {
+      padding: 12px;
+      font-size: 16px;
+      color: #000;
       font-weight: bold;
-      color: #ffca28;
-      margin-bottom: 20px;
+      text-align: left;
     }
-    .relatorio-link {
-      display: block;
-      background: #1e88e5;
+
+    .tabela-relatorio td {
+      padding: 12px;
+      border-bottom: 1px solid #444;
       color: #fff;
-      padding: 15px;
-      border-radius: 10px;
-      text-decoration: none;
-      font-weight: 600;
-      margin-bottom: 15px;
-      transition: .2s ease;
+      font-size: 15px;
     }
-    .relatorio-link:hover {
-      background: #1565c0;
+
+    .tabela-relatorio tr:last-child td {
+      border-bottom: none;
+    }
+
+    .admin-container {
+      margin-top: 30px;
     }
   </style>
 </head>
 
 <body>
 
+  <!-- TOPO -->
   <header class="admin-header">
     <div class="admin-header-left">
       <img src="./img/logo-dfl.png" class="admin-logo" />
-      <h1>Relatórios – DFL</h1>
+      <h1>Relatório de Entregas</h1>
     </div>
 
-    <button class="admin-logout" onclick="window.location.href='dashboard-admin.html'">
+    <button class="admin-logout" onclick="window.location.href='relatorios.html'">
       ⬅ Voltar
     </button>
   </header>
 
-  <div class="relatorios-container">
-
-    <div class="relatorios-title">Selecione o Relatório</div>
-
-    <a class="relatorio-link" href="pdf-estoque.html">
-      📦 PDF – Estoque do Dia
-    </a>
-
-    <a class="relatorio-link" href="javascript:void(0)" id="btnRelatorioDespesas">
-      💰 PDF – Despesas
-    </a>
-
-    <a class="relatorio-link" href="javascript:void(0)" id="btnRelatorioEntregas">
-      🛵 PDF – Entregas Manuais
-    </a>
-
-    <a class="relatorio-link" href="pdf-pagamentos-motoboys.html">
-      🛵💸 PDF – Pagamentos de Motoboys
-    </a>
-
+  <div class="admin-container">
+    <!-- Aqui o relatório será carregado -->
+    <div id="relatorioEntregasContainer">Carregando...</div>
   </div>
 
-  <script type="module" src="./js/relatorios.js"></script>
+  <!-- JS DO RELATÓRIO -->
+  <script type="module" src="./js/relatorios-entregas.js"></script>
+
 </body>
 </html>
