@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PDF – Financeiro Geral</title>
+
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <!-- AutoTable -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+  <link rel="stylesheet" href="./css/dashboard-admin.css" />
+
+  <style>
+    body {
+      background: #0d0d0d;
+      color: #fff;
+      padding: 25px;
+      font-family: system-ui, sans-serif;
+    }
+
+    h1 {
+      color: #ffca28;
+      margin-bottom: 20px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 14px 20px;
+      border-radius: 8px;
+      border: none;
+      background: #1e88e5;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: 600;
+      display: block;
+    }
+
+    button:hover {
+      background: #1565c0;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Relatório Financeiro Geral</h1>
+
+  <p>Gerar um PDF contendo:</p>
+
+  <ul>
+    <li>Total em despesas</li>
+    <li>Total pago aos motoboys</li>
+    <li>Saldo final (entradas – saídas)</li>
+  </ul>
+
+  <button id="btnGerarPDF">Gerar PDF Financeiro</button>
+
+  <script type="module">
+    import { db } from "./js/firebase-config-v2.js";
+    import {
+      collection,
+      getDocs
+    } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+    window.jsPDF = window.jspdf.jsPDF;
+
+    document.getElementById("btnGerarPDF").addEventListener("click", async () => {
+      try {
+        // ===========================
+        // 1️⃣ BUSCA DESPESAS
+        // ===========================
+        const despesasSnap = await getDocs(collection(db, "despesas"));
+        let totalDespesas = 0;
+        despesasSnap.forEach(d => {
+          totalDespesas += Number(d.data().valor || 0);
+        });
+
+        // ===========================
+        // 2️⃣ BUSCA PAGAMENTOS PARA MOTOBOYS
+        // ===========================
+        const pagamentosSnap = await getDocs(collection(db, "pagamentosMotoboy"));
+        let totalPagamentos = 0;
+
+        pagamentosSnap.forEach(d => {
+          totalPagamentos += Number(d.data().valorPago || 0);
+        });
+
+        // ===========================
+        // 3️⃣ CÁLCULO FINAL
+        // ===========================
+        const saldoFinal = totalDespesas + totalPagamentos; 
+        // (futuramente você pode colocar entradas para subtrair)
+
+        // ===========================
+        // 4️⃣ GERA PDF
+        // ===========================
+        const doc = new jsPDF();
+        doc.setFontSize(18);
+        doc.text("Relatório Financeiro Geral – DFL", 10, 15);
+
+        const linhas = [
+          ["Total em Despesas", `R$ ${totalDespesas.toFixed(2).replace(".", ",")}`],
+          ["Total Pago a Motoboys", `R$ ${totalPagamentos.toFixed(2).replace(".", ",")}`],
+          ["Saldo Final", `R$ ${saldoFinal.toFixed(2).replace(".", ",")}`],
+        ];
+
+        doc.autoTable({
+          startY: 30,
+          head: [["Categoria", "Valor"]],
+          body: linhas
+        });
+
+        doc.save("financeiro-geral.pdf");
+
+      } catch (e) {
+        console.error(e);
+        alert("Erro ao gerar relatório financeiro.");
+      }
+    });
+  </script>
+</body>
+</html>
