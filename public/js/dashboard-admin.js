@@ -1,5 +1,5 @@
 // =========================================================
-//  DFL — DASHBOARD ADMIN (VERSÃO FINAL COMPLETA)
+//  DFL — DASHBOARD ADMIN (VERSÃO FINAL COMPLETA CORRIGIDA)
 // =========================================================
 
 import { auth, db } from "./firebase-config-v2.js";
@@ -70,12 +70,12 @@ document.getElementById("btnRelatorios")?.addEventListener("click", () => {
 const MOTOS_FIXOS = {
   lucas_hiago: {
     nome: "Lucas Hiago",
-    valorEntrega: 6 // fixo
+    valorEntrega: 6
   },
   rodrigo_goncalves: {
     nome: "Rodrigo Gonçalves",
-    valorEntrega: 7, // após 10 entregas
-    valorBase: 100 // até 10 entregas
+    valorEntrega: 7,
+    valorBase: 100
   }
 };
 
@@ -92,9 +92,17 @@ async function carregarListaMotoboys() {
 
   snap.forEach((docu) => {
     const x = docu.data();
-
     const saldo = Number(x.saldo || 0);
-    const classe = saldo > 0 ? "negativo" : "positivo";
+
+    let classe = "neutral";
+
+    if (docu.id === "lucas_hiago") {
+      if (saldo > 0) classe = "negativo";      // Lucas: saldo positivo = você está devendo
+      else if (saldo < 0) classe = "positivo"; // Lucas: saldo negativo = crédito para você
+    } else {
+      if (saldo > 0) classe = "positivo";       // Outros: saldo positivo = ele recebeu
+      else if (saldo < 0) classe = "negativo";  // Outros: saldo negativo = estranho, mas possível
+    }
 
     html += `
       <div class="motoboy-item ${classe}">
@@ -172,9 +180,7 @@ const SUBITENS = {
     "Tomate"
   ],
 
-  outros_extra: [
-    "Outro (Preencher manualmente)"
-  ]
+  outros_extra: ["Outro (Preencher manualmente)"]
 };
 
 const categoriaSel = document.getElementById("estoqueCategoria");
