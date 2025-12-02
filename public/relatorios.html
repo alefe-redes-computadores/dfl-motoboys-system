@@ -3,105 +3,68 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DFL – Relatórios</title>
+  <title>Relatórios – DFL</title>
 
   <link rel="stylesheet" href="./css/dashboard-admin.css" />
 
   <style>
-    body {
-      margin: 0;
-      background: #0d0d0d;
-      font-family: system-ui, sans-serif;
-      color: #fff;
-    }
-
     .relatorios-container {
-      padding: 22px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 22px;
+      padding: 25px;
     }
-
-    .relatorio-card {
-      background: #1a1a1a;
-      border: 1px solid #333;
-      border-radius: 14px;
-      padding: 24px;
-    }
-
-    .relatorio-card h2 {
-      margin-top: 0;
-      font-size: 22px;
+    .relatorios-title {
+      font-size: 28px;
+      font-weight: bold;
       color: #ffca28;
+      margin-bottom: 20px;
     }
-
-    .relatorio-card button {
-      width: 100%;
-      margin-top: 12px;
-      background: #ffca28;
-      color: #111;
-      border: none;
-      padding: 12px;
-      border-radius: 8px;
-      font-weight: bold;
-      font-size: 15px;
-      cursor: pointer;
-    }
-
-    .topo-relatorios {
-      background: #111;
-      padding: 18px 22px;
-      border-bottom: 2px solid #ffca28;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .btn-voltar {
+    .relatorio-link {
+      display: block;
       background: #1e88e5;
-      padding: 10px 16px;
-      border-radius: 8px;
-      color: white;
-      font-weight: bold;
-      border: none;
-      cursor: pointer;
+      color: #fff;
+      padding: 15px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+      margin-bottom: 15px;
+      transition: .2s;
+    }
+    .relatorio-link:hover {
+      background: #1565c0;
     }
   </style>
 </head>
 
 <body>
 
-  <!-- TOPO -->
-  <header class="topo-relatorios">
-    <h1>📊 Relatórios — DFL</h1>
-    <button class="btn-voltar" onclick="window.location.href='dashboard-admin.html'">Voltar</button>
+  <header class="admin-header">
+    <div class="admin-header-left">
+      <img src="./img/logo-dfl.png" class="admin-logo" />
+      <h1>Relatórios – DFL</h1>
+    </div>
+
+    <button class="admin-logout" onclick="window.location.href='dashboard-admin.html'">
+      ⬅ Voltar
+    </button>
   </header>
 
   <div class="relatorios-container">
 
-    <div class="relatorio-card">
-      <h2>Relatório de Estoque (Hoje)</h2>
-      <button onclick="location.href='pdf-estoque.html'">Gerar PDF</button>
-    </div>
+    <div class="relatorios-title">Selecione o Relatório</div>
 
-    <div class="relatorio-card">
-      <h2>Relatório de Despesas</h2>
-      <button id="btnRelatorioDespesas">Gerar PDF</button>
-    </div>
+    <a class="relatorio-link" href="pdf-estoque.html">
+      📦 PDF – Estoque do Dia
+    </a>
 
-    <div class="relatorio-card">
-      <h2>Relatório de Entregas Manuais</h2>
-      <button id="btnRelatorioEntregas">Gerar PDF</button>
-    </div>
+    <a class="relatorio-link" id="btnRelatorioDespesas">
+      💰 Relatório de Despesas (em construção)
+    </a>
 
-    <div class="relatorio-card">
-      <h2>Relatório Financeiro Geral</h2>
-      <button id="btnRelatorioFinanceiro">Gerar PDF</button>
-    </div>
+    <a class="relatorio-link" id="btnRelatorioEntregas">
+      🛵 Relatório de Entregas (em construção)
+    </a>
 
   </div>
 
   <script type="module" src="./js/relatorios.js"></script>
-
 </body>
 </html>
