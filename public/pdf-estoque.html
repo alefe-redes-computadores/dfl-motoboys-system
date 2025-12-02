@@ -73,7 +73,6 @@
       collection,
       query,
       where,
-      orderBy,
       getDocs
     } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
@@ -81,11 +80,10 @@
       const hoje = new Date().toISOString().slice(0, 10);
       document.getElementById("dataHoje").textContent = hoje;
 
+      // 🔥 Consulta SEM orderBy (evita erro de índice)
       const q = query(
         collection(db, "estoqueDia"),
-        where("data", "==", hoje),
-        orderBy("categoria"),
-        orderBy("item")
+        where("data", "==", hoje)
       );
 
       const snap = await getDocs(q);
@@ -95,6 +93,18 @@
           "<p class='no-records'>Nenhum estoque registrado hoje.</p>";
         return;
       }
+
+      // 🔥 Criar array e ordenar manualmente
+      let itens = [];
+      snap.forEach(doc => itens.push(doc.data()));
+
+      itens.sort((a, b) => {
+        if (a.categoria < b.categoria) return -1;
+        if (a.categoria > b.categoria) return 1;
+        if (a.item < b.item) return -1;
+        if (a.item > b.item) return 1;
+        return 0;
+      });
 
       let tabela = `
         <table>
@@ -109,9 +119,7 @@
           <tbody>
       `;
 
-      snap.forEach(doc => {
-        const d = doc.data();
-
+      itens.forEach(d => {
         tabela += `
           <tr>
             <td>${d.categoria}</td>
@@ -137,9 +145,7 @@
 
   <div class="top-info">Data: <span id="dataHoje"></span></div>
 
-  <div id="conteudo">
-    <!-- Conteúdo carregado pelo JS -->
-  </div>
+  <div id="conteudo"></div>
 
 </body>
 </html>
