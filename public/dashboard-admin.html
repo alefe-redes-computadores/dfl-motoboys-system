@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Painel Administrativo – DFL</title>
 
-  <!-- CSS CORRETO -->
+  <!-- CSS -->
   <link rel="stylesheet" href="./css/dashboard-admin.css" />
 </head>
 
@@ -18,7 +18,6 @@
       <h1>Painel Administrativo – DFL</h1>
     </div>
 
-    <!-- ✅ BOTÕES DO TOPO: RELATÓRIOS + SAIR -->
     <div class="admin-header-right">
       <button id="btnRelatorios" class="admin-reports">Relatórios</button>
       <button id="logoutAdmin" class="admin-logout">Sair</button>
@@ -27,11 +26,10 @@
 
   <div class="admin-container">
 
-    <!-- SALDO POR MOTOBOY (AGORA LISTA DINÂMICA) -->
+    <!-- SALDO POR MOTOBOY -->
     <div class="admin-card">
       <h2>Saldo por Motoboy</h2>
       <div id="listaMotoboys" class="lista-motoboys">
-        <!-- Preenchido via JS -->
         <p>Carregando motoboys...</p>
       </div>
     </div>
@@ -61,8 +59,8 @@
         <option value="refrigerantes">Refrigerantes</option>
         <option value="embalagens">Embalagens</option>
         <option value="paes">Pães</option>
-        <option value="hortifruti">Hortifruti</option> <!-- 🔄 RENOMEADO -->
-        <option value="outros_extra">Outros</option> <!-- 🆕 NOVA CATEGORIA -->
+        <option value="hortifruti">Hortifruti</option>
+        <option value="outros_extra">Outros (Manual)</option>
       </select>
 
       <label>Item</label>
@@ -81,7 +79,7 @@
       </button>
     </div>
 
-    <!-- ENTREGAS / PAGAMENTOS PARA MOTOBOY -->
+    <!-- ENTREGAS E PAGAMENTOS -->
     <div class="admin-card">
       <h2>Registrar Entregas / Pagamento p/ Motoboy</h2>
 
@@ -89,7 +87,7 @@
       <select id="entregaMotoboy">
         <option value="lucas_hiago">Lucas Hiago</option>
         <option value="rodrigo_goncalves">Rodrigo Gonçalves</option>
-        <option value="outro">Outro (preencher manualmente)</option>
+        <option value="outro">Outro (manual)</option>
       </select>
 
       <div id="grupoMotoboyOutro" style="display: none; margin-top: 6px;">
@@ -98,22 +96,19 @@
       </div>
 
       <label>Qtd. Entregas</label>
-      <input id="entregaQtd" type="number" placeholder="Ex: 3" />
+      <input id="entregaQtd" type="number" placeholder="Ex: 10" />
 
       <label>Valor pago ao motoboy (R$)</label>
-      <input id="valorPagoMotoboy" type="number" step="0.01" placeholder="Ex: 45.90" />
+      <input id="valorPagoMotoboy" type="number" step="0.01" placeholder="Ex: 70.00" />
 
       <label>Data</label>
       <input id="entregaData" type="date" />
 
-      <button class="admin-btn" id="btnSalvarEntregaManual">
-        Salvar Registro
-      </button>
+      <button class="admin-btn" id="btnSalvarEntregaManual">Salvar Registro</button>
     </div>
 
   </div>
 
-  <!-- JS CORRETO -->
   <script type="module" src="./js/dashboard-admin.js"></script>
 </body>
 </html>
