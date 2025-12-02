@@ -1,175 +1,204 @@
-/* ===========================================================
-   🎨 DFL Painel Admin – CSS COMPLETO FINAL
-   - Suporte a: negativo / positivo / neutro
-   - Visual padrão DFL preservado
-   =========================================================== */
+/* ============================================================
+   🎨 DFL — CSS DO PAINEL ADMINISTRATIVO
+   Visual consistente com DFL, painel organizado e moderno
+   ============================================================ */
 
-:root {
-  --bg: #0d0d0d;
-  --card: #111;
-  --text: #fff;
-  --yellow: #ffca28;
-  --red: #d32f2f;
-  --green: #4caf50;
-  --border: #2a2a2a;
-  --radius: 12px;
-  --shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
+/* Configuração base */
 body {
-  background: var(--bg);
-  font-family: "Poppins", sans-serif;
   margin: 0;
-  padding: 0;
-  color: var(--text);
+  background: #0d0d0d;
+  font-family: system-ui, sans-serif;
+  color: #fff;
 }
 
-/* ===========================================================
-   HEADER
-   =========================================================== */
-header {
-  padding: 25px;
+/* ============================================================
+   🔝 TOPO (HEADER)
+   ============================================================ */
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #111;
+  padding: 15px 22px;
+  border-bottom: 2px solid #ffca28;
+}
+
+.admin-header-left {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  background: #000;
-  border-bottom: 2px solid var(--yellow);
+  gap: 14px;
 }
 
-header h1 {
-  font-size: 32px;
-  margin: 0;
-  line-height: 1.2;
-  font-weight: 700;
+.admin-logo {
+  width: 45px;
+  height: 45px;
+  border-radius: 12px;
+  border: 2px solid #ffca28;
+  object-fit: cover;
 }
 
-header button {
-  padding: 10px 22px;
-  border-radius: 10px;
-  border: 0;
-  font-size: 15px;
+/* Botões do topo */
+.admin-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-reports {
+  background: #1e88e5;
+  color: white;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
   cursor: pointer;
-  color: #fff;
-  background: #1976d2;
+  transition: .2s ease;
 }
 
-/* Botão sair */
-header .btn-sair {
-  background: var(--yellow);
-  color: #000;
-  font-weight: 600;
+.admin-reports:hover {
+  background: #1565c0;
 }
 
-/* ===========================================================
-   CARDS
-   =========================================================== */
-.card {
-  background: var(--card);
-  margin: 22px;
+.admin-logout {
+  background: #ffca28;
+  color: #111;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* ============================================================
+   📦 CONTAINER PRINCIPAL
+   ============================================================ */
+.admin-container {
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+  gap: 20px;
+}
+
+/* CARDS */
+.admin-card {
+  background: #1a1a1a;
   padding: 22px;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  border: 1px solid var(--border);
+  border-radius: 14px;
+  border: 1px solid #333;
 }
 
-.card h2 {
-  color: var(--yellow);
+.admin-card h2 {
   margin-top: 0;
+  color: #ffca28;
 }
 
-/* ===========================================================
-   MOTOBOYS LISTA
-   =========================================================== */
+/* VALORES */
+.admin-value {
+  font-size: 28px;
+  font-weight: bold;
+  color: #ffca28;
+}
+
+/* Inputs */
+input,
+select {
+  width: 100%;
+  padding: 9px 12px;
+  margin-top: 6px;
+  margin-bottom: 12px;
+  border: 1px solid #444;
+  background: #0f0f0f;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+/* Botões principais */
+.admin-btn {
+  width: 100%;
+  background: #ffca28;
+  color: #111;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 5px;
+}
+
+/* ============================================================
+   🛵 LISTA DE MOTOBOYS (DINÂMICA)
+   ============================================================ */
+.lista-motoboys {
+  margin-top: 10px;
+}
+
 .motoboy-item {
   display: flex;
   justify-content: space-between;
-  padding: 12px 8px;
-  font-size: 18px;
-  border-bottom: 1px solid #222;
-}
-
-/* 🔥 Cores inteligentes */
-.negativo span {
-  color: var(--red) !important;
-  font-weight: 600;
-}
-
-.positivo span {
-  color: var(--green) !important;
-  font-weight: 600;
-}
-
-.neutral span {
-  color: var(--text) !important;
-}
-
-/* Nome do motoboy */
-.motoboy-item strong {
-  font-weight: 600;
-  color: var(--text);
-}
-
-/* ===========================================================
-   SALDO GERAL
-   =========================================================== */
-.admin-value {
-  font-size: 36px;
-  margin-top: 10px;
-  display: block;
-}
-
-.admin-value.negativo {
-  color: var(--red);
-  font-weight: 700;
-}
-
-.admin-value.positivo {
-  color: var(--green);
-  font-weight: 700;
-}
-
-.admin-value.neutral {
-  color: var(--text);
-}
-
-/* ===========================================================
-   INPUTS
-   =========================================================== */
-input, select {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  border-radius: 10px;
-  border: 1px solid #333;
-  background: #000;
-  color: #fff;
+  align-items: center;
+  margin-top: 8px;
+  padding: 10px 0;
+  border-bottom: 1px solid #333;
   font-size: 16px;
-}
-
-/* ===========================================================
-   BOTÕES GERAIS
-   =========================================================== */
-button {
-  margin-top: 15px;
-  padding: 14px;
-  border-radius: 12px;
-  border: 0;
-  width: 100%;
-  font-size: 17px;
   font-weight: 600;
+}
+
+.negativo {
+  color: #e53935 !important;
+}
+
+.positivo {
+  color: #43a047 !important;
+}
+
+.neutral {
+  color: #ffffff !important;
+}
+
+/* ============================================================
+   📄 BOTÃO PDF
+   ============================================================ */
+.admin-btn-pdf {
+  width: 100%;
+  margin-top: 12px;
+  padding: 14px;
+  background: #1e88e5;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
   cursor: pointer;
+  transition: 0.2s ease;
 }
 
-.btn-amarelo {
-  background: var(--yellow);
-  color: #000;
+.admin-btn-pdf:hover {
+  background: #1565c0;
 }
 
-.btn-azul {
-  background: #1976d2;
-  color: #fff;
+.admin-btn-pdf:active {
+  transform: scale(0.98);
 }
 
-.hidden {
-  display: none;
+/* ============================================================
+   📱 RESPONSIVIDADE
+   ============================================================ */
+@media (max-width: 480px) {
+  .admin-header {
+    flex-direction: column;
+    gap: 14px;
+    padding: 15px;
+  }
+
+  .admin-header-right {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .admin-container {
+    grid-template-columns: 1fr;
+  }
 }
