@@ -6,6 +6,32 @@
   <title>Relatórios – DFL</title>
 
   <link rel="stylesheet" href="./css/dashboard-admin.css" />
+
+  <style>
+    .relatorios-container {
+      padding: 25px;
+    }
+    .relatorios-title {
+      font-size: 28px;
+      font-weight: bold;
+      color: #ffca28;
+      margin-bottom: 20px;
+    }
+    .relatorio-link {
+      display: block;
+      background: #1e88e5;
+      color: #fff;
+      padding: 15px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+      margin-bottom: 15px;
+      transition: .2s;
+    }
+    .relatorio-link:hover {
+      background: #1565c0;
+    }
+  </style>
 </head>
 
 <body>
@@ -26,24 +52,24 @@
 
     <div class="relatorios-title">Selecione o Relatório</div>
 
-    <!-- RELATÓRIO ESTOQUE DO DIA -->
+    <!-- ESTOQUE -->
     <a class="relatorio-link" href="pdf-estoque.html">
       📦 PDF – Estoque do Dia
     </a>
 
-    <!-- RELATÓRIO DESPESAS -->
+    <!-- DESPESAS -->
     <a class="relatorio-link" id="btnRelatorioDespesas">
       💰 Relatório de Despesas
     </a>
 
-    <!-- RELATÓRIO ENTREGAS -->
+    <!-- ENTREGAS MANUAIS -->
     <a class="relatorio-link" id="btnRelatorioEntregas">
-      🛵 Relatório de Entregas
+      🛵 Relatório de Entregas Manuais
     </a>
 
-    <!-- 🔥 NOVO RELATÓRIO -->
+    <!-- 🆕 PAGAMENTOS MOTOBOYS -->
     <a class="relatorio-link" id="btnRelatorioPagamentos">
-      🧾 Relatório de Pagamentos de Motoboys
+      🧾 Relatório de Pagamentos p/ Motoboys
     </a>
 
   </div>
