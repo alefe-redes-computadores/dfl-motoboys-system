@@ -1,108 +1,122 @@
-body {  
-  margin: 0;  
-  background: #0d0d0d;  
-  font-family: system-ui, sans-serif;  
-  color: #fff;  
-}  
+body {
+  margin: 0;
+  background: #0d0d0d;
+  font-family: system-ui, sans-serif;
+  color: #fff;
+}
 
-.admin-header {  
-  display: flex;  
-  justify-content: space-between;  
-  align-items: center;  
-  background: #111;  
-  padding: 15px 22px;  
-  border-bottom: 2px solid #ffca28;  
-}  
+/* TOPO */
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #111;
+  padding: 15px 22px;
+  border-bottom: 2px solid #ffca28;
+}
 
-.admin-header-left {  
-  display: flex;  
-  align-items: center;  
-  gap: 14px;  
-}  
+.admin-header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
 
-.admin-logo {  
-  width: 45px;  
-  height: 45px;  
-  border-radius: 12px;  
-  border: 2px solid #ffca28;  
-}  
+.admin-logo {
+  width: 45px;
+  height: 45px;
+  border-radius: 12px;
+  border: 2px solid #ffca28;
+}
 
-.admin-logout {  
-  background: #ffca28;  
-  color: #111;  
-  border: none;  
-  padding: 10px 18px;  
-  border-radius: 8px;  
-  font-weight: bold;  
-  cursor: pointer;  
-}  
+/* ✅ CONTAINER DOS BOTÕES (RELATÓRIOS + SAIR) */
+.admin-header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
-.admin-container {  
-  padding: 20px;  
-  display: grid;  
-  grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));  
-  gap: 20px;  
-}  
+/* BOTÃO SAIR (já existia) */
+.admin-logout {
+  background: #ffca28;
+  color: #111;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
 
-.admin-card {  
-  background: #1a1a1a;  
-  padding: 22px;  
-  border-radius: 14px;  
-  border: 1px solid #333;  
-}  
+/* ✅ NOVO BOTÃO RELATÓRIOS */
+.admin-reports {
+  background: #1e88e5;
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
 
-.admin-card h2 {  
-  margin-top: 0;  
-}  
+.admin-reports:hover {
+  background: #1565c0;
+}
 
-.admin-value {  
-  font-size: 28px;  
-  font-weight: bold;  
-  color: #ffca28;  
-}  
+.admin-reports:active {
+  transform: scale(0.97);
+}
 
-input,  
-select {  
-  width: 100%;  
-  padding: 9px 12px;  
-  margin-top: 6px;  
-  margin-bottom: 12px;  
-  border: 1px solid #444;  
-  background: #0f0f0f;  
-  color: #fff;  
-  border-radius: 8px;  
-  font-size: 15px;  
-}  
+/* GRID DOS CARDS */
+.admin-container {
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+  gap: 20px;
+}
 
-.admin-btn {  
-  width: 100%;  
-  background: #ffca28;  
-  color: #111;  
-  padding: 10px;  
-  border-radius: 8px;  
-  border: none;  
-  font-weight: bold;  
-  cursor: pointer;  
-  margin-top: 5px;  
-}  
+.admin-card {
+  background: #1a1a1a;
+  padding: 22px;
+  border-radius: 14px;
+  border: 1px solid #333;
+}
 
-.motoboy-item {  
-  margin-top: 8px;  
-  padding: 8px 0;  
-  border-bottom: 1px solid #333;  
-  font-size: 15px;  
-}  
+.admin-card h2 {
+  margin-top: 0;
+}
 
-.estoque-item {
-  padding: 8px 0;
-  border-bottom: 1px solid #333;
+.admin-value {
+  font-size: 28px;
+  font-weight: bold;
+  color: #ffca28;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 9px 12px;
+  margin-top: 6px;
+  margin-bottom: 12px;
+  border: 1px solid #444;
+  background: #0f0f0f;
+  color: #fff;
+  border-radius: 8px;
   font-size: 15px;
 }
 
-.lista-estoque {
-  margin-top: 10px;
+.admin-btn {
+  width: 100%;
+  background: #ffca28;
+  color: #111;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 5px;
 }
 
+/* LISTAS / ITENS */
 .motoboy-item {
   display: flex;
   justify-content: space-between;
@@ -121,6 +135,17 @@ select {
   font-weight: 700;
 }
 
+.estoque-item {
+  padding: 8px 0;
+  border-bottom: 1px solid #333;
+  font-size: 15px;
+}
+
+.lista-estoque {
+  margin-top: 10px;
+}
+
+/* CORES DOS SALDOS */
 .negativo {
   color: #e53935 !important; /* vermelho – dívida com motoboy */
 }
@@ -133,11 +158,7 @@ select {
   color: #ffffff !important;
 }
 
-.admin-btn-secondary {
-  margin-top: 8px;
-  background: #1976d2;
-  color: #fff;
-}
+/* BOTÃO PDF – PAINEL ADMIN */
 .admin-btn-pdf {
   width: 100%;
   margin-top: 12px;
@@ -154,28 +175,6 @@ select {
 
 .admin-btn-pdf:hover {
   background: #1565c0; /* Azul mais escuro */
-}
-
-.admin-btn-pdf:active {
-  transform: scale(0.98);
-}
-/* BOTÃO PDF – PAINEL ADMIN */
-.admin-btn-pdf {
-  width: 100%;
-  margin-top: 12px;
-  padding: 14px;
-  background: #1e88e5;
-  color: white;
-  font-size: 15px;
-  font-weight: 600;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.admin-btn-pdf:hover {
-  background: #1565c0;
 }
 
 .admin-btn-pdf:active {
