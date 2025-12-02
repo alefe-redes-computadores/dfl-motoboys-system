@@ -27,10 +27,13 @@
 
   <div class="admin-container">
 
-    <!-- SALDO POR MOTOBOY -->
+    <!-- SALDO POR MOTOBOY (AGORA LISTA DINÂMICA) -->
     <div class="admin-card">
       <h2>Saldo por Motoboy</h2>
-      <div id="saldo_lucas_hiago" class="motoboy-item">R$ 0,00</div>
+      <div id="listaMotoboys" class="lista-motoboys">
+        <!-- Preenchido via JS -->
+        <p>Carregando motoboys...</p>
+      </div>
     </div>
 
     <!-- SALDO GERAL -->
@@ -78,17 +81,27 @@
       </button>
     </div>
 
-    <!-- ENTREGAS MANUAIS -->
+    <!-- ENTREGAS / PAGAMENTOS PARA MOTOBOY -->
     <div class="admin-card">
-      <h2>Registrar Entregas Manuais</h2>
+      <h2>Registrar Entregas / Pagamento p/ Motoboy</h2>
 
       <label>Motoboy</label>
       <select id="entregaMotoboy">
         <option value="lucas_hiago">Lucas Hiago</option>
+        <option value="rodrigo_goncalves">Rodrigo Gonçalves</option>
+        <option value="outro">Outro (preencher manualmente)</option>
       </select>
+
+      <div id="grupoMotoboyOutro" style="display: none; margin-top: 6px;">
+        <label>Nome do motoboy (outro)</label>
+        <input id="entregaMotoboyOutro" placeholder="Ex: João Motoboy" />
+      </div>
 
       <label>Qtd. Entregas</label>
       <input id="entregaQtd" type="number" placeholder="Ex: 3" />
+
+      <label>Valor pago ao motoboy (R$)</label>
+      <input id="valorPagoMotoboy" type="number" step="0.01" placeholder="Ex: 45.90" />
 
       <label>Data</label>
       <input id="entregaData" type="date" />
