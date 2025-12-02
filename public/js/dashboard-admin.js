@@ -1,6 +1,6 @@
-// =========================================
-//  DFL — DASHBOARD ADMIN (VERSÃO FINAL)
-// =========================================
+// ==============================================
+//   DFL — DASHBOARD ADMIN (versão atualizada)
+// ==============================================
 
 import { auth, db } from "./firebase-config-v2.js";
 
@@ -21,7 +21,7 @@ import {
   setDoc
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-// UID dos administradores
+// ADMINISTRADORES
 const ADMINS = [
   "6YczX4gLpUStlBVdQOXWc3uEYGG2",
   "LYu3M8gyRdMCqhE90vmH9Jh5Ksj1",
@@ -29,24 +29,15 @@ const ADMINS = [
   "zIfbMxD1SQNvtlX9y6YUsEz2TXC3"
 ];
 
-// =======================
-// Helper: normalizar ID para motoboy "outro"
-// =======================
-function gerarIdMotoboy(nome) {
-  return (
-    nome
-      .trim()
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]+/g, "_")
-      .replace(/^_+|_+$/g, "") || "motoboy_generico"
-  );
-}
+// LISTA DE MOTOBOYS FIXOS DO SISTEMA
+const MOTOBOYS_FIXOS = {
+  lucas_hiago: "Lucas Hiago",
+  rodrigo_goncalves: "Rodrigo Gonçalves"
+};
 
-// =======================
+// ====================================================
 // VERIFICA LOGIN
-// =======================
+// ====================================================
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "index.html";
@@ -59,142 +50,126 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  carregarSaldoMotoboy();
+  carregarListaMotoboys();
+  carregarSaldoGeral();
   verificarEstoqueHoje();
 });
 
-// =======================
+// ====================================================
 // LOGOUT
-// =======================
+// ====================================================
 document.getElementById("logoutAdmin")?.addEventListener("click", async () => {
   await signOut(auth);
   window.location.href = "index.html";
 });
 
-// =======================
+// ====================================================
 // BOTÃO RELATÓRIOS
-// =======================
+// ====================================================
 document.getElementById("btnRelatorios")?.addEventListener("click", () => {
   window.location.href = "relatorios.html";
 });
 
-// =======================
-// SALDO DO MOTOBOY + GERAL (DINÂMICO)
-// =======================
-async function carregarSaldoMotoboy() {
-  const lista = document.getElementById("listaMotoboys");
-  const saldoGeralEl = document.getElementById("saldoGeral");
 
-  if (!lista) return;
+// ====================================================
+// 🔄 LISTA DE MOTOBOYS NO PAINEL
+// ====================================================
+async function carregarListaMotoboys() {
+  const container = document.getElementById("listaMotoboys");
+  container.innerHTML = "<p>Carregando...</p>";
 
-  lista.innerHTML = "<p>Carregando motoboys...</p>";
-
-  const snapAll = await getDocs(collection(db, "motoboys"));
-  let total = 0;
-  const motoboys = [];
-
-  snapAll.forEach((d) => {
-    const data = d.data();
-    const saldo = Number(data.saldo || 0);
-    let nome = data.nome;
-
-    if (!nome) {
-      if (d.id === "lucas_hiago") nome = "Lucas Hiago";
-      else if (d.id === "rodrigo_goncalves") nome = "Rodrigo Gonçalves";
-      else nome = d.id;
-    }
-
-    total += saldo;
-    motoboys.push({ id: d.id, nome, saldo });
-  });
-
-  if (motoboys.length === 0) {
-    lista.innerHTML = "<p>Nenhum motoboy cadastrado.</p>";
-  } else {
-    // Ordena por maior saldo absoluto (mais relevante em cima)
-    motoboys.sort((a, b) => Math.abs(b.saldo) - Math.abs(a.saldo));
-
-    lista.innerHTML = "";
-    motoboys.forEach((m) => {
-      const wrapper = document.createElement("div");
-      wrapper.className = "motoboy-item";
-
-      let classeSaldo = "motoboy-saldo neutral";
-      if (m.saldo > 0) classeSaldo = "motoboy-saldo negativo"; // devendo
-      else if (m.saldo < 0) classeSaldo = "motoboy-saldo positivo"; // empresa no positivo
-
-      const saldoFormatado = `R$ ${m.saldo.toFixed(2).replace(".", ",")}`;
-
-      wrapper.innerHTML = `
-        <span class="motoboy-nome">${m.nome}</span>
-        <span class="${classeSaldo}">${saldoFormatado}</span>
-      `;
-
-      lista.appendChild(wrapper);
-    });
+  const snap = await getDocs(collection(db, "motoboys"));
+  if (snap.empty) {
+    container.innerHTML = "<p>Nenhum motoboy cadastrado.</p>";
+    return;
   }
 
-  // Atualiza saldo geral
-  saldoGeralEl.textContent = "R$ " + total.toFixed(2).replace(".", ",");
-  if (total > 0) saldoGeralEl.className = "admin-value negativo";
-  else if (total < 0) saldoGeralEl.className = "admin-value positivo";
-  else saldoGeralEl.className = "admin-value neutral";
+  let motoboys = [];
+
+  snap.forEach((doc) => {
+    motoboys.push({
+      id: doc.id,
+      nome: MOTOBOYS_FIXOS[doc.id] || doc.id,
+      saldo: Number(doc.data().saldo || 0)
+    });
+  });
+
+  // Ordena: quem tem saldo negativo primeiro
+  motoboys.sort((a, b) => a.saldo - b.saldo);
+
+  container.innerHTML = "";
+  motoboys.forEach((m) => {
+    const classe =
+      m.saldo < 0
+        ? "negativo"
+        : m.saldo > 0
+        ? "positivo"
+        : "neutral";
+
+    const el = document.createElement("div");
+    el.className = "motoboy-item";
+    el.innerHTML = `
+      <span class="motoboy-nome">${m.nome}</span>
+      <span class="motoboy-saldo ${classe}">R$ ${m.saldo
+        .toFixed(2)
+        .replace(".", ",")}</span>
+    `;
+    container.appendChild(el);
+  });
 }
 
-// =======================
-// CATEGORIAS + SUBITENS
-// =======================
+
+// ====================================================
+// SALDO GERAL
+// ====================================================
+async function carregarSaldoGeral() {
+  const snap = await getDocs(collection(db, "motoboys"));
+  let total = 0;
+
+  snap.forEach((d) => {
+    total += Number(d.data().saldo || 0);
+  });
+
+  const saldoGeralEl = document.getElementById("saldoGeral");
+  saldoGeralEl.textContent = "R$ " + total.toFixed(2).replace(".", ",");
+  saldoGeralEl.className =
+    total < 0 ? "admin-value negativo" : "admin-value positivo";
+}
+
+
+// ====================================================
+// ITENS DE ESTOQUE
+// ====================================================
 const SUBITENS = {
   frios: [
-    "Bacon",
-    "Carne Moída/Artesanais",
-    "Cheddar",
-    "Filé de Frango",
-    "Hambúrguer",
-    "Mussarela",
-    "Presunto",
-    "Salsicha"
+    "Bacon", "Carne Moída/Artesanais", "Cheddar",
+    "Filé de Frango", "Hambúrguer", "Mussarela",
+    "Presunto", "Salsicha"
   ],
 
   refrigerantes: [
-    "Coca 200ml",
-    "Coca 310ml",
-    "Coca 310ml Zero",
-    "Coca 1L",
-    "Coca 1L Zero",
-    "Coca 2L",
-    "Del Valle 450ml Uva",
-    "Del Valle 450ml Laranja",
-    "Fanta 1L",
-    "Kuat 2L"
+    "Coca 200ml", "Coca 310ml", "Coca 310ml Zero",
+    "Coca 1L", "Coca 1L Zero", "Coca 2L",
+    "Del Valle 450ml Uva", "Del Valle 450ml Laranja",
+    "Fanta 1L", "Kuat 2L"
   ],
 
   embalagens: [
-    "Bobina",
-    "Dogueira",
-    "Hamburgueira",
-    "Papel Kraft",
-    "Saco Plástico",
-    "Sacola 30x40",
-    "Sacola 38x48"
+    "Bobina", "Dogueira", "Hamburgueira",
+    "Papel Kraft", "Saco Plástico",
+    "Sacola 30x40", "Sacola 38x48"
   ],
 
   paes: ["Pão Hambúrguer", "Pão Hot Dog"],
 
-  // 🔄 RENOMEADO: antes era "outros"
   hortifruti: [
-    "Alface",
-    "Batata Palha",
-    "Cebola",
-    "Cebolinha",
-    "Milho",
-    "Óleo",
-    "Ovo",
-    "Tomate"
+    "Alface", "Batata Palha", "Cebola", "Cebolinha",
+    "Milho", "Óleo", "Ovo", "Tomate"
   ],
 
-  // 🆕 NOVA CATEGORIA: apenas 1 item manual
-  outros_extra: ["Outro (Preencher manualmente)"]
+  outros_extra: [
+    "Outro (Preencher manualmente)"
+  ]
 };
 
 const categoriaSel = document.getElementById("estoqueCategoria");
@@ -213,9 +188,10 @@ function atualizarItens() {
 categoriaSel.addEventListener("change", atualizarItens);
 atualizarItens();
 
-// =======================
+
+// ====================================================
 // SALVAR ESTOQUE
-// =======================
+// ====================================================
 document.getElementById("btnSalvarEstoque").addEventListener("click", async () => {
   const categoria = categoriaSel.value;
   const item = itemSel.value;
@@ -238,126 +214,133 @@ document.getElementById("btnSalvarEstoque").addEventListener("click", async () =
   verificarEstoqueHoje();
 });
 
-// =======================
-// MOSTRAR BOTÃO PDF
-// =======================
+
+// ====================================================
+// BOTÃO PDF ESTOQUE
+// ====================================================
 async function verificarEstoqueHoje() {
   const hoje = new Date().toISOString().slice(0, 10);
 
   const q = query(collection(db, "estoqueDia"), where("data", "==", hoje));
-
   const snap = await getDocs(q);
 
   const btn = document.getElementById("btnGerarPdfEstoque");
   btn.style.display = snap.size > 0 ? "block" : "none";
 }
 
-// =======================
-// ABRIR GERADOR DE PDF
-// =======================
 document.getElementById("btnGerarPdfEstoque").addEventListener("click", () => {
   window.location.href = "pdf-estoque.html";
 });
 
-// =======================
-// SALVAR DESPESA
-// =======================
-document
-  .getElementById("btnSalvarDespesa")
-  .addEventListener("click", async () => {
-    const desc = document.getElementById("descDespesa").value;
-    const valor = document.getElementById("valorDespesa").value;
-    const data = document.getElementById("dataDespesa").value;
 
-    if (!desc || !valor || !data) {
-      alert("Preencha todos os campos.");
-      return;
-    }
+// ====================================================
+// SALVAR DESPESA MANUAL
+// ====================================================
+document.getElementById("btnSalvarDespesa").addEventListener("click", async () => {
+  const desc = document.getElementById("descDespesa").value;
+  const valor = document.getElementById("valorDespesa").value;
+  const data = document.getElementById("dataDespesa").value;
 
-    await addDoc(collection(db, "despesas"), {
-      descricao: desc,
-      valor: Number(valor),
-      data
-    });
+  if (!desc || !valor || !data) {
+    alert("Preencha todos os campos.");
+    return;
+  }
 
-    alert("Despesa salva!");
+  await addDoc(collection(db, "despesas"), {
+    descricao: desc,
+    valor: Number(valor),
+    data
   });
 
-// =======================
-// ENTREGAS / PAGAMENTOS PARA MOTOBOY
-// =======================
-const selectMotoboy = document.getElementById("entregaMotoboy");
-const grupoMotoboyOutro = document.getElementById("grupoMotoboyOutro");
-const inputMotoboyOutro = document.getElementById("entregaMotoboyOutro");
-
-selectMotoboy.addEventListener("change", () => {
-  if (selectMotoboy.value === "outro") {
-    grupoMotoboyOutro.style.display = "block";
-  } else {
-    grupoMotoboyOutro.style.display = "none";
-    inputMotoboyOutro.value = "";
-  }
+  alert("Despesa salva!");
 });
 
-document
-  .getElementById("btnSalvarEntregaManual")
-  .addEventListener("click", async () => {
-    let motoboyId = selectMotoboy.value;
-    let motoboyNome = "";
 
-    if (motoboyId === "lucas_hiago") {
-      motoboyNome = "Lucas Hiago";
-    } else if (motoboyId === "rodrigo_goncalves") {
-      motoboyNome = "Rodrigo Gonçalves";
-    } else if (motoboyId === "outro") {
-      const nomeOutro = inputMotoboyOutro.value.trim();
-      if (!nomeOutro) {
-        alert("Preencha o nome do motoboy (outro).");
-        return;
-      }
-      motoboyNome = nomeOutro;
-      motoboyId = gerarIdMotoboy(nomeOutro);
-    }
+// ====================================================
+// REGISTRAR ENTREGA + PAGAMENTO AUTOMÁTICO
+// ====================================================
+document.getElementById("entregaMotoboy").addEventListener("change", () => {
+  const sel = document.getElementById("entregaMotoboy").value;
+  document.getElementById("grupoMotoboyOutro").style.display =
+    sel === "outro" ? "block" : "none";
+});
 
-    const qtd = Number(document.getElementById("entregaQtd").value);
-    const valorPago = Number(
-      document.getElementById("valorPagoMotoboy").value
-    );
-    const data = document.getElementById("entregaData").value;
+document.getElementById("btnSalvarEntregaManual").addEventListener("click", async () => {
+  const motoboySel = document.getElementById("entregaMotoboy").value;
+  const nomeOutro = document.getElementById("entregaMotoboyOutro").value;
+  const qtd = Number(document.getElementById("entregaQtd").value);
+  const valorManual = Number(document.getElementById("valorPagoMotoboy").value);
+  const data = document.getElementById("entregaData").value;
 
-    if (!motoboyId || !motoboyNome || !qtd || qtd <= 0 || isNaN(valorPago) || valorPago <= 0 || !data) {
-      alert("Preencha todos os campos corretamente (quantidade e valor > 0).");
+  if (!qtd || !data) {
+    alert("Preencha todos os campos obrigatórios.");
+    return;
+  }
+
+  // ============================
+  // IDENTIFICA O MOTOBOY
+  // ============================
+  let motoboyId = motoboySel;
+  let nomeMotoboy = MOTOBOYS_FIXOS[motoboySel];
+
+  if (motoboySel === "outro") {
+    if (!nomeOutro) {
+      alert("Digite o nome do motoboy.");
       return;
     }
+    motoboyId = nomeOutro.toLowerCase().replace(/\s+/g, "_");
+    nomeMotoboy = nomeOutro;
+  }
 
-    // 🔹 Registro detalhado para relatórios
-    await addDoc(collection(db, "entregasManuais"), {
-      motoboyId,
-      motoboyNome,
-      quantidade: qtd,
-      valorPago,
-      data
-    });
+  // ============================
+  // CALCULA O PAGAMENTO
+  // ============================
+  let valorPagar = 0;
 
-    // 🔹 Atualiza saldo no documento do motoboy
-    const ref = doc(db, "motoboys", motoboyId);
-    const snap = await getDoc(ref);
+  if (motoboySel === "lucas_hiago") {
+    valorPagar = qtd * 6;
+  } else if (motoboySel === "rodrigo_goncalves") {
+    if (qtd <= 10) valorPagar = 100;
+    else valorPagar = 100 + (qtd - 10) * 7;
+  } else {
+    valorPagar = valorManual;
+  }
 
-    let saldoAtual = snap.exists() ? Number(snap.data().saldo || 0) : 0;
-    saldoAtual += qtd * 2; // mantém a regra atual (2 reais por entrega)
-
-    if (snap.exists()) {
-      await updateDoc(ref, {
-        saldo: saldoAtual,
-        nome: motoboyNome
-      });
-    } else {
-      await setDoc(ref, {
-        saldo: saldoAtual,
-        nome: motoboyNome
-      });
-    }
-
-    alert("Registro salvo!");
-    carregarSaldoMotoboy();
+  // ============================
+  // REGISTRA ENTREGA
+  // ============================
+  await addDoc(collection(db, "entregasManuais"), {
+    motoboy: nomeMotoboy,
+    quantidade: qtd,
+    valorPago: valorPagar,
+    data
   });
+
+  // ============================
+  // REGISTRA DESPESA AUTOMÁTICA
+  // ============================
+  await addDoc(collection(db, "despesas"), {
+    descricao: `Pagamento p/ motoboy: ${nomeMotoboy}`,
+    valor: Number(valorPagar),
+    data
+  });
+
+  // ============================
+  // ATUALIZA SALDO DO MOTOBOY
+  // ============================
+  const ref = doc(db, "motoboys", motoboyId);
+  const snap = await getDoc(ref);
+
+  let saldoAtual = snap.exists() ? Number(snap.data().saldo || 0) : 0;
+  saldoAtual -= valorPagar;
+
+  await setDoc(ref, {
+    nome: nomeMotoboy,
+    saldo: saldoAtual
+  });
+
+  alert("Entrega e pagamento registrados!");
+
+  carregarListaMotoboys();
+  carregarSaldoGeral();
+});
