@@ -1,35 +1,40 @@
 /* ===========================================================
-   🎨 DFL CSS – Painel Admin (VERSÃO FINAL CORRIGIDA)
-=========================================================== */
+   🎨 DFL Painel Admin – CSS FINAL ESTÁVEL
+   - Visual bonito e alinhado
+   - Botão PAGAR na direita
+   - Cores corrigidas
+   =========================================================== */
 
 :root {
   --bg: #0d0d0d;
   --card: #111;
   --text: #fff;
   --yellow: #ffca28;
-  --red: #d32f2f;
+  --yellow-dark: #e0b020;
   --green: #4caf50;
+  --red: #d32f2f;
+  --neutral: #ffffff;
   --border: #2a2a2a;
   --radius: 12px;
-  --shadow: 0 4px 12px rgba(0,0,0,0.2);
+  --shadow: 0 4px 12px rgba(0,0,0,0.25);
 }
 
 body {
   background: var(--bg);
+  color: var(--text);
   font-family: "Poppins", sans-serif;
   margin: 0;
   padding: 0;
-  color: var(--text);
 }
 
 /* HEADER */
 .admin-header {
+  background: #000;
+  border-bottom: 2px solid var(--yellow);
   padding: 25px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #000;
-  border-bottom: 2px solid var(--yellow);
 }
 
 .admin-header-left {
@@ -39,16 +44,16 @@ body {
 }
 
 .admin-logo {
-  height: 55px;
+  width: 60px;
+  height: auto;
 }
 
 .admin-header-right button {
   padding: 10px 22px;
   border-radius: 10px;
-  border: 0;
-  font-size: 15px;
+  border: none;
   cursor: pointer;
-  margin-left: 10px;
+  font-size: 15px;
   font-weight: 600;
 }
 
@@ -77,129 +82,131 @@ body {
   margin-top: 0;
 }
 
-/* ===========================================================
-   LISTA DE MOTOBOYS (ALINHAMENTO PERFEITO)
-=========================================================== */
-
-.motoboy-item {
+/* LISTA DE MOTOBOYS */
+.lista-motoboys {
+  margin-top: 15px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 8px;
-  font-size: 18px;
-  border-bottom: 1px solid #222;
+  flex-direction: column;
   gap: 10px;
 }
 
-/* Nome */
-.motoboy-item strong {
-  font-weight: 600;
+.motoboy-item {
+  background: #000;
+  border: 1px solid #222;
+  border-radius: 10px;
+  padding: 12px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.motoboy-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.motoboy-nome {
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.motoboy-saldo {
+  font-size: 18px;
+  margin-top: 4px;
+}
+
+/* CORES DO SALDO */
+.negativo .motoboy-saldo {
+  color: var(--red);
+  font-weight: 700;
+}
+
+.positivo .motoboy-saldo {
+  color: var(--green);
+  font-weight: 700;
+}
+
+.neutral .motoboy-saldo {
   color: var(--text);
 }
 
-/* Valor */
-.motoboy-item span {
-  font-weight: 600;
-}
-
-/* Botão PAGAR */
+/* BOTÃO PAGAR */
 .btn-pagar {
-  background: #fff;
+  background: var(--yellow);
   color: #000;
-  padding: 6px 14px;
-  border: 0;
+  border: none;
+  font-weight: 600;
+  padding: 8px 16px;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.btn-pagar:hover {
-  background: var(--yellow);
-}
-
-/* CORES AUTOMÁTICAS */
-.negativo span {
-  color: var(--red);
-}
-
-.positivo span {
-  color: var(--green);
-}
-
-.neutral span {
-  color: var(--text);
 }
 
 /* SALDO GERAL */
 .admin-value {
   font-size: 36px;
   margin-top: 10px;
-  display: block;
+  font-weight: 700;
 }
 
-.admin-value.negativo { color: var(--red); font-weight: 700; }
-.admin-value.positivo { color: var(--green); font-weight: 700; }
-.admin-value.neutral  { color: var(--text); }
+.admin-value.negativo {
+  color: var(--red);
+}
+
+.admin-value.positivo {
+  color: var(--green);
+}
+
+.admin-value.neutral {
+  color: var(--text);
+}
 
 /* INPUTS */
 input, select {
   width: 100%;
   padding: 12px;
-  margin-top: 10px;
-  border-radius: 10px;
-  border: 1px solid #333;
   background: #000;
-  color: #fff;
-  font-size: 16px;
+  border-radius: 10px;
+  margin-top: 10px;
+  color: var(--text);
+  border: 1px solid #333;
 }
 
-/* BOTÕES */
+/* BOTÕES GERAIS */
 .admin-btn {
-  margin-top: 15px;
-  padding: 14px;
-  border-radius: 12px;
-  border: 0;
-  width: 100%;
-  font-size: 17px;
-  font-weight: 600;
   background: var(--yellow);
   color: #000;
+  padding: 14px;
+  margin-top: 15px;
+  border: none;
+  width: 100%;
+  border-radius: 12px;
+  font-size: 17px;
+  font-weight: 600;
   cursor: pointer;
 }
 
 .admin-btn-pdf {
-  margin-top: 15px;
-  padding: 14px;
-  border-radius: 12px;
-  border: 0;
-  width: 100%;
-  font-size: 17px;
-  font-weight: 600;
   background: #1976d2;
   color: #fff;
+  padding: 14px;
+  margin-top: 15px;
+  border: none;
+  width: 100%;
+  border-radius: 12px;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
-.btn-cancelar {
-  background: #444;
-  color: #fff;
-}
-
-/* ===========================================================
-   MODAL — Pagamento Motoboy
-=========================================================== */
-
+/* MODAL */
 .modal {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   background: rgba(0,0,0,0.7);
-  display: none; /* 🔥 IMPORTANTE */
-  justify-content: center;
+  display: none;
   align-items: center;
-  z-index: 9999;
+  justify-content: center;
+  z-index: 999;
 }
 
 .modal-content {
@@ -208,23 +215,11 @@ input, select {
   border-radius: 12px;
   width: 90%;
   max-width: 380px;
+  text-align: center;
   box-shadow: var(--shadow);
-  border: 1px solid var(--yellow);
 }
 
-.modal-content h3 {
-  color: var(--yellow);
-  margin-top: 0;
-  font-size: 22px;
-  font-weight: 700;
-}
-
-.modal-content button {
-  width: 100%;
-  margin-top: 12px;
-  padding: 12px;
-  border-radius: 10px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
+.btn-cancelar {
+  background: #333 !important;
+  color: #fff;
 }
