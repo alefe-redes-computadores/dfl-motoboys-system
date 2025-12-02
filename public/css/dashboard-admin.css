@@ -285,3 +285,39 @@ button {
     justify-content: center;
   }
 }
+
+/* ============================================================
+   ORGANIZAÇÃO EM 2 LINHAS — NOME EM CIMA, SALDO + BOTÃO EMBAIXO
+   ============================================================ */
+
+.motoboy-item {
+  display: flex;
+  flex-direction: column;        /* <<< coloca nome em cima */
+  gap: 6px;
+  padding: 14px 16px;
+  border-bottom: 1px solid #222;
+}
+
+.motoboy-top-line {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.motoboy-bottom-line {
+  display: flex;
+  justify-content: space-between;   /* saldo à esquerda / botão à direita */
+  align-items: center;
+}
+
+/* Saldo */
+.motoboy-bottom-line span {
+  font-size: 16px;
+  font-weight: 700;
+  margin-right: 14px;
+}
+
+/* Cores do saldo */
+.negativo span { color: var(--red) !important; }
+.positivo span { color: var(--green) !important; }
+.neutral span  { color: var(--text) !important; }
