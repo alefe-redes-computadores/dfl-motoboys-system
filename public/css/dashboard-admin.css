@@ -1,103 +1,136 @@
 /* ===========================================================
-   🎨 DFL Painel Admin – CSS FINAL ESTÁVEL
-   - Visual bonito e alinhado
-   - Botão PAGAR na direita
-   - Cores corrigidas
-   =========================================================== */
+   🎨 DFL Painel Admin – CSS COMPLETO (VERSÃO ALINHADA)
+   - Header alinhado (logo + título + botões)
+   - Cores negativo/positivo/neutral
+   - Botões do topo NÃO ocupam 100%
+=========================================================== */
 
 :root {
   --bg: #0d0d0d;
-  --card: #111;
-  --text: #fff;
+  --card: #111111;
+  --text: #ffffff;
   --yellow: #ffca28;
-  --yellow-dark: #e0b020;
-  --green: #4caf50;
   --red: #d32f2f;
-  --neutral: #ffffff;
+  --green: #4caf50;
   --border: #2a2a2a;
   --radius: 12px;
-  --shadow: 0 4px 12px rgba(0,0,0,0.25);
+  --shadow: 0 4px 12px rgba(0,0,0,0.2);
+  --blue: #1976d2;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: "Poppins", sans-serif;
   margin: 0;
   padding: 0;
+  font-family: "Poppins", sans-serif;
+  background: var(--bg);
+  color: var(--text);
 }
 
-/* HEADER */
+/* ===========================================================
+   HEADER
+=========================================================== */
+
 .admin-header {
-  background: #000;
-  border-bottom: 2px solid var(--yellow);
-  padding: 25px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 18px 22px;
+  background: #000000;
+  border-bottom: 2px solid var(--yellow);
 }
 
 .admin-header-left {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 14px;
 }
 
 .admin-logo {
-  width: 60px;
-  height: auto;
+  height: 54px;
+  width: auto;
+}
+
+.admin-header-left h1 {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+/* Botões do topo */
+
+.admin-header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .admin-header-right button {
-  padding: 10px 22px;
-  border-radius: 10px;
   border: none;
-  cursor: pointer;
+  border-radius: 10px;
+  padding: 10px 20px;
   font-size: 15px;
   font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
 }
 
 .admin-reports {
-  background: #1976d2;
-  color: #fff;
+  background: var(--blue);
+  color: #ffffff;
 }
 
 .admin-logout {
   background: var(--yellow);
-  color: #000;
+  color: #000000;
 }
 
-/* CARDS */
+/* ===========================================================
+   CONTAINER & CARDS
+=========================================================== */
+
+.admin-container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px 14px 40px;
+}
+
 .admin-card {
   background: var(--card);
-  margin: 22px;
-  padding: 22px;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   border: 1px solid var(--border);
+  padding: 20px 18px;
+  margin-bottom: 18px;
 }
 
 .admin-card h2 {
+  margin: 0 0 14px;
   color: var(--yellow);
-  margin-top: 0;
+  font-size: 20px;
 }
 
-/* LISTA DE MOTOBOYS */
+/* ===========================================================
+   LISTA DE MOTOBOYS
+=========================================================== */
+
 .lista-motoboys {
-  margin-top: 15px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .motoboy-item {
-  background: #000;
-  border: 1px solid #222;
-  border-radius: 10px;
-  padding: 12px 15px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  padding: 10px 10px;
+  border-radius: 10px;
+  border: 1px solid #222;
+  background: #000000;
 }
 
 .motoboy-left {
@@ -106,104 +139,125 @@ body {
 }
 
 .motoboy-nome {
-  font-weight: 700;
-  font-size: 18px;
+  font-weight: 600;
 }
 
 .motoboy-saldo {
-  font-size: 18px;
-  margin-top: 4px;
+  font-size: 16px;
 }
 
-/* CORES DO SALDO */
-.negativo .motoboy-saldo {
+/* Cores inteligentes por classe */
+
+.motoboy-item.negativo .motoboy-saldo {
   color: var(--red);
-  font-weight: 700;
+  font-weight: 600;
 }
 
-.positivo .motoboy-saldo {
+.motoboy-item.positivo .motoboy-saldo {
   color: var(--green);
-  font-weight: 700;
+  font-weight: 600;
 }
 
-.neutral .motoboy-saldo {
+.motoboy-item.neutral .motoboy-saldo {
   color: var(--text);
 }
 
-/* BOTÃO PAGAR */
+/* Botão PAGAR */
+
 .btn-pagar {
+  border: none;
+  border-radius: 10px;
+  padding: 8px 18px;
   background: var(--yellow);
   color: #000;
-  border: none;
   font-weight: 600;
-  padding: 8px 16px;
-  border-radius: 8px;
+  font-size: 14px;
   cursor: pointer;
 }
 
-/* SALDO GERAL */
+/* ===========================================================
+   SALDO GERAL
+=========================================================== */
+
 .admin-value {
-  font-size: 36px;
-  margin-top: 10px;
-  font-weight: 700;
+  font-size: 32px;
+  margin-top: 4px;
 }
 
 .admin-value.negativo {
   color: var(--red);
+  font-weight: 700;
 }
 
 .admin-value.positivo {
   color: var(--green);
+  font-weight: 700;
 }
 
 .admin-value.neutral {
   color: var(--text);
 }
 
-/* INPUTS */
-input, select {
+/* ===========================================================
+   INPUTS & BOTÕES DO FORM
+=========================================================== */
+
+input,
+select {
   width: 100%;
-  padding: 12px;
-  background: #000;
+  padding: 11px 12px;
+  margin-top: 6px;
+  margin-bottom: 10px;
   border-radius: 10px;
-  margin-top: 10px;
-  color: var(--text);
   border: 1px solid #333;
+  background: #000;
+  color: #fff;
+  font-size: 15px;
 }
 
-/* BOTÕES GERAIS */
+input::placeholder {
+  color: #777;
+}
+
+label {
+  font-size: 14px;
+  margin-top: 4px;
+  display: block;
+}
+
+/* Botões principais dentro dos cards */
+
+.admin-btn,
+.admin-btn-pdf {
+  width: 100%;
+  margin-top: 8px;
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 .admin-btn {
   background: var(--yellow);
   color: #000;
-  padding: 14px;
-  margin-top: 15px;
-  border: none;
-  width: 100%;
-  border-radius: 12px;
-  font-size: 17px;
-  font-weight: 600;
-  cursor: pointer;
 }
 
 .admin-btn-pdf {
-  background: #1976d2;
+  background: var(--blue);
   color: #fff;
-  padding: 14px;
-  margin-top: 15px;
-  border: none;
-  width: 100%;
-  border-radius: 12px;
-  font-size: 17px;
-  font-weight: 600;
-  cursor: pointer;
 }
 
-/* MODAL */
+/* ===========================================================
+   MODAL DE PAGAMENTO
+=========================================================== */
+
 .modal {
+  display: none;            /* é trocado para flex no JS */
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.7);
-  display: none;
+  background: rgba(0, 0, 0, 0.7);
   align-items: center;
   justify-content: center;
   z-index: 999;
@@ -211,15 +265,53 @@ input, select {
 
 .modal-content {
   background: #111;
-  padding: 25px;
-  border-radius: 12px;
+  border-radius: 14px;
+  padding: 20px 18px;
+  max-width: 360px;
   width: 90%;
-  max-width: 380px;
-  text-align: center;
   box-shadow: var(--shadow);
+  border: 1px solid var(--border);
 }
 
-.btn-cancelar {
-  background: #333 !important;
+.modal-content h3 {
+  margin: 0 0 10px;
+}
+
+.modal-content p {
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+/* Botões do modal */
+
+#confirmarPagamento,
+#cancelarPagamento {
+  width: 100%;
+  margin-top: 10px;
+  border-radius: 12px;
+  border: none;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#confirmarPagamento {
+  background: var(--yellow);
+  color: #000;
+}
+
+#cancelarPagamento {
+  background: #333;
   color: #fff;
+}
+
+/* ===========================================================
+   RESPONSIVO BÁSICO
+=========================================================== */
+
+@media (min-width: 768px) {
+  .admin-header-left h1 {
+    font-size: 26px;
+  }
 }
