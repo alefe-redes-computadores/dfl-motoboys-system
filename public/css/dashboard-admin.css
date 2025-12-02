@@ -165,33 +165,58 @@ button {
   margin-top: 10px;
 }
 
+/* === BLOCO ÚNICO FINAL (SEM DUPLICAÇÕES) === */
 .motoboy-item {
-  padding: 12px 6px;
+  padding: 12px 16px;
   border-bottom: 1px solid #222;
+
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 16px;
+  gap: 10px;
+
+  flex-wrap: nowrap;             /* impede quebra */
+  border-radius: 10px;
 }
 
 .motoboy-item strong {
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 16px;
   color: var(--text);
 }
 
+.motoboy-item span {
+  font-weight: 700;
+  font-size: 16px;
+  margin-right: 12px;
+
+  /* 🔥 REMOVE o color: inherit para as cores funcionarem */
+}
+
 /* 🔥 Cores do saldo */
-.negativo span {
-  color: var(--red) !important;
-  font-weight: 700;
-}
+.negativo span { color: var(--red) !important; }
+.positivo span { color: var(--green) !important; }
+.neutral span  { color: var(--text) !important; }
 
-.positivo span {
-  color: var(--green) !important;
-  font-weight: 700;
-}
+/* ============================================================
+   BOTÃO PAGAR
+============================================================ */
+.btnPagar {
+  background: var(--yellow);
+  color: #000;
+  border: none;
+  padding: 8px 14px;
+  font-size: 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
 
-.neutral span {
-  color: var(--text) !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  width: auto !important;
+  min-width: 90px;
 }
 
 /* ============================================================
@@ -203,20 +228,12 @@ button {
   margin-top: 10px;
 }
 
-.admin-value.negativo {
-  color: var(--red);
-}
-
-.admin-value.positivo {
-  color: var(--green);
-}
-
-.admin-value.neutral {
-  color: var(--text);
-}
+.admin-value.negativo { color: var(--red); }
+.admin-value.positivo { color: var(--green); }
+.admin-value.neutral  { color: var(--text); }
 
 /* ============================================================
-   MODAL DE PAGAMENTO
+   MODAL
 ============================================================ */
 .modal {
   position: fixed;
@@ -231,9 +248,7 @@ button {
   z-index: 9999;
 }
 
-.modal.hidden {
-  display: none;
-}
+.modal.hidden { display: none; }
 
 .modal-content {
   background: #111;
@@ -269,75 +284,4 @@ button {
     width: 100%;
     justify-content: center;
   }
-}
-
-/* ===========================================
-   BOTÃO PAGAR (TAMANHO CORRETO)
-   =========================================== */
-
-.btnPagar {
-  background: #ffcb00;
-  color: #000;
-  border: none;
-  padding: 8px 14px;
-  font-size: 14px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  width: auto !important;      /* <<< VOLTA AO TAMANHO PEQUENO */
-  min-width: 90px;
-}
-
-/* Ícone */
-.btnPagar img,
-.btnPagar svg {
-  width: 18px;
-  height: 18px;
-}
-
-/* Alinhamento da linha */
-.motoboy-item {
-  display: flex;
-  justify-content: space-between; /* <<< arruma tudo */
-  align-items: center;
-  padding: 14px;
-  border-radius: 10px;
-  margin-bottom: 10px;
-}
-
-/* ===========================================
-   SALDO DO MOTOBOY — AJUSTE DE ALINHAMENTO
-   =========================================== */
-
-.motoboy-item strong {
-  font-weight: 700;
-  font-size: 16px;
-}
-
-.motoboy-item span {
-  font-weight: 700;         /* negrito */
-  font-size: 16px;
-  color: inherit !important;
-  margin-right: 12px;        /* dá um respiro antes do botão */
-}
-
-/* Reduz uma folguinha pra alinhar verticalmente com o botão */
-.motoboy-item {
-  padding: 12px 16px;
-}
-
-.motoboy-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: nowrap;   /* <<< impede quebra */
-}
-
-.motoboy-item strong,
-.motoboy-item span {
-  white-space: nowrap; /* <<< impede quebrar o saldo */
 }
