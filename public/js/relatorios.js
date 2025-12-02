@@ -1,208 +1,140 @@
-// ======================================================
-//  📊 RELATÓRIOS — DFL
-// ======================================================
+// ===================================================================
+// 📊 DFL — relatorios.js (VERSÃO FINAL)
+// Geração de PDFs: Estoque, Despesas, Entregas, Motoboys e Financeiro
+// ===================================================================
 
 import { db } from "./firebase-config-v2.js";
 import {
   collection,
   getDocs,
   query,
-  orderBy,
-  where
+  where,
+  orderBy
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-// ======================================================
-//  REDIRECIONAR PARA O PDF DE ESTOQUE
-// ======================================================
-document.getElementById("btnRelatorioDespesas")?.addEventListener("click", gerarRelatorioDespesas);
-document.getElementById("btnRelatorioEntregas")?.addEventListener("click", gerarRelatorioEntregas);
-document.getElementById("btnRelatorioPagamentos")?.addEventListener("click", gerarRelatorioPagamentos);
+// jsPDF + AutoTable (já carregados no HTML)
+window.jsPDF = window.jspdf?.jsPDF;
 
-// ======================================================
-//  FUNÇÃO — RELATÓRIO DE DESPESAS
-// ======================================================
-async function gerarRelatorioDespesas() {
-  const q = query(
-    collection(db, "despesas"),
-    orderBy("data", "desc")
-  );
+// ===================================================================
+// 📌 Função genérica para gerar PDF
+// ===================================================================
+function gerarTabelaPDF(titulo, cabecalho, linhas, nomeArquivo) {
+  const doc = new jsPDF();
 
-  const snap = await getDocs(q);
+  doc.setFontSize(18);
+  doc.text(titulo, 10, 15);
 
-  if (snap.empty) {
-    alert("Nenhuma despesa registrada.");
-    return;
-  }
-
-  let html = `
-    <h1>Relatório de Despesas</h1>
-    <table border="1" cellspacing="0" cellpadding="8">
-      <thead>
-        <tr>
-          <th>Data</th>
-          <th>Descrição</th>
-          <th>Valor (R$)</th>
-        </tr>
-      </thead>
-      <tbody>
-  `;
-
-  let total = 0;
-
-  snap.forEach(doc => {
-    const d = doc.data();
-    total += Number(d.valor || 0);
-
-    html += `
-      <tr>
-        <td>${d.data}</td>
-        <td>${d.descricao}</td>
-        <td>R$ ${Number(d.valor).toFixed(2).replace(".", ",")}</td>
-      </tr>
-    `;
+  doc.autoTable({
+    startY: 25,
+    head: [cabecalho],
+    body: linhas
   });
 
-  html += `
-      </tbody>
-      <tfoot>
-        <tr>
-          <td colspan="2"><strong>Total</strong></td>
-          <td><strong>R$ ${total.toFixed(2).replace(".", ",")}</strong></td>
-        </tr>
-      </tfoot>
-    </table>
-  `;
-
-  abrirNovaAba(html);
+  doc.save(nomeArquivo);
 }
 
-// ======================================================
-//  FUNÇÃO — RELATÓRIO DE ENTREGAS MANUAIS
-// ======================================================
-async function gerarRelatorioEntregas() {
-  const q = query(
-    collection(db, "entregasManuais"),
-    orderBy("data", "desc")
-  );
+// ===================================================================
+// 💰 RELATÓRIO DE DESPESAS
+// ===================================================================
+document.getElementById("btnRelatorioDespesas")?.addEventListener("click", async () => {
+  try {
+    const snap = await getDocs(query(collection(db, "despesas"), orderBy("data", "desc")));
+    const linhas = [];
 
-  const snap = await getDocs(q);
+    snap.forEach(d => {
+      const x = d.data();
+      linhas.push([
+        x.descricao,
+        "R$ " + Number(x.valor || 0).toFixed(2).replace(".", ","),
+        x.data
+      ]);
+    });
 
-  if (snap.empty) {
-    alert("Nenhuma entrega registrada.");
-    return;
+    if (linhas.length === 0) {
+      alert("Nenhuma despesa registrada.");
+      return;
+    }
+
+    gerarTabelaPDF(
+      "Relatório de Despesas",
+      ["Descrição", "Valor", "Data"],
+      linhas,
+      "despesas.pdf"
+    );
+
+  } catch (e) {
+    console.error(e);
+    alert("Erro ao gerar relatório de despesas.");
   }
+});
 
-  let html = `
-    <h1>Relatório de Entregas Manuais</h1>
-    <table border="1" cellspacing="0" cellpadding="8">
-      <thead>
-        <tr>
-          <th>Data</th>
-          <th>Motoboy</th>
-          <th>Qtd Entregas</th>
-        </tr>
-      </thead>
-      <tbody>
-  `;
+// ===================================================================
+// 🛵 RELATÓRIO DE ENTREGAS MANUAIS
+// ===================================================================
+document.getElementById("btnRelatorioEntregas")?.addEventListener("click", async () => {
+  try {
+    const snap = await getDocs(query(collection(db, "entregasManuais"), orderBy("data", "desc")));
+    const linhas = [];
 
-  let total = 0;
+    snap.forEach(d => {
+      const x = d.data();
+      linhas.push([
+        x.nomeMotoboy,
+        x.quantidade,
+        "R$ " + Number(x.valorPago || 0).toFixed(2).replace(".", ","),
+        x.data
+      ]);
+    });
 
-  snap.forEach(doc => {
-    const d = doc.data();
-    total += Number(d.quantidade);
+    if (linhas.length === 0) {
+      alert("Nenhum registro de entrega encontrado.");
+      return;
+    }
 
-    html += `
-      <tr>
-        <td>${d.data}</td>
-        <td>${d.motoboy}</td>
-        <td>${d.quantidade}</td>
-      </tr>
-    `;
-  });
+    gerarTabelaPDF(
+      "Relatório de Entregas / Pagamentos p/ Motoboy",
+      ["Motoboy", "Qtd Entregas", "Valor Pago", "Data"],
+      linhas,
+      "entregas_motoboy.pdf"
+    );
 
-  html += `
-      </tbody>
-      <tfoot>
-        <tr>
-          <td colspan="2"><strong>Total de Entregas</strong></td>
-          <td><strong>${total}</strong></td>
-        </tr>
-      </tfoot>
-    </table>
-  `;
-
-  abrirNovaAba(html);
-}
-
-// ======================================================
-//  FUNÇÃO — 🧾 RELATÓRIO DE PAGAMENTOS PARA MOTOBOYS
-// ======================================================
-async function gerarRelatorioPagamentos() {
-  const q = query(
-    collection(db, "pagamentosMotoboys"),
-    orderBy("data", "desc")
-  );
-
-  const snap = await getDocs(q);
-
-  if (snap.empty) {
-    alert("Nenhum pagamento registrado.");
-    return;
+  } catch (e) {
+    console.error(e);
+    alert("Erro ao gerar relatório de entregas.");
   }
+});
 
-  let html = `
-    <h1>Relatório de Pagamentos — Motoboys</h1>
-    <table border="1" cellspacing="0" cellpadding="8">
-      <thead>
-        <tr>
-          <th>Data</th>
-          <th>Motoboy</th>
-          <th>Qtd Entregas</th>
-          <th>Valor Pago (R$)</th>
-        </tr>
-      </thead>
-      <tbody>
-  `;
+// ===================================================================
+// 🧮 RELATÓRIO FINANCEIRO GERAL
+// ===================================================================
+document.getElementById("btnRelatorioFinanceiro")?.addEventListener("click", async () => {
+  try {
+    const despesasSnap = await getDocs(collection(db, "despesas"));
+    const entregasSnap = await getDocs(collection(db, "entregasManuais"));
 
-  let totalGeral = 0;
+    let totalDespesas = 0;
+    let totalPagamentosMotoboy = 0;
 
-  snap.forEach(doc => {
-    const d = doc.data();
-    totalGeral += Number(d.valorPago);
+    despesasSnap.forEach(d => totalDespesas += Number(d.data().valor || 0));
+    entregasSnap.forEach(d => totalPagamentosMotoboy += Number(d.data().valorPago || 0));
 
-    html += `
-      <tr>
-        <td>${d.data}</td>
-        <td>${d.motoboy}</td>
-        <td>${d.qtd}</td>
-        <td>R$ ${Number(d.valorPago).toFixed(2).replace(".", ",")}</td>
-      </tr>
-    `;
-  });
+    const saldo = totalDespesas + totalPagamentosMotoboy;
 
-  html += `
-      </tbody>
-      <tfoot>
-        <tr>
-          <td colspan="3"><strong>Total Pago</strong></td>
-          <td><strong>R$ ${totalGeral.toFixed(2).replace(".", ",")}</strong></td>
-        </tr>
-      </tfoot>
-    </table>
-  `;
+    const linhas = [
+      ["Total Despesas", "R$ " + totalDespesas.toFixed(2).replace(".", ",")],
+      ["Pagamentos p/ Motoboys", "R$ " + totalPagamentosMotoboy.toFixed(2).replace(".", ",")],
+      ["TOTAL GERAL", "R$ " + saldo.toFixed(2).replace(".", ",")]
+    ];
 
-  abrirNovaAba(html);
-}
+    gerarTabelaPDF(
+      "Relatório Financeiro Geral",
+      ["Categoria", "Valor"],
+      linhas,
+      "financeiro_geral.pdf"
+    );
 
-// ======================================================
-//  UTILITÁRIO — ABRIR NOVA ABA PARA PDF
-// ======================================================
-function abrirNovaAba(html) {
-  const win = window.open("", "_blank");
-  win.document.write(`
-    <html><head><title>Relatório</title></head><body>
-    ${html}
-    </body></html>
-  `);
-  win.document.close();
-}
+  } catch (e) {
+    console.error(e);
+    alert("Erro ao gerar relatório financeiro geral.");
+  }
+});
