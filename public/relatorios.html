@@ -1,73 +1,57 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Relatório de Entregas – DFL</title>
-
-  <!-- CSS PRINCIPAL DO PAINEL -->
-  <link rel="stylesheet" href="./css/dashboard-admin.css">
+  <meta charset="UTF-8" />
+  <title>Relatórios – DFL</title>
 
   <style>
-    .tabela-relatorio {
+    body {
+      font-family: Arial, sans-serif;
+      background: #0d0d0d;
+      color: white;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #ffca28;
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      display: block;
       width: 100%;
-      border-collapse: collapse;
-      margin-top: 25px;
-      background: #1e1e1e;
-      border-radius: 12px;
-      overflow: hidden;
-    }
-
-    .tabela-relatorio thead {
+      padding: 15px;
+      margin-bottom: 15px;
       background: #ffca28;
-    }
-
-    .tabela-relatorio th {
-      padding: 12px;
-      font-size: 16px;
       color: #000;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 17px;
       font-weight: bold;
-      text-align: left;
+      text-decoration: none;
     }
 
-    .tabela-relatorio td {
-      padding: 12px;
-      border-bottom: 1px solid #444;
-      color: #fff;
-      font-size: 15px;
+    .btn:hover {
+      opacity: 0.8;
     }
 
-    .tabela-relatorio tr:last-child td {
-      border-bottom: none;
-    }
-
-    .admin-container {
-      margin-top: 30px;
+    .voltar {
+      background: #1e88e5;
+      color: white !important;
     }
   </style>
 </head>
 
 <body>
 
-  <!-- TOPO -->
-  <header class="admin-header">
-    <div class="admin-header-left">
-      <img src="./img/logo-dfl.png" class="admin-logo" />
-      <h1>Relatório de Entregas</h1>
-    </div>
+  <a class="btn voltar" href="dashboard-admin.html">⬅ Voltar</a>
 
-    <button class="admin-logout" onclick="window.location.href='relatorios.html'">
-      ⬅ Voltar
-    </button>
-  </header>
+  <h1>Relatórios DFL</h1>
 
-  <div class="admin-container">
-    <!-- Aqui o relatório será carregado -->
-    <div id="relatorioEntregasContainer">Carregando...</div>
-  </div>
-
-  <!-- JS DO RELATÓRIO -->
-  <script type="module" src="./js/relatorios-entregas.js"></script>
+  <a class="btn" href="pdf-estoque.html">📦 Estoque do Dia</a>
+  <a class="btn" href="pdf-despesas.html">💸 Relatório de Despesas</a>
+  <a class="btn" href="pdf-entregas.html">🛵 Relatório de Entregas</a>
 
 </body>
 </html>
