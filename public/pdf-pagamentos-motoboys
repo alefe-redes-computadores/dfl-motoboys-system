@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>DFL — Pagamentos de Motoboys</title>
+
+  <!-- jsPDF + AutoTable (versão UMD correta) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+  <!-- Fix obrigatório para jsPDF -->
+  <script>
+    window.jsPDF = window.jspdf.jsPDF;
+  </script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+      padding: 20px;
+    }
+    h1 {
+      color: #ffca28;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Gerando PDF de Pagamentos...</h1>
+
+  <script type="module">
+    import { db } from "./js/firebase-config-v2.js";
+
+    import {
+      collection,
+      getDocs
+    } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+    async function gerarPDF() {
+      try {
+        const snap = await getDocs(collection(db, "entregasManuais"));
+        const itens = [];
+
+        snap.forEach(d => {
+          const x = d.data();
+
+          itens.push([
+            x.motoboyNome || x.motoboy,
+            x.quantidade,
+            "R$ " + Number(x.valorPago || 0).toFixed(2).replace(".", ","),
+            x.data
+          ]);
+        });
+
+        if (itens.length === 0) {
+          alert("Nenhum pagamento encontrado.");
+          window.location.href = "relatorios.html";
+          return;
+        }
+
+        const doc = new jsPDF();
+
+        doc.setFontSize(18);
+        doc.text("Relatório de Pagamentos – Motoboys", 10, 15);
+
+        doc.autoTable({
+          startY: 25,
+          head: [["Motoboy", "Qtd Entregas", "Valor Pago", "Data"]],
+          body: itens
+        });
+
+        doc.save("pagamentos_motoboys.pdf");
+
+        window.location.href = "relatorios.html";
+
+      } catch (e) {
+        console.error(e);
+        alert("Erro ao gerar PDF de pagamentos. Confira o console.");
+      }
+    }
+
+    gerarPDF();
+  </script>
+
+</body>
+</html>
