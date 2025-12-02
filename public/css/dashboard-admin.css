@@ -307,3 +307,37 @@ button {
   border-radius: 10px;
   margin-bottom: 10px;
 }
+
+/* ===========================================
+   SALDO DO MOTOBOY — AJUSTE DE ALINHAMENTO
+   =========================================== */
+
+.motoboy-item strong {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.motoboy-item span {
+  font-weight: 700;         /* negrito */
+  font-size: 16px;
+  color: inherit !important;
+  margin-right: 12px;        /* dá um respiro antes do botão */
+}
+
+/* Reduz uma folguinha pra alinhar verticalmente com o botão */
+.motoboy-item {
+  padding: 12px 16px;
+}
+
+.motoboy-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap;   /* <<< impede quebra */
+}
+
+.motoboy-item strong,
+.motoboy-item span {
+  white-space: nowrap; /* <<< impede quebrar o saldo */
+}
