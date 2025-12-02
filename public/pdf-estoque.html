@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <title>PDF – Estoque do Dia</title>
 
+  <!-- Biblioteca para gerar PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -65,6 +68,20 @@
     .btn-voltar:hover {
       background: #1565c0;
     }
+
+    /* Botão de baixar PDF */
+    .btn-download {
+      background: #ffca28;
+      padding: 10px 18px;
+      color: black;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      display: inline-block;
+      margin-bottom: 25px;
+      cursor: pointer;
+      border: none;
+    }
   </style>
 
   <script type="module">
@@ -73,6 +90,7 @@
       collection,
       query,
       where,
+      orderBy,
       getDocs
     } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
@@ -80,10 +98,11 @@
       const hoje = new Date().toISOString().slice(0, 10);
       document.getElementById("dataHoje").textContent = hoje;
 
-      // 🔥 Consulta SEM orderBy (evita erro de índice)
       const q = query(
         collection(db, "estoqueDia"),
-        where("data", "==", hoje)
+        where("data", "==", hoje),
+        orderBy("categoria"),
+        orderBy("item")
       );
 
       const snap = await getDocs(q);
@@ -93,18 +112,6 @@
           "<p class='no-records'>Nenhum estoque registrado hoje.</p>";
         return;
       }
-
-      // 🔥 Criar array e ordenar manualmente
-      let itens = [];
-      snap.forEach(doc => itens.push(doc.data()));
-
-      itens.sort((a, b) => {
-        if (a.categoria < b.categoria) return -1;
-        if (a.categoria > b.categoria) return 1;
-        if (a.item < b.item) return -1;
-        if (a.item > b.item) return 1;
-        return 0;
-      });
 
       let tabela = `
         <table>
@@ -119,7 +126,9 @@
           <tbody>
       `;
 
-      itens.forEach(d => {
+      snap.forEach(doc => {
+        const d = doc.data();
+
         tabela += `
           <tr>
             <td>${d.categoria}</td>
@@ -134,6 +143,21 @@
 
       document.getElementById("conteudo").innerHTML = tabela;
     };
+
+    // FUNÇÃO PARA GERAR PDF
+    window.gerarPDF = () => {
+      const elemento = document.getElementById("areaPDF");
+
+      const opt = {
+        margin: 8,
+        filename: `estoque_${new Date().toISOString().slice(0,10)}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(elemento).save();
+    };
   </script>
 </head>
 
@@ -141,11 +165,23 @@
 
   <a class="btn-voltar" href="dashboard-admin.html">⬅ Voltar</a>
 
-  <h1>Relatório – Estoque do Dia</h1>
+  <!-- Botão de baixar PDF -->
+  <button class="btn-download" onclick="gerarPDF()">
+    📄 Baixar PDF
+  </button>
 
-  <div class="top-info">Data: <span id="dataHoje"></span></div>
+  <!-- ÁREA QUE VAI PRO PDF -->
+  <div id="areaPDF">
 
-  <div id="conteudo"></div>
+    <h1>Relatório – Estoque do Dia</h1>
+
+    <div class="top-info">Data: <span id="dataHoje"></span></div>
+
+    <div id="conteudo">
+      <!-- Conteúdo carregado pelo JS -->
+    </div>
+
+  </div>
 
 </body>
 </html>
