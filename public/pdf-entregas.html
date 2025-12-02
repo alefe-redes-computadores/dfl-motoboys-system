@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>PDF – Entregas / Pagamentos Motoboys</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 25px;
+      background: #f8f8f8;
+    }
+
+    h1 {
+      text-align: center;
+      color: #ffca28;
+      margin-bottom: 25px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    th {
+      background: #ffca28;
+      color: #000;
+      padding: 10px;
+      border: 1px solid #000;
+      font-size: 15px;
+    }
+
+    td {
+      padding: 10px;
+      border: 1px solid #000;
+    }
+
+    .no-records {
+      text-align: center;
+      padding: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #444;
+    }
+
+    .btn-voltar {
+      display: inline-block;
+      margin-bottom: 20px;
+      padding: 8px 15px;
+      background: #1e88e5;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+
+    .btn-voltar:hover {
+      background: #1565c0;
+    }
+
+    .total-box {
+      margin-top: 25px;
+      font-size: 20px;
+      font-weight: bold;
+      padding: 10px;
+      background: #fff3cd;
+      border: 1px solid #ffca28;
+      border-radius: 8px;
+      display: inline-block;
+    }
+  </style>
+
+  <script type="module">
+    import { db } from "./js/firebase-config-v2.js";
+    import {
+      collection,
+      getDocs,
+      orderBy,
+      query
+    } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+    window.onload = async () => {
+      const q = query(
+        collection(db, "entregasManuais"),
+        orderBy("data", "desc")
+      );
+
+      const snap = await getDocs(q);
+
+      if (snap.empty) {
+        document.getElementById("conteudo").innerHTML =
+          "<p class='no-records'>Nenhum registro de entrega encontrado.</p>";
+        return;
+      }
+
+      let totalPago = 0;
+
+      let tabela = `
+        <table>
+          <thead>
+            <tr>
+              <th>Motoboy</th>
+              <th>Qtd. Entregas</th>
+              <th>Valor Pago</th>
+              <th>Data</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      snap.forEach(doc => {
+        const d = doc.data();
+
+        const nomeMotoboy =
+          d.motoboy === "lucas_hiago" ? "Lucas Hiago" :
+          d.motoboy === "rodrigo_goncalves" ? "Rodrigo Gonçalves" :
+          d.motoboy_outro ? d.motoboy_outro : "Outro";
+
+        totalPago += Number(d.valor_pago || 0);
+
+        tabela += `
+          <tr>
+            <td>${nomeMotoboy}</td>
+            <td>${d.quantidade}</td>
+            <td>R$ ${Number(d.valor_pago || 0).toFixed(2).replace(".", ",")}</td>
+            <td>${d.data}</td>
+          </tr>
+        `;
+      });
+
+      tabela += "</tbody></table>";
+
+      document.getElementById("conteudo").innerHTML = tabela;
+
+      document.getElementById("totalPago").textContent =
+        "R$ " + totalPago.toFixed(2).replace(".", ",");
+    };
+  </script>
+</head>
+
+<body>
+
+  <a class="btn-voltar" href="relatorios.html">⬅ Voltar</a>
+
+  <h1>Relatório – Entregas / Pagamentos para Motoboy</h1>
+
+  <div id="conteudo"></div>
+
+  <div class="total-box">
+    Total Pago: <span id="totalPago">R$ 0,00</span>
+  </div>
+
+</body>
+</html>
