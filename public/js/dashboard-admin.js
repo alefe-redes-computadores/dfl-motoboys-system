@@ -56,7 +56,7 @@ document.getElementById("logoutAdmin")?.addEventListener("click", async () => {
 });
 
 // =======================
-// ✅ BOTÃO RELATÓRIOS (TOPO)
+// BOTÃO RELATÓRIOS
 // =======================
 document.getElementById("btnRelatorios")?.addEventListener("click", () => {
   window.location.href = "relatorios.html";
@@ -76,12 +76,10 @@ async function carregarSaldoMotoboy() {
     saldo = Number(snap.data().saldo || 0);
   }
 
-  // Nome + valor
   const valorFormatado = saldo.toFixed(2).replace(".", ",");
   saldoLucasEl.textContent = `Lucas Hiago — R$ ${valorFormatado}`;
   saldoLucasEl.className = saldo > 0 ? "motoboy-item negativo" : "motoboy-item positivo";
 
-  // SALDO GERAL
   const snapAll = await getDocs(collection(db, "motoboys"));
   let total = 0;
   snapAll.forEach(d => (total += Number(d.data().saldo || 0)));
@@ -130,7 +128,8 @@ const SUBITENS = {
 
   paes: ["Pão Hambúrguer", "Pão Hot Dog"],
 
-  outros: [
+  // 🔄 RENOMEADO: antes era "outros"
+  hortifruti: [
     "Alface",
     "Batata Palha",
     "Cebola",
@@ -139,6 +138,11 @@ const SUBITENS = {
     "Óleo",
     "Ovo",
     "Tomate"
+  ],
+
+  // 🆕 NOVA CATEGORIA: apenas 1 item manual
+  outros_extra: [
+    "Outro (Preencher manualmente)"
   ]
 };
 
@@ -151,7 +155,7 @@ function atualizarItens() {
 
   itemSel.innerHTML = itens
     .sort()
-    .map((i) => `<option value="${i}">${i}</option>`)
+    .map(i => `<option value="${i}">${i}</option>`)
     .join("");
 }
 
@@ -184,7 +188,7 @@ document.getElementById("btnSalvarEstoque").addEventListener("click", async () =
 });
 
 // =======================
-// MOSTRAR BOTÃO PDF SE EXISTIR ESTOQUE DO DIA
+// MOSTRAR BOTÃO PDF
 // =======================
 async function verificarEstoqueHoje() {
   const hoje = new Date().toISOString().slice(0, 10);
@@ -207,56 +211,52 @@ document.getElementById("btnGerarPdfEstoque").addEventListener("click", () => {
 // =======================
 // SALVAR DESPESA
 // =======================
-document
-  .getElementById("btnSalvarDespesa")
-  .addEventListener("click", async () => {
-    const desc = document.getElementById("descDespesa").value;
-    const valor = document.getElementById("valorDespesa").value;
-    const data = document.getElementById("dataDespesa").value;
+document.getElementById("btnSalvarDespesa").addEventListener("click", async () => {
+  const desc = document.getElementById("descDespesa").value;
+  const valor = document.getElementById("valorDespesa").value;
+  const data = document.getElementById("dataDespesa").value;
 
-    if (!desc || !valor || !data) {
-      alert("Preencha todos os campos.");
-      return;
-    }
+  if (!desc || !valor || !data) {
+    alert("Preencha todos os campos.");
+    return;
+  }
 
-    await addDoc(collection(db, "despesas"), {
-      descricao: desc,
-      valor: Number(valor),
-      data
-    });
-
-    alert("Despesa salva!");
+  await addDoc(collection(db, "despesas"), {
+    descricao: desc,
+    valor: Number(valor),
+    data
   });
+
+  alert("Despesa salva!");
+});
 
 // =======================
 // ENTREGAS MANUAIS
 // =======================
-document
-  .getElementById("btnSalvarEntregaManual")
-  .addEventListener("click", async () => {
-    const motoboy = document.getElementById("entregaMotoboy").value;
-    const qtd = Number(document.getElementById("entregaQtd").value);
-    const data = document.getElementById("entregaData").value;
+document.getElementById("btnSalvarEntregaManual").addEventListener("click", async () => {
+  const motoboy = document.getElementById("entregaMotoboy").value;
+  const qtd = Number(document.getElementById("entregaQtd").value);
+  const data = document.getElementById("entregaData").value;
 
-    if (!motoboy || !qtd || !data) {
-      alert("Preencha todos os campos.");
-      return;
-    }
+  if (!motoboy || !qtd || !data) {
+    alert("Preencha todos os campos.");
+    return;
+  }
 
-    await addDoc(collection(db, "entregasManuais"), {
-      motoboy,
-      quantidade: qtd,
-      data
-    });
-
-    const ref = doc(db, "motoboys", motoboy);
-    const snap = await getDoc(ref);
-
-    let saldoAtual = snap.exists() ? Number(snap.data().saldo || 0) : 0;
-    saldoAtual += qtd * 2;
-
-    await updateDoc(ref, { saldo: saldoAtual });
-
-    alert("Entrega registrada!");
-    carregarSaldoMotoboy();
+  await addDoc(collection(db, "entregasManuais"), {
+    motoboy,
+    quantidade: qtd,
+    data
   });
+
+  const ref = doc(db, "motoboys", motoboy);
+  const snap = await getDoc(ref);
+
+  let saldoAtual = snap.exists() ? Number(snap.data().saldo || 0) : 0;
+  saldoAtual += qtd * 2;
+
+  await updateDoc(ref, { saldo: saldoAtual });
+
+  alert("Entrega registrada!");
+  carregarSaldoMotoboy();
+});
