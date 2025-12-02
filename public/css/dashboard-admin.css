@@ -270,3 +270,40 @@ button {
     justify-content: center;
   }
 }
+
+/* ===========================================
+   BOTÃO PAGAR (TAMANHO CORRETO)
+   =========================================== */
+
+.btnPagar {
+  background: #ffcb00;
+  color: #000;
+  border: none;
+  padding: 8px 14px;
+  font-size: 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: auto !important;      /* <<< VOLTA AO TAMANHO PEQUENO */
+  min-width: 90px;
+}
+
+/* Ícone */
+.btnPagar img,
+.btnPagar svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Alinhamento da linha */
+.motoboy-item {
+  display: flex;
+  justify-content: space-between; /* <<< arruma tudo */
+  align-items: center;
+  padding: 14px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
