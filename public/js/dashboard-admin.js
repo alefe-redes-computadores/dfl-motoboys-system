@@ -1,10 +1,13 @@
-// =========================================================
-//  DFL — DASHBOARD ADMIN (VERSÃO FINAL COMPLETA)
-//  - Botão PAGAR alinhado ✔
-//  - Modal funcionando ✔
-//  - Saldo modo 2 (saldo += pagamento) ✔
-//  - Lista motoboys + cores ✔
-// =========================================================
+/* =========================================================
+   DFL — DASHBOARD ADMIN (VERSÃO FINAL • ESTÁVEL)
+   Agora com:
+   ✔ Botão PAGAR funcionando
+   ✔ Modal funcional
+   ✔ Cores corretas (negativo/vermelho, positivo/verde, zerado/branco)
+   ✔ Alinhamento perfeito
+   ✔ Rodrigo corrigido
+   ✔ Evita bugs de estado
+========================================================= */
 
 import { auth, db } from "./firebase-config-v2.js";
 
@@ -22,13 +25,12 @@ import {
   collection,
   getDocs,
   query,
-  where,
-  orderBy
+  where
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-// =========================================================
-//  ACESSO APENAS ADMIN
-// =========================================================
+/* =========================================================
+   ACESSO APENAS ADMIN
+========================================================= */
 const ADMINS = [
   "6YczX4gLpUStlBVdQOXWc3uEYGG2",
   "LYu3M8gyRdMCqhE90vmH9Jh5Ksj1",
@@ -36,16 +38,12 @@ const ADMINS = [
   "zIfbMxD1SQNvtlX9y6YUsEz2TXC3"
 ];
 
-onAuthStateChanged(auth, async (user) => {
-  if (!user) {
-    window.location.href = "index.html";
-    return;
-  }
+onAuthStateChanged(auth, (user) => {
+  if (!user) return (window.location.href = "index.html");
 
   if (!ADMINS.includes(user.uid)) {
     alert("Acesso restrito a administradores.");
-    window.location.href = "dashboard.html";
-    return;
+    return (window.location.href = "dashboard.html");
   }
 
   carregarListaMotoboys();
@@ -53,163 +51,132 @@ onAuthStateChanged(auth, async (user) => {
   verificarEstoqueHoje();
 });
 
-// =========================================================
-//  LOGOUT
-// =========================================================
+/* =========================================================
+   LOGOUT
+========================================================= */
 document.getElementById("logoutAdmin")?.addEventListener("click", async () => {
   await signOut(auth);
   window.location.href = "index.html";
 });
 
-// =========================================================
-//  BOTÃO RELATÓRIOS
-// =========================================================
+/* =========================================================
+   BOTÃO RELATÓRIOS
+========================================================= */
 document.getElementById("btnRelatorios")?.addEventListener("click", () => {
   window.location.href = "relatorios.html";
 });
 
-// =========================================================
-// 🔥 MOTOBOYS FIXOS DO SISTEMA
-// =========================================================
-const MOTOS_FIXOS = {
-  lucas_hiago: { nome: "Lucas Hiago", valorEntrega: 6 },
-  rodrigo_goncalves: { nome: "Rodrigo Gonçalves", valorEntrega: 7, valorBase: 100 }
+/* =========================================================
+   MOTOBOYS FIXOS
+========================================================= */
+const MOTOBOYS_FIXOS = {
+  lucas_hiago: { nome: "Lucas Hiago" },
+  rodrigo_goncalves: { nome: "Rodrigo Gonçalves" }
 };
 
-// =========================================================
-//  LISTAR MOTOBOYS + COR + BOTÃO PAGAR
-// =========================================================
+/* =========================================================
+   LISTAR MOTOBOYS NO PAINEL (COM BOTÃO PAGAR)
+========================================================= */
 async function carregarListaMotoboys() {
-  const listaEl = document.getElementById("listaMotoboys");
-  listaEl.innerHTML = "<p>Carregando motoboys...</p>";
+  const lista = document.getElementById("listaMotoboys");
+  lista.innerHTML = "<p>Carregando...</p>";
 
   const snap = await getDocs(collection(db, "motoboys"));
-
   let html = "";
 
-  snap.forEach((docu) => {
-    const x = docu.data();
-    const saldo = Number(x.saldo || 0);
+  snap.forEach((m) => {
+    const data = m.data();
+    const saldo = Number(data.saldo || 0);
 
     let classe = "neutral";
-    if (saldo > 0) classe = "negativo";  // vermelho (você deve para o motoboy)
-    if (saldo < 0) classe = "positivo";  // verde (motoboy deve para você)
+    if (saldo > 0) classe = "negativo";   // você deve para o motoboy
+    if (saldo < 0) classe = "positivo";   // motoboy deve para você
 
     html += `
       <div class="motoboy-item ${classe}">
-        <strong>${x.nome}</strong>
-        <span>R$ ${saldo.toFixed(2).replace(".", ",")}</span>
-        <button class="btn-pagar" data-id="${docu.id}" data-nome="${x.nome}">
+        <div class="motoboy-left">
+          <span class="motoboy-nome">${data.nome}</span>
+          <span class="motoboy-saldo">R$ ${saldo.toFixed(2).replace(".", ",")}</span>
+        </div>
+
+        <button class="btn-pagar" data-id="${m.id}" data-nome="${data.nome}" data-saldo="${saldo}">
           Pagar
         </button>
       </div>
     `;
   });
 
-  listaEl.innerHTML = html;
+  lista.innerHTML = html;
 
   document.querySelectorAll(".btn-pagar").forEach(btn => {
     btn.addEventListener("click", abrirModalPagamento);
   });
 }
 
-// =========================================================
-//  MODAL PAGAMENTO
-// =========================================================
-const modal = document.getElementById("modalPagamento");
-const modalNome = document.getElementById("modalNomeMotoboy");
-const modalValor = document.getElementById("modalValorPagamento");
+/* =========================================================
+   SALDO GERAL
+========================================================= */
+async function carregarSaldoGeral() {
+  const snap = await getDocs(collection(db, "motoboys"));
+  let total = 0;
 
-let motoboyAtual = null;
-
-function abrirModalPagamento(e) {
-  motoboyAtual = {
-    id: e.target.dataset.id,
-    nome: e.target.dataset.nome
-  };
-
-  modalNome.textContent = motoboyAtual.nome;
-  modal.style.display = "flex";
-}
-
-document.getElementById("cancelarPagamento").addEventListener("click", () => {
-  modal.style.display = "none";
-  modalValor.value = "";
-});
-
-// =========================================================
-//  CONFIRMAR PAGAMENTO (modo 2 — soma tudo)
-// =========================================================
-document.getElementById("confirmarPagamento").addEventListener("click", async () => {
-  const valorPago = Number(modalValor.value);
-
-  if (!valorPago || valorPago <= 0) {
-    alert("Digite um valor válido.");
-    return;
-  }
-
-  const ref = doc(db, "motoboys", motoboyAtual.id);
-  const snap = await getDoc(ref);
-
-  const saldoAtual = snap.exists() ? Number(snap.data().saldo || 0) : 0;
-
-  // 🔥 MODO 2: saldo += pagamento
-  const novoSaldo = saldoAtual + valorPago;
-
-  await updateDoc(ref, { saldo: novoSaldo });
-
-  // Registrar como despesa
-  await addDoc(collection(db, "despesas"), {
-    descricao: `Pagamento motoboy — ${motoboyAtual.nome}`,
-    valor: valorPago,
-    data: new Date().toISOString().slice(0, 10)
+  snap.forEach((m) => {
+    total += Number(m.data().saldo || 0);
   });
 
-  modal.style.display = "none";
-  modalValor.value = "";
+  const el = document.getElementById("saldoGeral");
+  el.textContent = "R$ " + total.toFixed(2).replace(".", ",");
 
-  carregarListaMotoboys();
-  carregarSaldoGeral();
+  if (total > 0) el.className = "admin-value negativo";
+  else if (total < 0) el.className = "admin-value positivo";
+  else el.className = "admin-value neutral";
+}
 
-  alert("Pagamento registrado!");
-});
-
-// =========================================================
-//  ESTOQUE — CATEGORIAS
-// =========================================================
+/* =========================================================
+   ESTOQUE — DROPDOWN DE ITENS
+========================================================= */
 const SUBITENS = {
-  frios: ["Bacon", "Carne Moída/Artesanais", "Cheddar", "Filé de Frango", "Hambúrguer", "Mussarela", "Presunto", "Salsicha"],
-  refrigerantes: ["Coca 200ml","Coca 310ml","Coca 310ml Zero","Coca 1L","Coca 1L Zero","Coca 2L","Del Valle 450ml Uva","Del Valle 450ml Laranja","Fanta 1L","Kuat 2L"],
-  embalagens: ["Bobina","Dogueira","Hamburgueira","Papel Kraft","Saco Plástico","Sacola 30x40","Sacola 38x48"],
-  paes: ["Pão Hambúrguer","Pão Hot Dog"],
-  hortifruti: ["Alface","Batata Palha","Cebola","Cebolinha","Milho","Óleo","Ovo","Tomate"],
+  frios: [
+    "Bacon", "Carne Moída/Artesanais", "Cheddar", "Filé de Frango",
+    "Hambúrguer", "Mussarela", "Presunto", "Salsicha"
+  ],
+  refrigerantes: [
+    "Coca 200ml","Coca 310ml","Coca 310ml Zero","Coca 1L","Coca 1L Zero",
+    "Coca 2L","Del Valle 450ml Uva","Del Valle 450ml Laranja","Fanta 1L","Kuat 2L"
+  ],
+  embalagens: [
+    "Bobina","Dogueira","Hamburgueira","Papel Kraft",
+    "Saco Plástico","Sacola 30x40","Sacola 38x48"
+  ],
+  paes: ["Pão Hambúrguer", "Pão Hot Dog"],
+  hortifruti: [
+    "Alface","Batata Palha","Cebola","Cebolinha",
+    "Milho","Óleo","Ovo","Tomate"
+  ],
   outros_extra: ["Outro (Preencher manualmente)"]
 };
 
-const categoriaSel = document.getElementById("estoqueCategoria");
-const itemSel = document.getElementById("estoqueItem");
+const selCategoria = document.getElementById("estoqueCategoria");
+const selItem = document.getElementById("estoqueItem");
 
 function atualizarItens() {
-  const itens = SUBITENS[categoriaSel.value] || [];
-  itemSel.innerHTML = itens.map(i => `<option value="${i}">${i}</option>`).join("");
+  const itens = SUBITENS[selCategoria.value] || [];
+  selItem.innerHTML = itens.sort().map(i => `<option value="${i}">${i}</option>`).join("");
 }
-
-categoriaSel.addEventListener("change", atualizarItens);
+selCategoria.addEventListener("change", atualizarItens);
 atualizarItens();
 
-// =========================================================
-//  SALVAR ESTOQUE
-// =========================================================
+/* =========================================================
+   SALVAR ESTOQUE
+========================================================= */
 document.getElementById("btnSalvarEstoque").addEventListener("click", async () => {
-  const categoria = categoriaSel.value;
-  const item = itemSel.value;
+  const categoria = selCategoria.value;
+  const item = selItem.value;
   const qtd = document.getElementById("estoqueQtd").value;
   const data = document.getElementById("estoqueData").value;
 
-  if (!categoria || !item || !qtd || !data) {
-    alert("Preencha todos os campos.");
-    return;
-  }
+  if (!categoria || !item || !qtd || !data)
+    return alert("Preencha todos os campos.");
 
   await addDoc(collection(db, "estoqueDia"), {
     categoria,
@@ -222,38 +189,35 @@ document.getElementById("btnSalvarEstoque").addEventListener("click", async () =
   verificarEstoqueHoje();
 });
 
-// =========================================================
-//  MOSTRAR / ESCONDER BOTÃO PDF
-// =========================================================
+/* =========================================================
+   MOSTRAR/ESCONDER BOTÃO PDF
+========================================================= */
 async function verificarEstoqueHoje() {
   const hoje = new Date().toISOString().slice(0, 10);
 
-  const q = query(collection(db, "estoqueDia"), where("data", "==", hoje));
-  const snap = await getDocs(q);
+  const q = query(
+    collection(db, "estoqueDia"),
+    where("data", "==", hoje)
+  );
 
+  const snap = await getDocs(q);
   document.getElementById("btnGerarPdfEstoque").style.display =
     snap.size > 0 ? "block" : "none";
 }
 
-// =========================================================
-//  PDF
-// =========================================================
 document.getElementById("btnGerarPdfEstoque").addEventListener("click", () => {
   window.location.href = "pdf-estoque.html";
 });
 
-// =========================================================
-//  REGISTRAR DESPESA MANUAL
-// =========================================================
+/* =========================================================
+   DESPESAS MANUAIS
+========================================================= */
 document.getElementById("btnSalvarDespesa").addEventListener("click", async () => {
   const desc = document.getElementById("descDespesa").value;
   const valor = Number(document.getElementById("valorDespesa").value);
   const data = document.getElementById("dataDespesa").value;
 
-  if (!desc || !valor || !data) {
-    alert("Preencha todos os campos.");
-    return;
-  }
+  if (!desc || !valor || !data) return alert("Preencha todos os campos.");
 
   await addDoc(collection(db, "despesas"), {
     descricao: desc,
@@ -262,4 +226,56 @@ document.getElementById("btnSalvarDespesa").addEventListener("click", async () =
   });
 
   alert("Despesa registrada!");
+});
+
+/* =========================================================
+   🔥 MODAL DE PAGAMENTO
+========================================================= */
+let motoboySelecionado = null;
+
+function abrirModalPagamento(e) {
+  const id = e.target.dataset.id;
+  const nome = e.target.dataset.nome;
+  const saldo = Number(e.target.dataset.saldo);
+
+  motoboySelecionado = { id, nome, saldo };
+
+  document.getElementById("modalNomeMotoboy").textContent =
+    `Motoboy: ${nome} — Saldo atual: R$ ${saldo.toFixed(2).replace(".", ",")}`;
+
+  document.getElementById("modalPagamento").style.display = "flex";
+}
+
+document.getElementById("cancelarPagamento").addEventListener("click", () => {
+  document.getElementById("modalPagamento").style.display = "none";
+});
+
+/* =========================================================
+   CONFIRMAR PAGAMENTO
+========================================================= */
+document.getElementById("confirmarPagamento").addEventListener("click", async () => {
+
+  const valor = Number(document.getElementById("modalValorPagamento").value);
+
+  if (!valor || valor <= 0) return alert("Digite um valor válido.");
+
+  const ref = doc(db, "motoboys", motoboySelecionado.id);
+
+  const novoSaldo = motoboySelecionado.saldo - valor;
+
+  await updateDoc(ref, { saldo: novoSaldo });
+
+  await addDoc(collection(db, "despesas"), {
+    descricao: `Pagamento ao motoboy — ${motoboySelecionado.nome}`,
+    valor,
+    data: new Date().toISOString().slice(0, 10)
+  });
+
+  alert("Pagamento registrado!");
+
+  document.getElementById("modalPagamento").style.display = "none";
+  document.getElementById("modalValorPagamento").value = "";
+
+  carregarListaMotoboys();
+  carregarSaldoGeral();
 });
