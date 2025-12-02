@@ -4,9 +4,14 @@
   <meta charset="UTF-8">
   <title>DFL — PDF Estoque</title>
 
-  <!-- jsPDF + AutoTable (VERSÃO COMPATÍVEL UMD) -->
+  <!-- jsPDF + AutoTable (versão UMD correta) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+  <!-- Fix obrigatório para jsPDF (SEM ISSO NÃO FUNCIONA) -->
+  <script>
+    window.jsPDF = window.jspdf.jsPDF;
+  </script>
 
   <style>
     body {
@@ -23,7 +28,8 @@
   <h1>Gerando PDF do Estoque...</h1>
 
   <script type="module">
-    import { db } from "./js/firebase-config-v2.js";
+    import { db } from "./firebase-config-v2.js"; /* CORRIGIDO */
+
     import {
       collection,
       getDocs,
@@ -33,7 +39,7 @@
 
     async function gerarPDF() {
       try {
-        const hoje = new Date().toISOString().slice(0,10);
+        const hoje = new Date().toISOString().slice(0, 10);
 
         const q = query(
           collection(db, "estoqueDia"),
@@ -54,7 +60,7 @@
           return;
         }
 
-        const { jsPDF } = window.jspdf;
+        const { jsPDF } = window;
         const doc = new jsPDF();
 
         doc.setFontSize(18);
