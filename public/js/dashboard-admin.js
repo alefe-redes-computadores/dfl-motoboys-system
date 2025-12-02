@@ -1,5 +1,5 @@
 // =========================================================
-//  DFL — DASHBOARD ADMIN (VERSÃO FINAL COMPLETA CORRIGIDA)
+//  DFL — DASHBOARD ADMIN (VERSÃO COMPLETA CORRIGIDA — OPÇÃO A)
 // =========================================================
 
 import { auth, db } from "./firebase-config-v2.js";
@@ -18,7 +18,8 @@ import {
   collection,
   getDocs,
   query,
-  where
+  where,
+  orderBy
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 // =========================================================
@@ -43,6 +44,7 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
+  await recalcularSaldos(); // 🔥 NOVO: recalcula tudo antes de exibir
   carregarListaMotoboys();
   carregarSaldoGeral();
   verificarEstoqueHoje();
@@ -64,19 +66,47 @@ document.getElementById("btnRelatorios")?.addEventListener("click", () => {
 });
 
 // =========================================================
-// 🔥 MOTOBOYS FIXOS DO SISTEMA
+// 🔥 MOTODOY FIXOS DO SISTEMA
 // =========================================================
 const MOTOS_FIXOS = {
   lucas_hiago: {
     nome: "Lucas Hiago",
-    valorEntrega: 6
+    valorEntrega: 6 // fixo
   },
   rodrigo_goncalves: {
     nome: "Rodrigo Gonçalves",
-    valorEntrega: 7,
-    valorBase: 100
+    valorEntrega: 7, // após 10 entregas
+    valorBase: 100 // até 10 entregas
   }
 };
+
+// =========================================================
+//  FUNÇÃO NOVA — RECALCULAR TODOS OS SALDOS DO ZERO
+// =========================================================
+async function recalcularSaldos() {
+  const motoboysSnap = await getDocs(collection(db, "motoboys"));
+
+  for (const docu of motoboysSnap.docs) {
+    const id = docu.id;
+
+    const entregasQuery = query(
+      collection(db, "entregasManuais"),
+      where("motoboy", "==", id)
+    );
+
+    const entregasSnap = await getDocs(entregasQuery);
+
+    let saldo = 0;
+
+    entregasSnap.forEach(e => {
+      saldo += Number(e.data().valorPago || 0);
+    });
+
+    await setDoc(doc(db, "motoboys", id), {
+      saldo: saldo
+    }, { merge: true });
+  }
+}
 
 // =========================================================
 //  LISTAR MOTOBOYS NO PAINEL
@@ -86,16 +116,19 @@ async function carregarListaMotoboys() {
   listaEl.innerHTML = "<p>Carregando...</p>";
 
   const snap = await getDocs(collection(db, "motoboys"));
+
   let html = "";
 
   snap.forEach((docu) => {
     const x = docu.data();
     const saldo = Number(x.saldo || 0);
 
-    let classe = "neutral";
-    if (saldo > 0) classe = "negativo";     // débito → vermelho
-    else if (saldo < 0) classe = "positivo"; // crédito → verde
-    else classe = "neutral";                // saldo zero
+    let classe =
+      saldo > 0
+        ? "negativo" // vermelho (você DEVENDO ao motoboy)
+        : saldo < 0
+        ? "positivo" // verde (motoboy DEVENDO a você)
+        : "neutral"; // zerado
 
     html += `
       <div class="motoboy-item ${classe}">
@@ -115,25 +148,49 @@ async function carregarSaldoGeral() {
   const snap = await getDocs(collection(db, "motoboys"));
   let total = 0;
 
-  snap.forEach(d => total += Number(d.data().saldo || 0));
+  snap.forEach(d => {
+    total += Number(d.data().saldo || 0);
+  });
 
   const el = document.getElementById("saldoGeral");
+
   el.textContent = "R$ " + total.toFixed(2).replace(".", ",");
 
-  if (total > 0) el.className = "admin-value negativo";
-  else if (total < 0) el.className = "admin-value positivo";
-  else el.className = "admin-value neutral";
+  el.className =
+    total > 0
+      ? "admin-value negativo"
+      : total < 0
+      ? "admin-value positivo"
+      : "admin-value neutral";
 }
 
 // =========================================================
-//  CATEGORIAS DE ESTOQUE (MANTIDAS)
+//  CATEGORIAS DE ESTOQUE
 // =========================================================
 const SUBITENS = {
-  frios: ["Bacon", "Carne Moída/Artesanais", "Cheddar", "Filé de Frango", "Hambúrguer", "Mussarela", "Presunto", "Salsicha"],
-  refrigerantes: ["Coca 200ml", "Coca 310ml", "Coca 310ml Zero", "Coca 1L", "Coca 1L Zero", "Coca 2L", "Del Valle 450ml Uva", "Del Valle 450ml Laranja", "Fanta 1L", "Kuat 2L"],
-  embalagens: ["Bobina", "Dogueira", "Hamburgueira", "Papel Kraft", "Saco Plástico", "Sacola 30x40", "Sacola 38x48"],
+  frios: [
+    "Bacon","Carne Moída/Artesanais","Cheddar","Filé de Frango",
+    "Hambúrguer","Mussarela","Presunto","Salsicha"
+  ],
+
+  refrigerantes: [
+    "Coca 200ml","Coca 310ml","Coca 310ml Zero","Coca 1L",
+    "Coca 1L Zero","Coca 2L","Del Valle 450ml Uva","Del Valle 450ml Laranja",
+    "Fanta 1L","Kuat 2L"
+  ],
+
+  embalagens: [
+    "Bobina","Dogueira","Hamburgueira","Papel Kraft",
+    "Saco Plástico","Sacola 30x40","Sacola 38x48"
+  ],
+
   paes: ["Pão Hambúrguer", "Pão Hot Dog"],
-  hortifruti: ["Alface", "Batata Palha", "Cebola", "Cebolinha", "Milho", "Óleo", "Ovo", "Tomate"],
+
+  hortifruti: [
+    "Alface","Batata Palha","Cebola","Cebolinha",
+    "Milho","Óleo","Ovo","Tomate"
+  ],
+
   outros_extra: ["Outro (Preencher manualmente)"]
 };
 
@@ -144,13 +201,16 @@ function atualizarItens() {
   const cat = categoriaSel.value;
   const itens = SUBITENS[cat] || [];
 
-  itemSel.innerHTML = itens.sort().map(i => `<option value="${i}">${i}</option>`).join("");
+  itemSel.innerHTML = itens
+    .sort()
+    .map(i => `<option value="${i}">${i}</option>`)
+    .join("");
 }
 categoriaSel.addEventListener("change", atualizarItens);
 atualizarItens();
 
 // =========================================================
-//  SALVAR ESTOQUE DO DIA
+//  SALVAR ESTOQUE
 // =========================================================
 document.getElementById("btnSalvarEstoque").addEventListener("click", async () => {
   const categoria = categoriaSel.value;
@@ -179,20 +239,23 @@ document.getElementById("btnSalvarEstoque").addEventListener("click", async () =
 // =========================================================
 async function verificarEstoqueHoje() {
   const hoje = new Date().toISOString().slice(0, 10);
+
   const q = query(collection(db, "estoqueDia"), where("data", "==", hoje));
   const snap = await getDocs(q);
-  document.getElementById("btnGerarPdfEstoque").style.display = snap.size > 0 ? "block" : "none";
+
+  const btn = document.getElementById("btnGerarPdfEstoque");
+  btn.style.display = snap.size > 0 ? "block" : "none";
 }
 
 // =========================================================
-//  ABRIR PÁGINA DO PDF
+//  ABRIR PDF
 // =========================================================
 document.getElementById("btnGerarPdfEstoque").addEventListener("click", () => {
   window.location.href = "pdf-estoque.html";
 });
 
 // =========================================================
-//  SALVAR DESPESA MANUAL
+//  REGISTRAR DESPESA MANUAL
 // =========================================================
 document.getElementById("btnSalvarDespesa").addEventListener("click", async () => {
   const desc = document.getElementById("descDespesa").value;
@@ -214,7 +277,7 @@ document.getElementById("btnSalvarDespesa").addEventListener("click", async () =
 });
 
 // =========================================================
-// 🔥 REGISTRAR ENTREGA + SALDO + DESPESA AUTOMÁTICA
+// 🔥 REGISTRAR ENTREGA + PAGAMENTO PARA MOTOBOY
 // =========================================================
 
 const selMotoboy = document.getElementById("entregaMotoboy");
@@ -262,7 +325,7 @@ document.getElementById("btnSalvarEntregaManual").addEventListener("click", asyn
   }
 
   // ============================================
-  // SALVAR ENTREGA
+  // SALVAR REGISTRO DE ENTREGA
   // ============================================
   await addDoc(collection(db, "entregasManuais"), {
     motoboy: idMotoboy,
@@ -271,20 +334,6 @@ document.getElementById("btnSalvarEntregaManual").addEventListener("click", asyn
     valorPago,
     data
   });
-
-  // ============================================
-  // ATUALIZAR SALDO DO MOTOBOY
-  // ============================================
-  const ref = doc(db, "motoboys", idMotoboy);
-  const snap = await getDoc(ref);
-  let saldoAtual = snap.exists() ? Number(snap.data().saldo || 0) : 0;
-
-  saldoAtual += valorPago; // entrada de crédito pro motoboy
-
-  await setDoc(ref, {
-    nome: nomeMotoboy,
-    saldo: saldoAtual
-  }, { merge: true });
 
   // ============================================
   // DESPESA AUTOMÁTICA
@@ -297,6 +346,7 @@ document.getElementById("btnSalvarEntregaManual").addEventListener("click", asyn
 
   alert("Entrega registrada com sucesso!");
 
+  await recalcularSaldos();
   carregarListaMotoboys();
   carregarSaldoGeral();
 });
