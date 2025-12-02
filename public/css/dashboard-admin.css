@@ -1,6 +1,6 @@
 /* ============================================================
-   🎨 DFL — CSS DO PAINEL ADMINISTRATIVO
-   Visual consistente com DFL, painel organizado e moderno
+   🎨 DFL — CSS DO PAINEL ADMINISTRATIVO (VERSÃO FINAL)
+   Inclui botões de pagamento + modal
    ============================================================ */
 
 /* Configuração base */
@@ -127,7 +127,7 @@ select {
 }
 
 /* ============================================================
-   🛵 LISTA DE MOTOBOYS (DINÂMICA)
+   🛵 LISTA DE MOTOBOYS
    ============================================================ */
 .lista-motoboys {
   margin-top: 10px;
@@ -137,23 +137,50 @@ select {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 8px;
-  padding: 10px 0;
-  border-bottom: 1px solid #333;
+  background: #111;
+  padding: 12px 15px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #333;
   font-size: 16px;
   font-weight: 600;
+  gap: 12px;
+}
+
+/* VALORES DE SALDO */
+.motoboy-saldo {
+  font-weight: bold;
+  min-width: 90px;
+  text-align: right;
 }
 
 .negativo {
-  color: #e53935 !important; /* Vermelho — débito */
+  color: #e53935 !important; /* vermelho */
 }
 
 .positivo {
-  color: #43a047 !important; /* Verde — saldo ok */
+  color: #43a047 !important; /* verde */
 }
 
-.neutral {
-  color: #ffffff !important;
+.neutro {
+  color: #ffffff !important; /* branco */
+}
+
+/* BOTÃO PAGAR (pequeno) */
+.btn-pagar {
+  background: #1e88e5;
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: .2s;
+}
+
+.btn-pagar:hover {
+  background: #1565c0;
 }
 
 /* ============================================================
@@ -182,6 +209,42 @@ select {
 }
 
 /* ============================================================
+   🪟 MODAL PAGAMENTO
+   ============================================================ */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modal-content {
+  background: #1a1a1a;
+  padding: 25px;
+  width: 90%;
+  max-width: 380px;
+  border-radius: 14px;
+  border: 2px solid #ffca28;
+}
+
+.modal-content h3 {
+  margin-top: 0;
+  color: #ffca28;
+}
+
+.btn-cancelar {
+  background: #444 !important;
+  margin-top: 10px;
+}
+
+.btn-cancelar:hover {
+  background: #555 !important;
+}
+
+/* ============================================================
    📱 RESPONSIVIDADE
    ============================================================ */
 @media (max-width: 480px) {
@@ -200,5 +263,15 @@ select {
 
   .admin-container {
     grid-template-columns: 1fr;
+  }
+
+  .motoboy-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .motoboy-saldo {
+    width: 100%;
+    text-align: left;
   }
 }
