@@ -1,5 +1,7 @@
 // =========================================================
-//  DFL — DASHBOARD ADMIN (VERSÃO COMPLETA CORRIGIDA — OPÇÃO A)
+//  DFL — DASHBOARD ADMIN (VERSÃO COMPLETA CORRIGIDA 2)
+//  - NÃO recalcula o saldo do Lucas Hiago
+//  - Recalcula apenas Rodrigo + outros motoboys
 // =========================================================
 
 import { auth, db } from "./firebase-config-v2.js";
@@ -44,7 +46,7 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  await recalcularSaldos(); // 🔥 NOVO: recalcula tudo antes de exibir
+  await recalcularSaldos();      // 🔥 Agora NÃO mexe no Lucas
   carregarListaMotoboys();
   carregarSaldoGeral();
   verificarEstoqueHoje();
@@ -75,19 +77,24 @@ const MOTOS_FIXOS = {
   },
   rodrigo_goncalves: {
     nome: "Rodrigo Gonçalves",
-    valorEntrega: 7, // após 10 entregas
-    valorBase: 100 // até 10 entregas
+    valorEntrega: 7,  // após 10 entregas
+    valorBase: 100    // até 10 entregas
   }
 };
 
 // =========================================================
-//  FUNÇÃO NOVA — RECALCULAR TODOS OS SALDOS DO ZERO
+//  FUNÇÃO NOVA — RECALCULAR SALDOS (EXCETO LUCAS HIAGO)
 // =========================================================
 async function recalcularSaldos() {
   const motoboysSnap = await getDocs(collection(db, "motoboys"));
 
   for (const docu of motoboysSnap.docs) {
     const id = docu.id;
+
+    // ⚠️ NÃO mexer no saldo do Lucas Hiago
+    if (id === "lucas_hiago") {
+      continue;
+    }
 
     const entregasQuery = query(
       collection(db, "entregasManuais"),
@@ -125,9 +132,9 @@ async function carregarListaMotoboys() {
 
     let classe =
       saldo > 0
-        ? "negativo" // vermelho (você DEVENDO ao motoboy)
+        ? "negativo" // vermelho — você devendo pro motoboy
         : saldo < 0
-        ? "positivo" // verde (motoboy DEVENDO a você)
+        ? "positivo" // verde — motoboy devendo pra você
         : "neutral"; // zerado
 
     html += `
@@ -169,29 +176,55 @@ async function carregarSaldoGeral() {
 // =========================================================
 const SUBITENS = {
   frios: [
-    "Bacon","Carne Moída/Artesanais","Cheddar","Filé de Frango",
-    "Hambúrguer","Mussarela","Presunto","Salsicha"
+    "Bacon",
+    "Carne Moída/Artesanais",
+    "Cheddar",
+    "Filé de Frango",
+    "Hambúrguer",
+    "Mussarela",
+    "Presunto",
+    "Salsicha"
   ],
 
   refrigerantes: [
-    "Coca 200ml","Coca 310ml","Coca 310ml Zero","Coca 1L",
-    "Coca 1L Zero","Coca 2L","Del Valle 450ml Uva","Del Valle 450ml Laranja",
-    "Fanta 1L","Kuat 2L"
+    "Coca 200ml",
+    "Coca 310ml",
+    "Coca 310ml Zero",
+    "Coca 1L",
+    "Coca 1L Zero",
+    "Coca 2L",
+    "Del Valle 450ml Uva",
+    "Del Valle 450ml Laranja",
+    "Fanta 1L",
+    "Kuat 2L"
   ],
 
   embalagens: [
-    "Bobina","Dogueira","Hamburgueira","Papel Kraft",
-    "Saco Plástico","Sacola 30x40","Sacola 38x48"
+    "Bobina",
+    "Dogueira",
+    "Hamburgueira",
+    "Papel Kraft",
+    "Saco Plástico",
+    "Sacola 30x40",
+    "Sacola 38x48"
   ],
 
   paes: ["Pão Hambúrguer", "Pão Hot Dog"],
 
   hortifruti: [
-    "Alface","Batata Palha","Cebola","Cebolinha",
-    "Milho","Óleo","Ovo","Tomate"
+    "Alface",
+    "Batata Palha",
+    "Cebola",
+    "Cebolinha",
+    "Milho",
+    "Óleo",
+    "Ovo",
+    "Tomate"
   ],
 
-  outros_extra: ["Outro (Preencher manualmente)"]
+  outros_extra: [
+    "Outro (Preencher manualmente)"
+  ]
 };
 
 const categoriaSel = document.getElementById("estoqueCategoria");
@@ -346,7 +379,7 @@ document.getElementById("btnSalvarEntregaManual").addEventListener("click", asyn
 
   alert("Entrega registrada com sucesso!");
 
-  await recalcularSaldos();
+  await recalcularSaldos();   // recalcula Rodrigo + outros, mas NÃO o Lucas
   carregarListaMotoboys();
   carregarSaldoGeral();
 });
