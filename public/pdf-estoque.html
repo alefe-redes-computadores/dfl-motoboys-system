@@ -4,9 +4,6 @@
   <meta charset="UTF-8" />
   <title>PDF – Estoque do Dia</title>
 
-  <!-- Biblioteca para gerar PDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
-
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -56,7 +53,7 @@
 
     .btn-voltar {
       display: inline-block;
-      margin-bottom: 20px;
+      margin-bottom: 12px;
       padding: 8px 15px;
       background: #1e88e5;
       color: white;
@@ -65,24 +62,21 @@
       font-weight: bold;
     }
 
-    .btn-voltar:hover {
-      background: #1565c0;
-    }
-
-    /* Botão de baixar PDF */
-    .btn-download {
-      background: #ffca28;
-      padding: 10px 18px;
-      color: black;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: bold;
+    .btn-pdf {
       display: inline-block;
-      margin-bottom: 25px;
-      cursor: pointer;
-      border: none;
+      margin-left: 10px;
+      padding: 8px 15px;
+      background: #ffca28;
+      color: black;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: bold;
     }
   </style>
+
+  <!-- jsPDF + autotable -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
   <script type="module">
     import { db } from "./js/firebase-config-v2.js";
@@ -90,19 +84,19 @@
       collection,
       query,
       where,
-      orderBy,
       getDocs
     } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+    let registros = [];
 
     window.onload = async () => {
       const hoje = new Date().toISOString().slice(0, 10);
       document.getElementById("dataHoje").textContent = hoje;
 
+      // 🔥 Query SEM orderBy (funciona sempre)
       const q = query(
         collection(db, "estoqueDia"),
-        where("data", "==", hoje),
-        orderBy("categoria"),
-        orderBy("item")
+        where("data", "==", hoje)
       );
 
       const snap = await getDocs(q);
@@ -112,6 +106,8 @@
           "<p class='no-records'>Nenhum estoque registrado hoje.</p>";
         return;
       }
+
+      registros = [];
 
       let tabela = `
         <table>
@@ -128,6 +124,7 @@
 
       snap.forEach(doc => {
         const d = doc.data();
+        registros.push(d);
 
         tabela += `
           <tr>
@@ -140,23 +137,29 @@
       });
 
       tabela += "</tbody></table>";
-
       document.getElementById("conteudo").innerHTML = tabela;
     };
 
-    // FUNÇÃO PARA GERAR PDF
-    window.gerarPDF = () => {
-      const elemento = document.getElementById("areaPDF");
+    // ==========================================================
+    // 🔽 BAIXAR PDF
+    // ==========================================================
+    window.baixarPDF = () => {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
 
-      const opt = {
-        margin: 8,
-        filename: `estoque_${new Date().toISOString().slice(0,10)}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
+      doc.setFontSize(18);
+      doc.text("Relatório – Estoque do Dia", 14, 20);
 
-      html2pdf().set(opt).from(elemento).save();
+      doc.setFontSize(12);
+      doc.text("Data: " + document.getElementById("dataHoje").textContent, 14, 30);
+
+      doc.autoTable({
+        startY: 40,
+        head: [["Categoria", "Item", "Quantidade", "Data"]],
+        body: registros.map(r => [r.categoria, r.item, r.quantidade, r.data])
+      });
+
+      doc.save("estoque_" + document.getElementById("dataHoje").textContent + ".pdf");
     };
   </script>
 </head>
@@ -164,24 +167,13 @@
 <body>
 
   <a class="btn-voltar" href="dashboard-admin.html">⬅ Voltar</a>
+  <a class="btn-pdf" href="#" onclick="baixarPDF()">📄 Baixar PDF</a>
 
-  <!-- Botão de baixar PDF -->
-  <button class="btn-download" onclick="gerarPDF()">
-    📄 Baixar PDF
-  </button>
+  <h1>Relatório – Estoque do Dia</h1>
 
-  <!-- ÁREA QUE VAI PRO PDF -->
-  <div id="areaPDF">
+  <div class="top-info">Data: <span id="dataHoje"></span></div>
 
-    <h1>Relatório – Estoque do Dia</h1>
-
-    <div class="top-info">Data: <span id="dataHoje"></span></div>
-
-    <div id="conteudo">
-      <!-- Conteúdo carregado pelo JS -->
-    </div>
-
-  </div>
+  <div id="conteudo"></div>
 
 </body>
 </html>
