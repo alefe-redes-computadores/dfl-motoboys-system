@@ -1,5 +1,5 @@
 // =========================================================
-//  DFL — DASHBOARD ADMIN (VERSÃO FINAL CORRIGIDA)
+//  DFL — DASHBOARD ADMIN (VERSÃO FINAL COMPLETA • CORRIGIDA)
 // =========================================================
 
 import { auth, db } from "./firebase-config-v2.js";
@@ -12,9 +12,9 @@ import {
 import {
   doc,
   getDoc,
+  updateDoc,
   setDoc,
   addDoc,
-  updateDoc,
   collection,
   getDocs,
   query,
@@ -65,128 +65,68 @@ document.getElementById("btnRelatorios")?.addEventListener("click", () => {
 });
 
 // =========================================================
-// 🔥 MOTOBOYS FIXOS
+// 🔥 MOTOBOYS FIXOS DO SISTEMA
 // =========================================================
 const MOTOS_FIXOS = {
-  lucas_hiago: "Lucas Hiago",
-  rodrigo_goncalves: "Rodrigo Gonçalves"
+  lucas_hiago: {
+    nome: "Lucas Hiago",
+    valorEntrega: 6 // fixo
+  },
+  rodrigo_goncalves: {
+    nome: "Rodrigo Gonçalves",
+    valorEntrega: 7, // após 10 entregas
+    valorBase: 100 // até 10 entregas
+  }
 };
 
 // =========================================================
-//  CALCULAR SALDO DINÂMICO (Rodrigo + Outros)
-// =========================================================
-async function calcularSaldoDinamico(idMotoboy, nome) {
-  // Somar entregas
-  const q1 = query(collection(db, "entregasManuais"), where("motoboy", "==", idMotoboy));
-  const snap1 = await getDocs(q1);
-
-  let totalEntregas = 0;
-  snap1.forEach(d => totalEntregas += Number(d.data().valorPago || 0));
-
-  // Somar pagamentos (despesas automáticas)
-  const q2 = query(
-    collection(db, "despesas"),
-    where("descricao", "==", `Pagamento motoboy — ${nome}`)
-  );
-  const snap2 = await getDocs(q2);
-
-  let totalPagamentos = 0;
-  snap2.forEach(d => totalPagamentos += Number(d.data().valor || 0));
-
-  return totalEntregas - totalPagamentos;
-}
-
-// =========================================================
-//  LISTAR MOTOBOYS (ORDEM FIXA + CORES CORRETAS)
+//  LISTAR MOTOBOYS NO PAINEL + REGRA DE CORES
 // =========================================================
 async function carregarListaMotoboys() {
   const listaEl = document.getElementById("listaMotoboys");
   listaEl.innerHTML = "<p>Carregando...</p>";
 
-  let html = "";
-
-  // ---------- 1. Lucas Hiago (saldo manual) ----------
-  let snapLucas = await getDoc(doc(db, "motoboys", "lucas_hiago"));
-  let saldoLucas = snapLucas.exists() ? Number(snapLucas.data().saldo || 0) : 0;
-
-  let classeLucas =
-    saldoLucas > 0 ? "negativo" :
-    saldoLucas < 0 ? "positivo" : "neutral";
-
-  html += `
-    <div class="motoboy-item ${classeLucas}">
-      <strong>Lucas Hiago</strong>
-      <span>R$ ${saldoLucas.toFixed(2).replace(".", ",")}</span>
-    </div>
-  `;
-
-  // ---------- 2. Rodrigo Gonçalves (saldo dinâmico) ----------
-  let saldoRodrigo = await calcularSaldoDinamico("rodrigo_goncalves", "Rodrigo Gonçalves");
-
-  let classeRodrigo =
-    saldoRodrigo > 0 ? "negativo" :
-    saldoRodrigo < 0 ? "positivo" : "neutral";
-
-  html += `
-    <div class="motoboy-item ${classeRodrigo}">
-      <strong>Rodrigo Gonçalves</strong>
-      <span>R$ ${saldoRodrigo.toFixed(2).replace(".", ",")}</span>
-    </div>
-  `;
-
-  // ---------- 3. Outros motoboys ----------
   const snap = await getDocs(collection(db, "motoboys"));
 
+  let html = "";
+
   snap.forEach((docu) => {
-    const id = docu.id;
-    const data = docu.data();
+    const x = docu.data();
 
-    if (id === "lucas_hiago" || id === "rodrigo_goncalves") return;
+    const saldo = Number(x.saldo || 0);
 
-    const nome = data.nome;
-    calcularSaldoDinamico(id, nome).then(saldo => {
-      let classe =
-        saldo > 0 ? "negativo" :
-        saldo < 0 ? "positivo" : "neutral";
+    let classe = "neutral";
 
-      listaEl.innerHTML += `
-        <div class="motoboy-item ${classe}">
-          <strong>${nome}</strong>
-          <span>R$ ${saldo.toFixed(2).replace(".", ",")}</span>
-        </div>
-      `;
-    });
+    if (saldo > 0) classe = "negativo";      // vermelho = você deve para o motoboy
+    if (saldo < 0) classe = "positivo";      // verde = motoboy deve para você
+    if (saldo === 0) classe = "neutral";     // branco = zerado
+
+    html += `
+      <div class="motoboy-item ${classe}">
+        <strong>${x.nome}</strong>
+        <span>R$ ${saldo.toFixed(2).replace(".", ",")}</span>
+      </div>
+    `;
   });
 
   listaEl.innerHTML = html;
 }
 
 // =========================================================
-//  SALDO GERAL (RODANDO APÓS TODOS)
+//  CALCULAR SALDO GERAL (mesma regra de cor)
 // =========================================================
 async function carregarSaldoGeral() {
-  // Soma apenas motoboys fixos + outros que existam
+  const snap = await getDocs(collection(db, "motoboys"));
   let total = 0;
 
-  // Lucas (manual)
-  let snapLucas = await getDoc(doc(db, "motoboys", "lucas_hiago"));
-  total += snapLucas.exists() ? Number(snapLucas.data().saldo || 0) : 0;
-
-  // Rodrigo (dinâmico)
-  total += await calcularSaldoDinamico("rodrigo_goncalves", "Rodrigo Gonçalves");
-
-  // Outros
-  const snap = await getDocs(collection(db, "motoboys"));
-  for (let d of snap.docs) {
-    if (d.id === "lucas_hiago" || d.id === "rodrigo_goncalves") continue;
-    total += await calcularSaldoDinamico(d.id, d.data().nome);
-  }
+  snap.forEach(d => total += Number(d.data().saldo || 0));
 
   const el = document.getElementById("saldoGeral");
   el.textContent = "R$ " + total.toFixed(2).replace(".", ",");
-  el.className =
-    total > 0 ? "admin-value negativo" :
-    total < 0 ? "admin-value positivo" : "admin-value neutral";
+
+  if (total > 0) el.className = "admin-value negativo";
+  else if (total < 0) el.className = "admin-value positivo";
+  else el.className = "admin-value neutral";
 }
 
 // =========================================================
@@ -286,12 +226,16 @@ document.getElementById("btnSalvarEstoque").addEventListener("click", async () =
 });
 
 // =========================================================
-//  MOSTRAR BOTÃO PDF DE ESTOQUE
+//  MOSTRAR BOTÃO PDF
 // =========================================================
 async function verificarEstoqueHoje() {
   const hoje = new Date().toISOString().slice(0, 10);
 
-  const q = query(collection(db, "estoqueDia"), where("data", "==", hoje));
+  const q = query(
+    collection(db, "estoqueDia"),
+    where("data", "==", hoje)
+  );
+
   const snap = await getDocs(q);
 
   const btn = document.getElementById("btnGerarPdfEstoque");
@@ -299,14 +243,14 @@ async function verificarEstoqueHoje() {
 }
 
 // =========================================================
-//  ABRIR PDF
+//  PDF
 // =========================================================
 document.getElementById("btnGerarPdfEstoque").addEventListener("click", () => {
   window.location.href = "pdf-estoque.html";
 });
 
 // =========================================================
-//  REGISTRAR DESPESA MANUAL
+// 🔥 REGISTRAR DESPESA MANUAL
 // =========================================================
 document.getElementById("btnSalvarDespesa").addEventListener("click", async () => {
   const desc = document.getElementById("descDespesa").value;
@@ -328,7 +272,7 @@ document.getElementById("btnSalvarDespesa").addEventListener("click", async () =
 });
 
 // =========================================================
-// 🔥 REGISTRAR ENTREGA + PAGAMENTO PARA MOTOBOY
+// 🔥 REGISTRAR ENTREGA + PAGAMENTO AUTOMÁTICO
 // =========================================================
 
 const selMotoboy = document.getElementById("entregaMotoboy");
@@ -355,6 +299,7 @@ document.getElementById("btnSalvarEntregaManual").addEventListener("click", asyn
   let nomeMotoboy = "";
   let valorPago = 0;
 
+  // OUTRO MOTOBOY (valor definido manualmente)
   if (idMotoboy === "outro") {
     if (!nomeOutro) {
       alert("Digite o nome do motoboy.");
@@ -364,11 +309,13 @@ document.getElementById("btnSalvarEntregaManual").addEventListener("click", asyn
     valorPago = valorManual;
   }
 
+  // LUCAS HIAGO
   else if (idMotoboy === "lucas_hiago") {
     nomeMotoboy = "Lucas Hiago";
     valorPago = qtdEntregas * 6;
   }
 
+  // RODRIGO GONÇALVES
   else if (idMotoboy === "rodrigo_goncalves") {
     nomeMotoboy = "Rodrigo Gonçalves";
     if (qtdEntregas <= 10) valorPago = 100;
@@ -376,7 +323,7 @@ document.getElementById("btnSalvarEntregaManual").addEventListener("click", asyn
   }
 
   // ============================================
-  // SALVAR REGISTRO DE ENTREGA
+  // SALVAR registro de entrega
   // ============================================
   await addDoc(collection(db, "entregasManuais"), {
     motoboy: idMotoboy,
@@ -387,33 +334,28 @@ document.getElementById("btnSalvarEntregaManual").addEventListener("click", asyn
   });
 
   // ============================================
-  // SE FOR OUTRO OU RODRIGO → SALDO DINÂMICO AUTOMÁTICO
+  // ATUALIZAR SALDO DO MOTOBOY
   // ============================================
-  if (idMotoboy === "outro" || idMotoboy === "rodrigo_goncalves") {
-    // Registrar também como despesa automática
-    await addDoc(collection(db, "despesas"), {
-      descricao: `Pagamento motoboy — ${nomeMotoboy}`,
-      valor: Number(valorPago),
-      data
-    });
-  }
+  const ref = doc(db, "motoboys", idMotoboy);
+
+  const snap = await getDoc(ref);
+  let saldoAtual = snap.exists() ? Number(snap.data().saldo || 0) : 0;
+
+  saldoAtual += valorPago;
+
+  await setDoc(ref, {
+    nome: nomeMotoboy,
+    saldo: saldoAtual
+  }, { merge: true });
 
   // ============================================
-  // LUCAS HIAGO → SALDO MANUAL (ATUALIZA DIRETO)
+  // REGISTRAR como DESPESA
   // ============================================
-  if (idMotoboy === "lucas_hiago") {
-    const ref = doc(db, "motoboys", idMotoboy);
-
-    const snap = await getDoc(ref);
-    let saldoAtual = snap.exists() ? Number(snap.data().saldo || 0) : 0;
-
-    saldoAtual += valorPago;
-
-    await setDoc(ref, {
-      nome: nomeMotoboy,
-      saldo: saldoAtual
-    }, { merge: true });
-  }
+  await addDoc(collection(db, "despesas"), {
+    descricao: `Pagamento motoboy — ${nomeMotoboy}`,
+    valor: Number(valorPago),
+    data
+  });
 
   alert("Entrega registrada com sucesso!");
 
