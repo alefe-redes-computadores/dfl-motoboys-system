@@ -5,64 +5,67 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Painel Administrativo – DFL</title>
 
-  <!-- CSS CORRETO -->
+  <!-- CSS FINAL -->
   <link rel="stylesheet" href="./css/dashboard-admin.css" />
 </head>
 
 <body>
 
-  <!-- TOPO -->
+  <!-- ===========================
+       🔝 TOPO (HEADER)
+  ============================ -->
   <header class="admin-header">
     <div class="admin-header-left">
       <img src="./img/logo-dfl.png" class="admin-logo" />
       <h1>Painel Administrativo – DFL</h1>
     </div>
 
-    <!-- BOTÕES DO TOPO -->
     <div class="admin-header-right">
-      <button id="btnRelatorios" class="admin-reports">Relatórios</button>
-      <button id="logoutAdmin" class="admin-logout">Sair</button>
+      <button id="btnRelatorios" class="admin-btn-header azul">Relatórios</button>
+      <button id="logoutAdmin" class="admin-btn-header amarelo">Sair</button>
     </div>
   </header>
 
-  <div class="admin-container">
+  <main class="admin-container">
 
-    <!-- SALDO POR MOTOBOY -->
-    <div class="admin-card">
+    <!-- ===========================
+         🛵 SALDO POR MOTOBOY
+    ============================ -->
+    <section class="admin-card">
       <h2>Saldo por Motoboy</h2>
       <div id="listaMotoboys" class="lista-motoboys">
         <p>Carregando motoboys...</p>
       </div>
-    </div>
+    </section>
 
-    <!-- SALDO GERAL -->
-    <div class="admin-card">
+    <!-- ===========================
+         💰 SALDO GERAL
+    ============================ -->
+    <section class="admin-card">
       <h2>Saldo Geral</h2>
-      <div id="saldoGeral" class="admin-value">R$ 0,00</div>
-    </div>
+      <div id="saldoGeral" class="admin-value neutral">R$ 0,00</div>
+    </section>
 
-    <!-- DESPESAS -->
-    <div class="admin-card">
+    <!-- ===========================
+         🧾 DESPESAS
+    ============================ -->
+    <section class="admin-card">
       <h2>Registrar Despesa</h2>
-      <input id="descDespesa" placeholder="Descrição da despesa" />
-      <input id="valorDespesa" type="number" placeholder="Ex: 45.90" />
-      <input id="dataDespesa" type="date" />
-      <button class="admin-btn" id="btnSalvarDespesa">Salvar Despesa</button>
-    </div>
 
-    <!-- ESTOQUE -->
-    <div class="admin-card">
+      <input id="descDespesa" placeholder="Descrição da despesa" />
+      <input id="valorDespesa" type="number" placeholder="Ex: 45.90" step="0.01" />
+      <input id="dataDespesa" type="date" />
+      <button id="btnSalvarDespesa" class="admin-btn amarelo">Salvar Despesa</button>
+    </section>
+
+    <!-- ===========================
+         📦 ESTOQUE
+    ============================ -->
+    <section class="admin-card">
       <h2>Registrar Estoque do Dia</h2>
 
       <label>Categoria</label>
-      <select id="estoqueCategoria">
-        <option value="frios">Frios</option>
-        <option value="refrigerantes">Refrigerantes</option>
-        <option value="embalagens">Embalagens</option>
-        <option value="paes">Pães</option>
-        <option value="hortifruti">Hortifruti</option>
-        <option value="outros_extra">Outros</option>
-      </select>
+      <select id="estoqueCategoria"></select>
 
       <label>Item</label>
       <select id="estoqueItem"></select>
@@ -73,15 +76,17 @@
       <label>Data</label>
       <input id="estoqueData" type="date" />
 
-      <button class="admin-btn" id="btnSalvarEstoque">Salvar Estoque</button>
+      <button id="btnSalvarEstoque" class="admin-btn amarelo">Salvar Estoque</button>
 
-      <button class="admin-btn-pdf" id="btnGerarPdfEstoque">
+      <button id="btnGerarPdfEstoque" class="admin-btn azul" style="margin-top: 12px; display: none;">
         📄 Gerar PDF – Estoque do Dia
       </button>
-    </div>
+    </section>
 
-    <!-- ENTREGAS -->
-    <div class="admin-card">
+    <!-- ===========================
+         🛵 ENTREGAS / PAGAMENTO MOTOS
+    ============================ -->
+    <section class="admin-card">
       <h2>Registrar Entregas / Pagamento p/ Motoboy</h2>
 
       <label>Motoboy</label>
@@ -91,8 +96,8 @@
         <option value="outro">Outro (preencher manualmente)</option>
       </select>
 
-      <div id="grupoMotoboyOutro" style="display: none; margin-top: 6px;">
-        <label>Nome do motoboy (outro)</label>
+      <div id="grupoMotoboyOutro" class="hidden">
+        <label>Nome do motoboy</label>
         <input id="entregaMotoboyOutro" placeholder="Ex: João Motoboy" />
       </div>
 
@@ -105,15 +110,17 @@
       <label>Data</label>
       <input id="entregaData" type="date" />
 
-      <button class="admin-btn" id="btnSalvarEntregaManual">
+      <button id="btnSalvarEntregaManual" class="admin-btn amarelo">
         Salvar Registro
       </button>
-    </div>
+    </section>
 
-  </div>
+  </main>
 
-  <!-- MODAL DE PAGAMENTO -->
-  <div id="modalPagamento" class="modal">
+  <!-- ===========================
+       💸 MODAL DE PAGAMENTO
+  ============================ -->
+  <div id="modalPagamento" class="modal hidden">
     <div class="modal-content">
       <h3>Registrar Pagamento</h3>
       <p id="modalNomeMotoboy"></p>
@@ -121,12 +128,15 @@
       <label>Valor pago (R$)</label>
       <input id="modalValorPagamento" type="number" step="0.01" placeholder="Ex: 50.00" />
 
-      <button class="admin-btn" id="confirmarPagamento">Confirmar</button>
-      <button class="admin-btn btn-cancelar" id="cancelarPagamento">Cancelar</button>
+      <button id="confirmarPagamento" class="admin-btn amarelo">Confirmar</button>
+      <button id="cancelarPagamento" class="admin-btn azul">Cancelar</button>
     </div>
   </div>
 
-  <!-- JS -->
+  <!-- ===========================
+       📌 JS FINAL
+  ============================ -->
   <script type="module" src="./js/dashboard-admin.js"></script>
+
 </body>
 </html>
