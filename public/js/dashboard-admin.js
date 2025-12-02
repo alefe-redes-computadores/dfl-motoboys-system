@@ -1,7 +1,5 @@
 // =========================================================
-//  DFL — DASHBOARD ADMIN (VERSÃO COMPLETA CORRIGIDA 2)
-//  - NÃO recalcula o saldo do Lucas Hiago
-//  - Recalcula apenas Rodrigo + outros motoboys
+//  DFL — DASHBOARD ADMIN (VERSÃO FINAL CORRIGIDA)
 // =========================================================
 
 import { auth, db } from "./firebase-config-v2.js";
@@ -14,9 +12,9 @@ import {
 import {
   doc,
   getDoc,
-  updateDoc,
   setDoc,
   addDoc,
+  updateDoc,
   collection,
   getDocs,
   query,
@@ -46,7 +44,6 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  await recalcularSaldos();      // 🔥 Agora NÃO mexe no Lucas
   carregarListaMotoboys();
   carregarSaldoGeral();
   verificarEstoqueHoje();
@@ -68,107 +65,128 @@ document.getElementById("btnRelatorios")?.addEventListener("click", () => {
 });
 
 // =========================================================
-// 🔥 MOTODOY FIXOS DO SISTEMA
+// 🔥 MOTOBOYS FIXOS
 // =========================================================
 const MOTOS_FIXOS = {
-  lucas_hiago: {
-    nome: "Lucas Hiago",
-    valorEntrega: 6 // fixo
-  },
-  rodrigo_goncalves: {
-    nome: "Rodrigo Gonçalves",
-    valorEntrega: 7,  // após 10 entregas
-    valorBase: 100    // até 10 entregas
-  }
+  lucas_hiago: "Lucas Hiago",
+  rodrigo_goncalves: "Rodrigo Gonçalves"
 };
 
 // =========================================================
-//  FUNÇÃO NOVA — RECALCULAR SALDOS (EXCETO LUCAS HIAGO)
+//  CALCULAR SALDO DINÂMICO (Rodrigo + Outros)
 // =========================================================
-async function recalcularSaldos() {
-  const motoboysSnap = await getDocs(collection(db, "motoboys"));
+async function calcularSaldoDinamico(idMotoboy, nome) {
+  // Somar entregas
+  const q1 = query(collection(db, "entregasManuais"), where("motoboy", "==", idMotoboy));
+  const snap1 = await getDocs(q1);
 
-  for (const docu of motoboysSnap.docs) {
-    const id = docu.id;
+  let totalEntregas = 0;
+  snap1.forEach(d => totalEntregas += Number(d.data().valorPago || 0));
 
-    // ⚠️ NÃO mexer no saldo do Lucas Hiago
-    if (id === "lucas_hiago") {
-      continue;
-    }
+  // Somar pagamentos (despesas automáticas)
+  const q2 = query(
+    collection(db, "despesas"),
+    where("descricao", "==", `Pagamento motoboy — ${nome}`)
+  );
+  const snap2 = await getDocs(q2);
 
-    const entregasQuery = query(
-      collection(db, "entregasManuais"),
-      where("motoboy", "==", id)
-    );
+  let totalPagamentos = 0;
+  snap2.forEach(d => totalPagamentos += Number(d.data().valor || 0));
 
-    const entregasSnap = await getDocs(entregasQuery);
-
-    let saldo = 0;
-
-    entregasSnap.forEach(e => {
-      saldo += Number(e.data().valorPago || 0);
-    });
-
-    await setDoc(doc(db, "motoboys", id), {
-      saldo: saldo
-    }, { merge: true });
-  }
+  return totalEntregas - totalPagamentos;
 }
 
 // =========================================================
-//  LISTAR MOTOBOYS NO PAINEL
+//  LISTAR MOTOBOYS (ORDEM FIXA + CORES CORRETAS)
 // =========================================================
 async function carregarListaMotoboys() {
   const listaEl = document.getElementById("listaMotoboys");
   listaEl.innerHTML = "<p>Carregando...</p>";
 
-  const snap = await getDocs(collection(db, "motoboys"));
-
   let html = "";
 
+  // ---------- 1. Lucas Hiago (saldo manual) ----------
+  let snapLucas = await getDoc(doc(db, "motoboys", "lucas_hiago"));
+  let saldoLucas = snapLucas.exists() ? Number(snapLucas.data().saldo || 0) : 0;
+
+  let classeLucas =
+    saldoLucas > 0 ? "negativo" :
+    saldoLucas < 0 ? "positivo" : "neutral";
+
+  html += `
+    <div class="motoboy-item ${classeLucas}">
+      <strong>Lucas Hiago</strong>
+      <span>R$ ${saldoLucas.toFixed(2).replace(".", ",")}</span>
+    </div>
+  `;
+
+  // ---------- 2. Rodrigo Gonçalves (saldo dinâmico) ----------
+  let saldoRodrigo = await calcularSaldoDinamico("rodrigo_goncalves", "Rodrigo Gonçalves");
+
+  let classeRodrigo =
+    saldoRodrigo > 0 ? "negativo" :
+    saldoRodrigo < 0 ? "positivo" : "neutral";
+
+  html += `
+    <div class="motoboy-item ${classeRodrigo}">
+      <strong>Rodrigo Gonçalves</strong>
+      <span>R$ ${saldoRodrigo.toFixed(2).replace(".", ",")}</span>
+    </div>
+  `;
+
+  // ---------- 3. Outros motoboys ----------
+  const snap = await getDocs(collection(db, "motoboys"));
+
   snap.forEach((docu) => {
-    const x = docu.data();
-    const saldo = Number(x.saldo || 0);
+    const id = docu.id;
+    const data = docu.data();
 
-    let classe =
-      saldo > 0
-        ? "negativo" // vermelho — você devendo pro motoboy
-        : saldo < 0
-        ? "positivo" // verde — motoboy devendo pra você
-        : "neutral"; // zerado
+    if (id === "lucas_hiago" || id === "rodrigo_goncalves") return;
 
-    html += `
-      <div class="motoboy-item ${classe}">
-        <strong>${x.nome}</strong>
-        <span>R$ ${saldo.toFixed(2).replace(".", ",")}</span>
-      </div>
-    `;
+    const nome = data.nome;
+    calcularSaldoDinamico(id, nome).then(saldo => {
+      let classe =
+        saldo > 0 ? "negativo" :
+        saldo < 0 ? "positivo" : "neutral";
+
+      listaEl.innerHTML += `
+        <div class="motoboy-item ${classe}">
+          <strong>${nome}</strong>
+          <span>R$ ${saldo.toFixed(2).replace(".", ",")}</span>
+        </div>
+      `;
+    });
   });
 
   listaEl.innerHTML = html;
 }
 
 // =========================================================
-//  CALCULAR SALDO GERAL
+//  SALDO GERAL (RODANDO APÓS TODOS)
 // =========================================================
 async function carregarSaldoGeral() {
-  const snap = await getDocs(collection(db, "motoboys"));
+  // Soma apenas motoboys fixos + outros que existam
   let total = 0;
 
-  snap.forEach(d => {
-    total += Number(d.data().saldo || 0);
-  });
+  // Lucas (manual)
+  let snapLucas = await getDoc(doc(db, "motoboys", "lucas_hiago"));
+  total += snapLucas.exists() ? Number(snapLucas.data().saldo || 0) : 0;
+
+  // Rodrigo (dinâmico)
+  total += await calcularSaldoDinamico("rodrigo_goncalves", "Rodrigo Gonçalves");
+
+  // Outros
+  const snap = await getDocs(collection(db, "motoboys"));
+  for (let d of snap.docs) {
+    if (d.id === "lucas_hiago" || d.id === "rodrigo_goncalves") continue;
+    total += await calcularSaldoDinamico(d.id, d.data().nome);
+  }
 
   const el = document.getElementById("saldoGeral");
-
   el.textContent = "R$ " + total.toFixed(2).replace(".", ",");
-
   el.className =
-    total > 0
-      ? "admin-value negativo"
-      : total < 0
-      ? "admin-value positivo"
-      : "admin-value neutral";
+    total > 0 ? "admin-value negativo" :
+    total < 0 ? "admin-value positivo" : "admin-value neutral";
 }
 
 // =========================================================
@@ -369,17 +387,36 @@ document.getElementById("btnSalvarEntregaManual").addEventListener("click", asyn
   });
 
   // ============================================
-  // DESPESA AUTOMÁTICA
+  // SE FOR OUTRO OU RODRIGO → SALDO DINÂMICO AUTOMÁTICO
   // ============================================
-  await addDoc(collection(db, "despesas"), {
-    descricao: `Pagamento motoboy — ${nomeMotoboy}`,
-    valor: Number(valorPago),
-    data
-  });
+  if (idMotoboy === "outro" || idMotoboy === "rodrigo_goncalves") {
+    // Registrar também como despesa automática
+    await addDoc(collection(db, "despesas"), {
+      descricao: `Pagamento motoboy — ${nomeMotoboy}`,
+      valor: Number(valorPago),
+      data
+    });
+  }
+
+  // ============================================
+  // LUCAS HIAGO → SALDO MANUAL (ATUALIZA DIRETO)
+  // ============================================
+  if (idMotoboy === "lucas_hiago") {
+    const ref = doc(db, "motoboys", idMotoboy);
+
+    const snap = await getDoc(ref);
+    let saldoAtual = snap.exists() ? Number(snap.data().saldo || 0) : 0;
+
+    saldoAtual += valorPago;
+
+    await setDoc(ref, {
+      nome: nomeMotoboy,
+      saldo: saldoAtual
+    }, { merge: true });
+  }
 
   alert("Entrega registrada com sucesso!");
 
-  await recalcularSaldos();   // recalcula Rodrigo + outros, mas NÃO o Lucas
   carregarListaMotoboys();
   carregarSaldoGeral();
 });
