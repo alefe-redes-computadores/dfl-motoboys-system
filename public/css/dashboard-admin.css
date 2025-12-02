@@ -1,3 +1,8 @@
+/* ===========================================================
+   🎨 DFL — CSS do Painel Administrativo
+   Layout atualizado e compatível com todos os novos recursos
+   =========================================================== */
+
 body {
   margin: 0;
   background: #0d0d0d;
@@ -5,7 +10,9 @@ body {
   color: #fff;
 }
 
-/* TOPO */
+/* =============================
+   TOPO
+   ============================= */
 .admin-header {
   display: flex;
   justify-content: space-between;
@@ -21,22 +28,22 @@ body {
   gap: 14px;
 }
 
+.admin-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .admin-logo {
   width: 45px;
   height: 45px;
   border-radius: 12px;
   border: 2px solid #ffca28;
+  object-fit: cover;
 }
 
-/* ✅ CONTAINER DOS BOTÕES (RELATÓRIOS + SAIR) */
-.admin-header-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-/* BOTÃO SAIR (já existia) */
-.admin-logout {
+.admin-logout,
+.admin-reports {
   background: #ffca28;
   color: #111;
   border: none;
@@ -44,29 +51,21 @@ body {
   border-radius: 8px;
   font-weight: bold;
   cursor: pointer;
+  font-size: 15px;
 }
 
-/* ✅ NOVO BOTÃO RELATÓRIOS */
 .admin-reports {
   background: #1e88e5;
-  color: #fff;
-  border: none;
-  padding: 10px 18px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.2s ease;
+  color: white;
 }
 
 .admin-reports:hover {
   background: #1565c0;
 }
 
-.admin-reports:active {
-  transform: scale(0.97);
-}
-
-/* GRID DOS CARDS */
+/* =============================
+   GRID PRINCIPAL
+   ============================= */
 .admin-container {
   padding: 20px;
   display: grid;
@@ -74,6 +73,9 @@ body {
   gap: 20px;
 }
 
+/* =============================
+   CARDS
+   ============================= */
 .admin-card {
   background: #1a1a1a;
   padding: 22px;
@@ -83,6 +85,8 @@ body {
 
 .admin-card h2 {
   margin-top: 0;
+  font-size: 22px;
+  color: #ffca28;
 }
 
 .admin-value {
@@ -91,6 +95,9 @@ body {
   color: #ffca28;
 }
 
+/* =============================
+   INPUTS & SELECTS
+   ============================= */
 input,
 select {
   width: 100%;
@@ -104,11 +111,18 @@ select {
   font-size: 15px;
 }
 
+input::placeholder {
+  color: #bbb;
+}
+
+/* =============================
+   BOTÕES PRINCIPAIS
+   ============================= */
 .admin-btn {
   width: 100%;
   background: #ffca28;
   color: #111;
-  padding: 10px;
+  padding: 12px;
   border-radius: 8px;
   border: none;
   font-weight: bold;
@@ -116,54 +130,22 @@ select {
   margin-top: 5px;
 }
 
-/* LISTAS / ITENS */
-.motoboy-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 8px;
-  padding: 8px 0;
-  border-bottom: 1px solid #333;
-  font-size: 15px;
+.admin-btn:hover {
+  background: #f4b000;
 }
 
-.motoboy-nome {
-  font-weight: 600;
+.admin-btn:active {
+  transform: scale(0.97);
 }
 
-.motoboy-saldo {
-  font-weight: 700;
-}
-
-.estoque-item {
-  padding: 8px 0;
-  border-bottom: 1px solid #333;
-  font-size: 15px;
-}
-
-.lista-estoque {
-  margin-top: 10px;
-}
-
-/* CORES DOS SALDOS */
-.negativo {
-  color: #e53935 !important; /* vermelho – dívida com motoboy */
-}
-
-.positivo {
-  color: #43a047 !important; /* verde – empresa no positivo */
-}
-
-.neutral {
-  color: #ffffff !important;
-}
-
-/* BOTÃO PDF – PAINEL ADMIN */
+/* =============================
+   BOTÃO PDF
+   ============================= */
 .admin-btn-pdf {
   width: 100%;
   margin-top: 12px;
   padding: 14px;
-  background: #1e88e5; /* Azul bonito */
+  background: #1e88e5;
   color: white;
   font-size: 15px;
   font-weight: 600;
@@ -174,9 +156,108 @@ select {
 }
 
 .admin-btn-pdf:hover {
-  background: #1565c0; /* Azul mais escuro */
+  background: #1565c0;
 }
 
 .admin-btn-pdf:active {
   transform: scale(0.98);
+}
+
+/* =============================
+   LISTA DE MOTOBOYS
+   ============================= */
+.lista-motoboys {
+  margin-top: 10px;
+}
+
+.motoboy-item {
+  padding: 10px 0;
+  border-bottom: 1px solid #333;
+  font-size: 15px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.motoboy-nome {
+  font-weight: 600;
+}
+
+.motoboy-saldo {
+  font-weight: 700;
+}
+
+/* CORES DO SALDO */
+.negativo {
+  color: #e53935 !important; /* Vermelho */
+}
+
+.positivo {
+  color: #43a047 !important; /* Verde */
+}
+
+.neutral {
+  color: #ffffff !important; /* Branco */
+}
+
+/* =============================
+   ÁREA "OUTRO" DO MOTOBOY
+   ============================= */
+#grupoMotoboyOutro {
+  background: #111;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #333;
+}
+
+#grupoMotoboyOutro label {
+  font-size: 14px;
+  color: #ffca28;
+}
+
+/* =============================
+   PÁGINA DE RELATÓRIOS
+   ============================= */
+.relatorios-container {
+  padding: 25px;
+}
+
+.relatorios-title {
+  font-size: 28px;
+  font-weight: bold;
+  color: #ffca28;
+  margin-bottom: 20px;
+}
+
+.relatorio-link {
+  display: block;
+  background: #1e88e5;
+  color: #fff;
+  padding: 15px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  margin-bottom: 15px;
+  transition: .2s;
+}
+
+.relatorio-link:hover {
+  background: #1565c0;
+}
+
+/* =============================
+   RESPONSIVO
+   ============================= */
+@media (max-width: 460px) {
+  .admin-header {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+
+  .admin-header-right {
+    width: 100%;
+    justify-content: center;
+  }
 }
