@@ -5,107 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Painel Administrativo – DFL</title>
 
-  <!-- CSS CORRETO -->
   <link rel="stylesheet" href="./css/dashboard-admin.css" />
-
-  <style>
-    body {
-      margin: 0;
-      background: #0d0d0d;
-      font-family: system-ui, sans-serif;
-      color: #fff;
-    }
-    .admin-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #111;
-      padding: 15px 22px;
-      border-bottom: 2px solid #ffca28;
-    }
-    .admin-header-left {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-    .admin-logo {
-      width: 45px;
-      height: 45px;
-      border-radius: 12px;
-      border: 2px solid #ffca28;
-      object-fit: cover;
-    }
-    .admin-logout {
-      background: #ffca28;
-      color: #111;
-      border: none;
-      padding: 10px 18px;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .admin-container {
-      padding: 20px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
-      gap: 20px;
-    }
-    .admin-card {
-      background: #1a1a1a;
-      padding: 22px;
-      border-radius: 14px;
-      border: 1px solid #333;
-    }
-    .admin-card h2 {
-      margin-top: 0;
-    }
-    .admin-value {
-      font-size: 28px;
-      font-weight: bold;
-      color: #ffca28;
-    }
-    input, select {
-      width: 100%;
-      padding: 9px 12px;
-      margin-top: 6px;
-      margin-bottom: 12px;
-      border: 1px solid #444;
-      background: #0f0f0f;
-      color: #fff;
-      border-radius: 8px;
-      font-size: 15px;
-    }
-    .admin-btn {
-      width: 100%;
-      background: #ffca28;
-      color: #111;
-      padding: 10px;
-      border-radius: 8px;
-      border: none;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 5px;
-    }
-    .admin-btn-pdf {
-      background: #1e88e5;
-      color: white;
-      border: none;
-      padding: 10px;
-      margin-top: 8px;
-      width: 100%;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .negativo { color: #e53935 !important; font-weight: bold; }
-    .positivo { color: #43a047 !important; font-weight: bold; }
-    .motoboy-item {
-      margin-top: 8px;
-      padding: 8px 0;
-      border-bottom: 1px solid #333;
-      font-size: 15px;
-    }
-  </style>
 </head>
 
 <body>
@@ -125,6 +25,11 @@
     <div class="admin-card">
       <h2>Saldo por Motoboy</h2>
       <div id="saldo_lucas_hiago" class="motoboy-item">R$ 0,00</div>
+
+      <!-- NOVO BOTÃO RELATÓRIOS -->
+      <button id="btnRelatorios" class="admin-btn-secondary">
+        📊 Relatórios
+      </button>
     </div>
 
     <!-- SALDO GERAL -->
@@ -142,7 +47,7 @@
       <button class="admin-btn" id="btnSalvarDespesa">Salvar Despesa</button>
     </div>
 
-    <!-- ESTOQUE -->
+    <!-- ESTOQUE DO DIA -->
     <div class="admin-card">
       <h2>Registrar Estoque do Dia</h2>
 
@@ -193,7 +98,12 @@
 
   </div>
 
-  <!-- JS CORRETO -->
   <script type="module" src="./js/dashboard-admin.js"></script>
+  <script>
+    // Redirecionar para relatórios
+    document.getElementById("btnRelatorios").addEventListener("click", () => {
+      window.location.href = "relatorios.html";
+    });
+  </script>
 </body>
 </html>
