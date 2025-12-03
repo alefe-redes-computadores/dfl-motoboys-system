@@ -13,7 +13,6 @@ import {
   doc,
   getDoc,
   updateDoc,
-  setDoc,
   addDoc,
   collection,
   getDocs,
@@ -32,10 +31,15 @@ const ADMINS = [
 ];
 
 onAuthStateChanged(auth, async (user) => {
-  if (!user) return (window.location.href = "index.html");
+  if (!user) {
+    window.location.href = "index.html";
+    return;
+  }
+
   if (!ADMINS.includes(user.uid)) {
     alert("Acesso restrito.");
-    return (window.location.href = "dashboard.html");
+    window.location.href = "dashboard.html";
+    return;
   }
 
   carregarListaMotoboys();
@@ -61,6 +65,9 @@ document.getElementById("btnRelatorios")?.addEventListener("click", () => {
 // =========================================================
 //  FUNÇÃO DE COR DO SALDO
 // =========================================================
+// saldo > 0 = você deve para o motoboy (vermelho)
+// saldo < 0 = motoboy deve para você (verde)
+// saldo = 0 = neutro (branco)
 function getClasseSaldo(saldo) {
   if (saldo > 0) return "negativo";
   if (saldo < 0) return "positivo";
@@ -68,7 +75,7 @@ function getClasseSaldo(saldo) {
 }
 
 // =========================================================
-//  LISTAR MOTOBOYS — LAYOUT CORRETO (NOME EM CIMA, SALDO EMBAIXO)
+//  LISTAR MOTOBOYS (COM COR CERTA + LAYOUT HORIZONTAL)
 // =========================================================
 async function carregarListaMotoboys() {
   const listaEl = document.getElementById("listaMotoboys");
@@ -86,9 +93,8 @@ async function carregarListaMotoboys() {
       <div class="motoboy-item ${classe}">
         <div class="motoboy-info">
           <strong>${x.nome}</strong>
-          <span class="motoboy-saldo">R$ ${saldo.toFixed(2).replace(".", ",")}</span>
+          <span class="saldo">R$ ${saldo.toFixed(2).replace(".", ",")}</span>
         </div>
-
         <button class="btnPagar" data-id="${d.id}" data-nome="${x.nome}" data-saldo="${saldo}">
           💸 Pagar
         </button>
@@ -98,6 +104,7 @@ async function carregarListaMotoboys() {
 
   listaEl.innerHTML = html;
 
+  // Ativar botões de pagamento
   document.querySelectorAll(".btnPagar").forEach(btn => {
     btn.addEventListener("click", abrirModalPagamento);
   });
@@ -170,12 +177,34 @@ const SUBITENS = {
 const categoriaSel = document.getElementById("estoqueCategoria");
 const itemSel = document.getElementById("estoqueItem");
 
+/* Preenche as categorias no select (sumiram porque o HTML ficou vazio) */
+const CATEGORIAS = [
+  { id: "frios", label: "Frios" },
+  { id: "refrigerantes", label: "Refrigerantes" },
+  { id: "embalagens", label: "Embalagens" },
+  { id: "paes", label: "Pães" },
+  { id: "hortifruti", label: "Hortifruti" },
+  { id: "outros_extra", label: "Outros / Extra" }
+];
+
+if (categoriaSel) {
+  categoriaSel.innerHTML =
+    `<option value="">Selecione...</option>` +
+    CATEGORIAS.map(c => `<option value="${c.id}">${c.label}</option>`).join("");
+}
+
 function atualizarItens() {
   const lista = SUBITENS[categoriaSel.value] || [];
-  itemSel.innerHTML = lista.sort().map(i => `<option value="${i}">${i}</option>`).join("");
+  itemSel.innerHTML = lista
+    .sort()
+    .map(i => `<option value="${i}">${i}</option>`)
+    .join("");
 }
-categoriaSel.addEventListener("change", atualizarItens);
-atualizarItens();
+
+categoriaSel?.addEventListener("change", atualizarItens);
+
+// deixa vazio até escolher uma categoria
+itemSel.innerHTML = "";
 
 // =========================================================
 //  REGISTRAR ESTOQUE
@@ -186,8 +215,10 @@ document.getElementById("btnSalvarEstoque").addEventListener("click", async () =
   const quantidade = document.getElementById("estoqueQtd").value;
   const data = document.getElementById("estoqueData").value;
 
-  if (!item || !categoria || !quantidade || !data)
-    return alert("Preencha tudo.");
+  if (!item || !categoria || !quantidade || !data) {
+    alert("Preencha tudo.");
+    return;
+  }
 
   await addDoc(collection(db, "estoqueDia"), {
     item,
@@ -209,8 +240,10 @@ async function verificarEstoqueHoje() {
   const q = query(collection(db, "estoqueDia"), where("data", "==", hoje));
   const snap = await getDocs(q);
 
-  document.getElementById("btnGerarPdfEstoque").style.display =
-    snap.size > 0 ? "block" : "none";
+  const btn = document.getElementById("btnGerarPdfEstoque");
+  if (btn) {
+    btn.style.display = snap.size > 0 ? "block" : "none";
+  }
 }
 
 // =========================================================
@@ -228,7 +261,10 @@ document.getElementById("btnSalvarDespesa").addEventListener("click", async () =
   const valor = Number(document.getElementById("valorDespesa").value);
   const data = document.getElementById("dataDespesa").value;
 
-  if (!desc || !valor || !data) return alert("Preencha tudo.");
+  if (!desc || !valor || !data) {
+    alert("Preencha tudo.");
+    return;
+  }
 
   await addDoc(collection(db, "despesas"), { descricao: desc, valor, data });
 
@@ -242,11 +278,19 @@ const modal = document.getElementById("modalPagamento");
 const inputValorPagamento = document.getElementById("modalValorPagamento");
 const confirmarPagamentoBtn = document.getElementById("confirmarPagamento");
 const cancelarPagamentoBtn = document.getElementById("cancelarPagamento");
+const modalNomeMotoboy = document.getElementById("modalNomeMotoboy");
 
 let pagamentoMotoboyId = null;
 
 function abrirModalPagamento(e) {
-  pagamentoMotoboyId = e.target.dataset.id;
+  const btn = e.currentTarget;
+  pagamentoMotoboyId = btn.dataset.id;
+  const nome = btn.dataset.nome;
+
+  if (modalNomeMotoboy) {
+    modalNomeMotoboy.textContent = nome;
+  }
+
   modal.classList.remove("hidden");
 }
 
@@ -262,13 +306,17 @@ cancelarPagamentoBtn.addEventListener("click", () => {
 confirmarPagamentoBtn.addEventListener("click", async () => {
   const valor = Number(inputValorPagamento.value);
 
-  if (!valor || valor <= 0) return alert("Valor inválido.");
+  if (!valor || valor <= 0) {
+    alert("Valor inválido.");
+    return;
+  }
 
   const ref = doc(db, "motoboys", pagamentoMotoboyId);
   const snap = await getDoc(ref);
 
   let saldoAtual = snap.exists() ? Number(snap.data().saldo || 0) : 0;
 
+  // PAGAMENTO diminui saldo (vai em direção a 0 ou negativo)
   saldoAtual -= valor;
 
   await updateDoc(ref, { saldo: saldoAtual });
@@ -281,6 +329,7 @@ confirmarPagamentoBtn.addEventListener("click", async () => {
 
   modal.classList.add("hidden");
   inputValorPagamento.value = "";
+  pagamentoMotoboyId = null;
 
   carregarListaMotoboys();
   carregarSaldoGeral();
@@ -289,35 +338,57 @@ confirmarPagamentoBtn.addEventListener("click", async () => {
 });
 
 // =========================================================
-//  REGISTRAR ENTREGA MANUAL
+//  REGISTRAR ENTREGA MANUAL (SEM ALTERAR SALDO DO RODRIGO)
 // =========================================================
+const selectMotoboy = document.getElementById("entregaMotoboy");
+const grupoOutro = document.getElementById("grupoMotoboyOutro");
+
+selectMotoboy.addEventListener("change", () => {
+  if (selectMotoboy.value === "outro") {
+    grupoOutro.classList.remove("hidden");
+  } else {
+    grupoOutro.classList.add("hidden");
+  }
+});
+
 document.getElementById("btnSalvarEntregaManual").addEventListener("click", async () => {
-  const idMotoboy = document.getElementById("entregaMotoboy").value;
+  const idMotoboy = selectMotoboy.value;
   const qtd = Number(document.getElementById("entregaQtd").value);
   const valorManual = Number(document.getElementById("valorPagoMotoboy").value);
   const data = document.getElementById("entregaData").value;
   const nomeOutro = document.getElementById("entregaMotoboyOutro").value.trim();
 
-  if (!qtd || !data) return alert("Preencha tudo.");
+  if (!qtd || !data) {
+    alert("Preencha tudo.");
+    return;
+  }
 
   let nomeMotoboy = "";
   let valorPago = 0;
 
+  // OUTRO MOTOBOY – valor definido manualmente
   if (idMotoboy === "outro") {
+    if (!nomeOutro) {
+      alert("Informe o nome do motoboy.");
+      return;
+    }
     nomeMotoboy = nomeOutro;
-    valorPago = valorManual;
+    valorPago = valorManual || 0;
   }
 
+  // LUCAS HIAGO – sempre afeta saldo via Pagar (então aqui é só para relatório)
   else if (idMotoboy === "lucas_hiago") {
     nomeMotoboy = "Lucas Hiago";
     valorPago = qtd * 6;
   }
 
+  // RODRIGO — NÃO altera saldo, apenas registro
   else if (idMotoboy === "rodrigo_goncalves") {
     nomeMotoboy = "Rodrigo Gonçalves";
     valorPago = 0;
   }
 
+  // Registrar apenas para relatórios
   await addDoc(collection(db, "entregasManuais"), {
     nomeMotoboy,
     motoboy: idMotoboy,
