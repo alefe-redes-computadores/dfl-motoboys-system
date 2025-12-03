@@ -1,5 +1,5 @@
 // ============================================================
-//  DFL — DASHBOARD ADMIN (VERSÃO FINAL ESTÁVEL 2025 • CORRIGIDA)
+//  DFL — DASHBOARD ADMIN (VERSÃO FINAL ESTÁVEL 2025 • RESTAURADA)
 // ============================================================
 
 import { auth, db } from "./firebase-config-v2.js";
@@ -198,20 +198,20 @@ function atualizarItens() {
 categoriaSel.addEventListener("change", atualizarItens);
 
 // ============================================================
-//  REGISTRAR ESTOQUE (DATA CORRIGIDA)
+//  REGISTRAR ESTOQUE (FORMATO ISO NORMAL)
 // ============================================================
 document.getElementById("btnSalvarEstoque").addEventListener("click", async () => {
   const item = itemSel.value;
   const categoria = categoriaSel.value;
   const quantidade = document.getElementById("estoqueQtd").value;
-  let dataBruta = document.getElementById("estoqueData").value;
+  const dataBruta = document.getElementById("estoqueData").value;
 
   if (!item || !categoria || !quantidade || !dataBruta) {
     alert("Preencha tudo.");
     return;
   }
 
-  // 👇 Corrigindo data para YYYY-MM-DD
+  // Data simples — SEM timezone extra
   const data = new Date(dataBruta).toISOString().slice(0, 10);
 
   await addDoc(collection(db, "estoqueDia"), {
@@ -226,7 +226,7 @@ document.getElementById("btnSalvarEstoque").addEventListener("click", async () =
 });
 
 // ============================================================
-//  MOSTRAR BOTÃO PDF
+//  MOSTRAR BOTÃO PDF — MODO ORIGINAL RESTAURADO
 // ============================================================
 async function verificarEstoqueHoje() {
   const hoje = new Date().toISOString().slice(0, 10);
@@ -380,18 +380,3 @@ document.getElementById("btnSalvarEntregaManual").addEventListener("click", asyn
   carregarListaMotoboys();
   carregarSaldoGeral();
 });
-
-async function verificarEstoqueHoje() {
-  // Corrige fuso horário no Android
-  const hoje = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
-    .toISOString()
-    .slice(0, 10);
-
-  console.log("Buscando estoque do dia:", hoje);
-
-  const q = query(collection(db, "estoqueDia"), where("data", "==", hoje));
-  const snap = await getDocs(q);
-
-  const btn = document.getElementById("btnGerarPdfEstoque");
-  if (btn) btn.style.display = snap.size > 0 ? "block" : "none";
-}
