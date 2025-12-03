@@ -74,11 +74,13 @@
     }
   </style>
 
+  <!-- jsPDF + autotable -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
   <script type="module">
     import { db } from "./firebase-config-v2.js";
+
     import {
       collection,
       query,
@@ -88,17 +90,13 @@
 
     let registros = [];
 
-    /* ============================================
-       🟡 CORREÇÃO ABSOLUTA — DATA LOCAL DO BRASIL
-       ============================================ */
-    function dataBrasilISO() {
-      return new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+    window.onload = async () => {
+
+      // 🔥 PATCH ANDROID — usar sempre data real do dia
+      const hoje = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
         .toISOString()
         .slice(0, 10);
-    }
 
-    window.onload = async () => {
-      const hoje = dataBrasilISO();
       document.getElementById("dataHoje").textContent = hoje;
 
       try {
@@ -154,7 +152,9 @@
       }
     };
 
-    // PDF
+    // ==========================================================
+    // 🔽 DOWNLOAD PDF
+    // ==========================================================
     window.baixarPDF = () => {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
@@ -162,16 +162,22 @@
       doc.setFontSize(18);
       doc.text("Relatório – Estoque do Dia", 14, 20);
 
+      const dataHoje = document.getElementById("dataHoje").textContent;
       doc.setFontSize(12);
-      doc.text("Data: " + document.getElementById("dataHoje").textContent, 14, 30);
+      doc.text("Data: " + dataHoje, 14, 30);
 
       doc.autoTable({
         startY: 40,
         head: [["Categoria", "Item", "Quantidade", "Data"]],
-        body: registros.map(r => [r.categoria, r.item, r.quantidade, r.data])
+        body: registros.map(r => [
+          r.categoria,
+          r.item,
+          r.quantidade,
+          r.data
+        ])
       });
 
-      doc.save("estoque_" + document.getElementById("dataHoje").textContent + ".pdf");
+      doc.save("estoque_" + dataHoje + ".pdf");
     };
   </script>
 </head>
