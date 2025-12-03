@@ -318,3 +318,34 @@ select {
     justify-content: center;
   }
 }
+
+/* ============================================================
+   🎨 AJUSTE VISUAL — BLOCO “REGISTRAR ENTREGAS”
+   ============================================================ */
+
+.admin-card label {
+  display: block;
+  font-size: 15px;
+  margin-bottom: 6px;
+  color: #ddd;
+}
+
+.admin-card select,
+.admin-card input {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 15px;
+  border-radius: 10px;
+  background: #000;
+  border: 1px solid #222;
+  color: #fff;
+  margin-bottom: 16px;    /* 🔥 espaçamento uniforme */
+}
+
+#grupoMotoboyOutro {
+  margin-top: -6px;
+}
+
+.admin-card button.admin-btn {
+  margin-top: 4px;
+}
