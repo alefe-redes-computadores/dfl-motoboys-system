@@ -74,12 +74,13 @@
     }
   </style>
 
-  <!-- jsPDF + autotable -->
+  <!-- jsPDF + AutoTable -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
   <script type="module">
-    import { db } from "./js/firebase-config-v2.js";
+    import { db } from "./firebase-config-v2.js";   <!-- 🔥 IMPORT CORRIGIDO -->
+
     import {
       collection,
       query,
@@ -90,10 +91,9 @@
     let registros = [];
 
     window.onload = async () => {
-      const hoje = new Date().toISOString().slice(0, 10);
+      const hoje = new Date().toISOString().slice(0,10);
       document.getElementById("dataHoje").textContent = hoje;
 
-      // 🔥 Query SEM orderBy (funciona sempre)
       const q = query(
         collection(db, "estoqueDia"),
         where("data", "==", hoje)
@@ -140,9 +140,9 @@
       document.getElementById("conteudo").innerHTML = tabela;
     };
 
-    // ==========================================================
-    // 🔽 BAIXAR PDF
-    // ==========================================================
+    // ================================
+    //   📄 BOTÃO "BAIXAR PDF"
+    // ================================
     window.baixarPDF = () => {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
