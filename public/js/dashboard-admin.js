@@ -380,3 +380,18 @@ document.getElementById("btnSalvarEntregaManual").addEventListener("click", asyn
   carregarListaMotoboys();
   carregarSaldoGeral();
 });
+
+async function verificarEstoqueHoje() {
+  // Corrige fuso horário no Android
+  const hoje = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+    .toISOString()
+    .slice(0, 10);
+
+  console.log("Buscando estoque do dia:", hoje);
+
+  const q = query(collection(db, "estoqueDia"), where("data", "==", hoje));
+  const snap = await getDocs(q);
+
+  const btn = document.getElementById("btnGerarPdfEstoque");
+  if (btn) btn.style.display = snap.size > 0 ? "block" : "none";
+}
