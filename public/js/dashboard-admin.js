@@ -1,6 +1,6 @@
-// =========================================================
-//  DFL — DASHBOARD ADMIN (VERSÃO FINAL ESTÁVEL 2025)
-// =========================================================
+// ============================================================
+//  DFL — DASHBOARD ADMIN (VERSÃO FINAL ESTÁVEL 2025 • CORRIGIDA)
+// ============================================================
 
 import { auth, db } from "./firebase-config-v2.js";
 
@@ -20,20 +20,9 @@ import {
   where
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-// =========================================================
-//  FUNÇÃO DE DATA — CORREÇÃO DE FUSO (IDEAL)
-// =========================================================
-// Garante que datas sempre sejam salvas e comparadas corretamente
-// Exemplo resultado: "2025-12-02"
-function toLocalISO(dateInput) {
-  const date = dateInput ? new Date(dateInput) : new Date();
-  date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
-  return date.toISOString().slice(0, 10);
-}
-
-// =========================================================
+// ============================================================
 //  ACESSO APENAS ADMIN
-// =========================================================
+// ============================================================
 const ADMINS = [
   "6YczX4gLpUStlBVdQOXWc3uEYGG2",
   "LYu3M8gyRdMCqhE90vmH9Jh5Ksj1",
@@ -42,11 +31,15 @@ const ADMINS = [
 ];
 
 onAuthStateChanged(auth, async (user) => {
-  if (!user) return (window.location.href = "index.html");
+  if (!user) {
+    window.location.href = "index.html";
+    return;
+  }
 
   if (!ADMINS.includes(user.uid)) {
     alert("Acesso restrito.");
-    return (window.location.href = "dashboard.html");
+    window.location.href = "dashboard.html";
+    return;
   }
 
   carregarListaMotoboys();
@@ -54,33 +47,33 @@ onAuthStateChanged(auth, async (user) => {
   verificarEstoqueHoje();
 });
 
-// =========================================================
+// ============================================================
 //  LOGOUT
-// =========================================================
+// ============================================================
 document.getElementById("logoutAdmin")?.addEventListener("click", async () => {
   await signOut(auth);
   window.location.href = "index.html";
 });
 
-// =========================================================
+// ============================================================
 //  BOTÃO RELATÓRIOS
-// =========================================================
+// ============================================================
 document.getElementById("btnRelatorios")?.addEventListener("click", () => {
   window.location.href = "relatorios.html";
 });
 
-// =========================================================
-//  FUNÇÃO DE COR DO SALDO
-// =========================================================
+// ============================================================
+//  COR DO SALDO
+// ============================================================
 function getClasseSaldo(saldo) {
-  if (saldo > 0) return "negativo";
-  if (saldo < 0) return "positivo";
+  if (saldo > 0) return "negativo";  // motoboy tem a receber
+  if (saldo < 0) return "positivo";  // motoboy te deve
   return "neutral";
 }
 
-// =========================================================
-//  LISTAR MOTOBOYS – LAYOUT HORIZONTAL + COR CERTA
-// =========================================================
+// ============================================================
+//  LISTAR MOTOBOYS
+// ============================================================
 async function carregarListaMotoboys() {
   const listaEl = document.getElementById("listaMotoboys");
   listaEl.innerHTML = "<p>Carregando...</p>";
@@ -100,7 +93,10 @@ async function carregarListaMotoboys() {
           <span class="saldo">R$ ${saldo.toFixed(2).replace(".", ",")}</span>
         </div>
 
-        <button class="btnPagar" data-id="${d.id}" data-nome="${x.nome}" data-saldo="${saldo}">
+        <button class="btnPagar" 
+          data-id="${d.id}" 
+          data-nome="${x.nome}" 
+          data-saldo="${saldo}">
           💸 Pagar
         </button>
       </div>
@@ -114,9 +110,9 @@ async function carregarListaMotoboys() {
   });
 }
 
-// =========================================================
+// ============================================================
 //  SALDO GERAL
-// =========================================================
+// ============================================================
 async function carregarSaldoGeral() {
   const snap = await getDocs(collection(db, "motoboys"));
   let total = 0;
@@ -128,27 +124,51 @@ async function carregarSaldoGeral() {
   el.className = "admin-value " + getClasseSaldo(total);
 }
 
-// =========================================================
-//  ITENS DO ESTOQUE — CATEGORIAS + ITENS
-// =========================================================
+// ============================================================
+//  CATEGORIAS + SUBITENS DO ESTOQUE
+// ============================================================
 const SUBITENS = {
   frios: [
-    "Bacon", "Carne Moída/Artesanais", "Cheddar", "Filé de Frango",
-    "Hambúrguer", "Mussarela", "Presunto", "Salsicha"
+    "Bacon",
+    "Carne Moída/Artesanais",
+    "Cheddar",
+    "Filé de Frango",
+    "Hambúrguer",
+    "Mussarela",
+    "Presunto",
+    "Salsicha"
   ],
   refrigerantes: [
-    "Coca 200ml", "Coca 310ml", "Coca 310ml Zero", "Coca 1L",
-    "Coca 1L Zero", "Coca 2L", "Del Valle 450ml Uva",
-    "Del Valle 450ml Laranja", "Fanta 1L", "Kuat 2L"
+    "Coca 200ml",
+    "Coca 310ml",
+    "Coca 310ml Zero",
+    "Coca 1L",
+    "Coca 1L Zero",
+    "Coca 2L",
+    "Del Valle 450ml Uva",
+    "Del Valle 450ml Laranja",
+    "Fanta 1L",
+    "Kuat 2L"
   ],
   embalagens: [
-    "Bobina", "Dogueira", "Hamburgueira", "Papel Kraft",
-    "Saco Plástico", "Sacola 30x40", "Sacola 38x48"
+    "Bobina",
+    "Dogueira",
+    "Hamburgueira",
+    "Papel Kraft",
+    "Saco Plástico",
+    "Sacola 30x40",
+    "Sacola 38x48"
   ],
   paes: ["Pão Hambúrguer", "Pão Hot Dog"],
   hortifruti: [
-    "Alface", "Batata Palha", "Cebola", "Cebolinha",
-    "Milho", "Óleo", "Ovo", "Tomate"
+    "Alface",
+    "Batata Palha",
+    "Cebola",
+    "Cebolinha",
+    "Milho",
+    "Óleo",
+    "Ovo",
+    "Tomate"
   ],
   outros_extra: ["Outro (Preencher manualmente)"]
 };
@@ -165,101 +185,94 @@ const CATEGORIAS = [
 const categoriaSel = document.getElementById("estoqueCategoria");
 const itemSel = document.getElementById("estoqueItem");
 
-if (categoriaSel) {
-  categoriaSel.innerHTML =
-    `<option value="">Selecione...</option>` +
-    CATEGORIAS.map(c => `<option value="${c.id}">${c.label}</option>`).join("");
-}
+// Preenche categorias
+categoriaSel.innerHTML =
+  `<option value="">Selecione...</option>` +
+  CATEGORIAS.map(c => `<option value="${c.id}">${c.label}</option>`).join("");
 
+// Atualiza itens quando muda categoria
 function atualizarItens() {
-  if (!categoriaSel) return;
   const lista = SUBITENS[categoriaSel.value] || [];
-  itemSel.innerHTML =
-    lista.map(i => `<option value="${i}">${i}</option>`).join("");
+  itemSel.innerHTML = lista.map(i => `<option value="${i}">${i}</option>`).join("");
 }
+categoriaSel.addEventListener("change", atualizarItens);
 
-categoriaSel?.addEventListener("change", atualizarItens);
-itemSel.innerHTML = "";
-
-// =========================================================
-//  REGISTRAR ESTOQUE
-// =========================================================
+// ============================================================
+//  REGISTRAR ESTOQUE (DATA CORRIGIDA)
+// ============================================================
 document.getElementById("btnSalvarEstoque").addEventListener("click", async () => {
   const item = itemSel.value;
   const categoria = categoriaSel.value;
   const quantidade = document.getElementById("estoqueQtd").value;
-  const dataInput = document.getElementById("estoqueData").value;
+  let dataBruta = document.getElementById("estoqueData").value;
 
-  if (!item || !categoria || !quantidade || !dataInput) {
+  if (!item || !categoria || !quantidade || !dataBruta) {
     alert("Preencha tudo.");
     return;
   }
 
-  const dataISO = toLocalISO(dataInput);
+  // 👇 Corrigindo data para YYYY-MM-DD
+  const data = new Date(dataBruta).toISOString().slice(0, 10);
 
   await addDoc(collection(db, "estoqueDia"), {
     item,
     categoria,
     quantidade,
-    data: dataISO
+    data
   });
 
   alert("Estoque salvo!");
   verificarEstoqueHoje();
 });
 
-// =========================================================
-//  MOSTRAR BOTÃO PDF — CORRIGIDO
-// =========================================================
+// ============================================================
+//  MOSTRAR BOTÃO PDF
+// ============================================================
 async function verificarEstoqueHoje() {
-  const hojeISO = toLocalISO();
+  const hoje = new Date().toISOString().slice(0, 10);
 
-  const q = query(collection(db, "estoqueDia"), where("data", "==", hojeISO));
+  const q = query(collection(db, "estoqueDia"), where("data", "==", hoje));
   const snap = await getDocs(q);
 
   const btn = document.getElementById("btnGerarPdfEstoque");
   if (btn) btn.style.display = snap.size > 0 ? "block" : "none";
 }
 
-// =========================================================
-//  ABRIR PDF
-// =========================================================
-document.getElementById("btnGerarPdfEstoque").addEventListener("click", () => {
+// ============================================================
+//  ABRIR TELA DE PDF
+// ============================================================
+document.getElementById("btnGerarPdfEstoque")?.addEventListener("click", () => {
   window.location.href = "pdf-estoque.html";
 });
 
-// =========================================================
-//  DESPESAS
-// =========================================================
+// ============================================================
+//  REGISTRAR DESPESA
+// ============================================================
 document.getElementById("btnSalvarDespesa").addEventListener("click", async () => {
   const desc = document.getElementById("descDespesa").value;
   const valor = Number(document.getElementById("valorDespesa").value);
-  const data = document.getElementById("dataDespesa").value;
+  const dataRaw = document.getElementById("dataDespesa").value;
 
-  if (!desc || !valor || !data) {
+  if (!desc || !valor || !dataRaw) {
     alert("Preencha tudo.");
     return;
   }
 
-  const dataISO = toLocalISO(data);
+  const data = new Date(dataRaw).toISOString().slice(0, 10);
 
-  await addDoc(collection(db, "despesas"), {
-    descricao: desc,
-    valor,
-    data: dataISO
-  });
+  await addDoc(collection(db, "despesas"), { descricao: desc, valor, data });
 
   alert("Despesa registrada!");
 });
 
-// =========================================================
+// ============================================================
 //  MODAL PAGAMENTO
-// =========================================================
+// ============================================================
 const modal = document.getElementById("modalPagamento");
 const inputValorPagamento = document.getElementById("modalValorPagamento");
-const modalNomeMotoboy = document.getElementById("modalNomeMotoboy");
 const confirmarPagamentoBtn = document.getElementById("confirmarPagamento");
 const cancelarPagamentoBtn = document.getElementById("cancelarPagamento");
+const modalNomeMotoboy = document.getElementById("modalNomeMotoboy");
 
 let pagamentoMotoboyId = null;
 
@@ -267,10 +280,7 @@ function abrirModalPagamento(e) {
   const btn = e.currentTarget;
   pagamentoMotoboyId = btn.dataset.id;
 
-  if (modalNomeMotoboy) {
-    modalNomeMotoboy.textContent = btn.dataset.nome;
-  }
-
+  modalNomeMotoboy.textContent = btn.dataset.nome;
   modal.classList.remove("hidden");
 }
 
@@ -280,9 +290,9 @@ cancelarPagamentoBtn.addEventListener("click", () => {
   inputValorPagamento.value = "";
 });
 
-// =========================================================
+// ============================================================
 //  CONFIRMAR PAGAMENTO
-// =========================================================
+// ============================================================
 confirmarPagamentoBtn.addEventListener("click", async () => {
   const valor = Number(inputValorPagamento.value);
 
@@ -301,14 +311,13 @@ confirmarPagamentoBtn.addEventListener("click", async () => {
   await updateDoc(ref, { saldo: saldoAtual });
 
   await addDoc(collection(db, "despesas"), {
-    descricao: "Pagamento motoboy",
+    descricao: `Pagamento motoboy`,
     valor,
-    data: toLocalISO()
+    data: new Date().toISOString().slice(0, 10)
   });
 
   modal.classList.add("hidden");
   inputValorPagamento.value = "";
-  pagamentoMotoboyId = null;
 
   carregarListaMotoboys();
   carregarSaldoGeral();
@@ -316,9 +325,9 @@ confirmarPagamentoBtn.addEventListener("click", async () => {
   alert("Pagamento registrado!");
 });
 
-// =========================================================
+// ============================================================
 //  REGISTRAR ENTREGA MANUAL
-// =========================================================
+// ============================================================
 const selectMotoboy = document.getElementById("entregaMotoboy");
 const grupoOutro = document.getElementById("grupoMotoboyOutro");
 
@@ -330,15 +339,16 @@ document.getElementById("btnSalvarEntregaManual").addEventListener("click", asyn
   const idMotoboy = selectMotoboy.value;
   const qtd = Number(document.getElementById("entregaQtd").value);
   const valorManual = Number(document.getElementById("valorPagoMotoboy").value);
-  const dataInput = document.getElementById("entregaData").value;
+  const dataRaw = document.getElementById("entregaData").value;
   const nomeOutro = document.getElementById("entregaMotoboyOutro").value.trim();
 
-  if (!qtd || !dataInput) {
+  if (!qtd || !dataRaw) {
     alert("Preencha tudo.");
     return;
   }
 
-  const data = toLocalISO(dataInput);
+  const data = new Date(dataRaw).toISOString().slice(0, 10);
+
   let nomeMotoboy = "";
   let valorPago = 0;
 
@@ -349,14 +359,10 @@ document.getElementById("btnSalvarEntregaManual").addEventListener("click", asyn
     }
     nomeMotoboy = nomeOutro;
     valorPago = valorManual || 0;
-  }
-
-  else if (idMotoboy === "lucas_hiago") {
+  } else if (idMotoboy === "lucas_hiago") {
     nomeMotoboy = "Lucas Hiago";
     valorPago = qtd * 6;
-  }
-
-  else if (idMotoboy === "rodrigo_goncalves") {
+  } else if (idMotoboy === "rodrigo_goncalves") {
     nomeMotoboy = "Rodrigo Gonçalves";
     valorPago = 0;
   }
