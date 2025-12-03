@@ -1,5 +1,5 @@
 // ============================================================
-//  DFL — DASHBOARD ADMIN (VERSÃO FINAL ESTÁVEL 2025 • RESTAURADA)
+//  DFL — DASHBOARD ADMIN (VERSÃO FINAL ESTÁVEL 2025 • PATCH ANDROID)
 // ============================================================
 
 import { auth, db } from "./firebase-config-v2.js";
@@ -66,8 +66,8 @@ document.getElementById("btnRelatorios")?.addEventListener("click", () => {
 //  COR DO SALDO
 // ============================================================
 function getClasseSaldo(saldo) {
-  if (saldo > 0) return "negativo";  // motoboy tem a receber
-  if (saldo < 0) return "positivo";  // motoboy te deve
+  if (saldo > 0) return "negativo";  
+  if (saldo < 0) return "positivo";  
   return "neutral";
 }
 
@@ -185,12 +185,10 @@ const CATEGORIAS = [
 const categoriaSel = document.getElementById("estoqueCategoria");
 const itemSel = document.getElementById("estoqueItem");
 
-// Preenche categorias
 categoriaSel.innerHTML =
   `<option value="">Selecione...</option>` +
   CATEGORIAS.map(c => `<option value="${c.id}">${c.label}</option>`).join("");
 
-// Atualiza itens quando muda categoria
 function atualizarItens() {
   const lista = SUBITENS[categoriaSel.value] || [];
   itemSel.innerHTML = lista.map(i => `<option value="${i}">${i}</option>`).join("");
@@ -198,21 +196,22 @@ function atualizarItens() {
 categoriaSel.addEventListener("change", atualizarItens);
 
 // ============================================================
-//  REGISTRAR ESTOQUE (FORMATO ISO NORMAL)
+//  REGISTRAR ESTOQUE  (CORREÇÃO DO ANDROID)
 // ============================================================
 document.getElementById("btnSalvarEstoque").addEventListener("click", async () => {
   const item = itemSel.value;
   const categoria = categoriaSel.value;
   const quantidade = document.getElementById("estoqueQtd").value;
-  const dataBruta = document.getElementById("estoqueData").value;
+  let dataBruta = document.getElementById("estoqueData").value;
 
   if (!item || !categoria || !quantidade || !dataBruta) {
     alert("Preencha tudo.");
     return;
   }
 
-  // Data simples — SEM timezone extra
-  const data = new Date(dataBruta).toISOString().slice(0, 10);
+  // 📌 CORREÇÃO DO ANDROID — evita salvar dia errado
+  const dataObj = new Date(dataBruta + "T12:00:00");
+  const data = dataObj.toISOString().slice(0, 10);
 
   await addDoc(collection(db, "estoqueDia"), {
     item,
@@ -226,10 +225,14 @@ document.getElementById("btnSalvarEstoque").addEventListener("click", async () =
 });
 
 // ============================================================
-//  MOSTRAR BOTÃO PDF — MODO ORIGINAL RESTAURADO
+//  MOSTRAR BOTÃO PDF (AGORA FUNCIONANDO SEM FALHAS)
 // ============================================================
 async function verificarEstoqueHoje() {
-  const hoje = new Date().toISOString().slice(0, 10);
+
+  // Também corrigido para Android (mantém sempre o dia correto)
+  const hoje = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+    .toISOString()
+    .slice(0, 10);
 
   const q = query(collection(db, "estoqueDia"), where("data", "==", hoje));
   const snap = await getDocs(q);
@@ -246,7 +249,7 @@ document.getElementById("btnGerarPdfEstoque")?.addEventListener("click", () => {
 });
 
 // ============================================================
-//  REGISTRAR DESPESA
+//  REGISTRAR DESPESA (COM PATCH DO ANDROID)
 // ============================================================
 document.getElementById("btnSalvarDespesa").addEventListener("click", async () => {
   const desc = document.getElementById("descDespesa").value;
@@ -258,7 +261,8 @@ document.getElementById("btnSalvarDespesa").addEventListener("click", async () =
     return;
   }
 
-  const data = new Date(dataRaw).toISOString().slice(0, 10);
+  const dataObj = new Date(dataRaw + "T12:00:00");
+  const data = dataObj.toISOString().slice(0, 10);
 
   await addDoc(collection(db, "despesas"), { descricao: desc, valor, data });
 
@@ -313,7 +317,9 @@ confirmarPagamentoBtn.addEventListener("click", async () => {
   await addDoc(collection(db, "despesas"), {
     descricao: `Pagamento motoboy`,
     valor,
-    data: new Date().toISOString().slice(0, 10)
+    data: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, 10)
   });
 
   modal.classList.add("hidden");
@@ -326,7 +332,7 @@ confirmarPagamentoBtn.addEventListener("click", async () => {
 });
 
 // ============================================================
-//  REGISTRAR ENTREGA MANUAL
+//  REGISTRAR ENTREGA MANUAL (COM PATCH ANDROID)
 // ============================================================
 const selectMotoboy = document.getElementById("entregaMotoboy");
 const grupoOutro = document.getElementById("grupoMotoboyOutro");
@@ -347,7 +353,8 @@ document.getElementById("btnSalvarEntregaManual").addEventListener("click", asyn
     return;
   }
 
-  const data = new Date(dataRaw).toISOString().slice(0, 10);
+  const dataObj = new Date(dataRaw + "T12:00:00");
+  const data = dataObj.toISOString().slice(0, 10);
 
   let nomeMotoboy = "";
   let valorPago = 0;
