@@ -74,12 +74,15 @@
     }
   </style>
 
-  <!-- jsPDF + AutoTable -->
+  <!-- jsPDF + autotable -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
   <script type="module">
-    import { db } from "./firebase-config-v2.js";   <!-- 🔥 IMPORT CORRIGIDO -->
+    /* ===========================
+       IMPORT CORRIGIDO
+       =========================== */
+    import { db } from "./firebase-config-v2.js";
 
     import {
       collection,
@@ -91,58 +94,65 @@
     let registros = [];
 
     window.onload = async () => {
-      const hoje = new Date().toISOString().slice(0,10);
+      const hoje = new Date().toISOString().slice(0, 10);
       document.getElementById("dataHoje").textContent = hoje;
 
-      const q = query(
-        collection(db, "estoqueDia"),
-        where("data", "==", hoje)
-      );
+      try {
+        const q = query(
+          collection(db, "estoqueDia"),
+          where("data", "==", hoje)
+        );
 
-      const snap = await getDocs(q);
+        const snap = await getDocs(q);
 
-      if (snap.empty) {
-        document.getElementById("conteudo").innerHTML =
-          "<p class='no-records'>Nenhum estoque registrado hoje.</p>";
-        return;
-      }
+        if (snap.empty) {
+          document.getElementById("conteudo").innerHTML =
+            "<p class='no-records'>Nenhum estoque registrado hoje.</p>";
+          return;
+        }
 
-      registros = [];
+        registros = [];
 
-      let tabela = `
-        <table>
-          <thead>
-            <tr>
-              <th>Categoria</th>
-              <th>Item</th>
-              <th>Quantidade</th>
-              <th>Data</th>
-            </tr>
-          </thead>
-          <tbody>
-      `;
-
-      snap.forEach(doc => {
-        const d = doc.data();
-        registros.push(d);
-
-        tabela += `
-          <tr>
-            <td>${d.categoria}</td>
-            <td>${d.item}</td>
-            <td>${d.quantidade}</td>
-            <td>${d.data}</td>
-          </tr>
+        let tabela = `
+          <table>
+            <thead>
+              <tr>
+                <th>Categoria</th>
+                <th>Item</th>
+                <th>Quantidade</th>
+                <th>Data</th>
+              </tr>
+            </thead>
+            <tbody>
         `;
-      });
 
-      tabela += "</tbody></table>";
-      document.getElementById("conteudo").innerHTML = tabela;
+        snap.forEach(doc => {
+          const d = doc.data();
+          registros.push(d);
+
+          tabela += `
+            <tr>
+              <td>${d.categoria}</td>
+              <td>${d.item}</td>
+              <td>${d.quantidade}</td>
+              <td>${d.data}</td>
+            </tr>
+          `;
+        });
+
+        tabela += "</tbody></table>";
+        document.getElementById("conteudo").innerHTML = tabela;
+
+      } catch (e) {
+        console.error(e);
+        document.getElementById("conteudo").innerHTML =
+          "<p class='no-records'>Erro ao carregar dados.</p>";
+      }
     };
 
-    // ================================
-    //   📄 BOTÃO "BAIXAR PDF"
-    // ================================
+    // ==========================================================
+    // 🔽 BAIXAR PDF
+    // ==========================================================
     window.baixarPDF = () => {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
