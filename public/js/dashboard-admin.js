@@ -61,9 +61,6 @@ document.getElementById("btnRelatorios")?.addEventListener("click", () => {
 // =========================================================
 //  FUNÇÃO DE COR DO SALDO
 // =========================================================
-// saldo > 0 = você deve para o motoboy (vermelho)
-// saldo < 0 = motoboy deve para você (verde)
-// saldo = 0 = neutro (branco)
 function getClasseSaldo(saldo) {
   if (saldo > 0) return "negativo";
   if (saldo < 0) return "positivo";
@@ -71,7 +68,7 @@ function getClasseSaldo(saldo) {
 }
 
 // =========================================================
-//  LISTAR MOTOBOYS (COM COR CERTA)
+//  LISTAR MOTOBOYS — LAYOUT CORRETO (NOME EM CIMA, SALDO EMBAIXO)
 // =========================================================
 async function carregarListaMotoboys() {
   const listaEl = document.getElementById("listaMotoboys");
@@ -87,8 +84,11 @@ async function carregarListaMotoboys() {
 
     html += `
       <div class="motoboy-item ${classe}">
-        <strong>${x.nome}</strong>
-        <span>R$ ${saldo.toFixed(2).replace(".", ",")}</span>
+        <div class="motoboy-info">
+          <strong>${x.nome}</strong>
+          <span class="motoboy-saldo">R$ ${saldo.toFixed(2).replace(".", ",")}</span>
+        </div>
+
         <button class="btnPagar" data-id="${d.id}" data-nome="${x.nome}" data-saldo="${saldo}">
           💸 Pagar
         </button>
@@ -98,7 +98,6 @@ async function carregarListaMotoboys() {
 
   listaEl.innerHTML = html;
 
-  // Ativar botões de pagamento
   document.querySelectorAll(".btnPagar").forEach(btn => {
     btn.addEventListener("click", abrirModalPagamento);
   });
@@ -270,7 +269,7 @@ confirmarPagamentoBtn.addEventListener("click", async () => {
 
   let saldoAtual = snap.exists() ? Number(snap.data().saldo || 0) : 0;
 
-  saldoAtual -= valor; // PAGAMENTO diminui saldo (ou seja, fica mais negativo)
+  saldoAtual -= valor;
 
   await updateDoc(ref, { saldo: saldoAtual });
 
@@ -290,7 +289,7 @@ confirmarPagamentoBtn.addEventListener("click", async () => {
 });
 
 // =========================================================
-//  REGISTRAR ENTREGA MANUAL (SEM ALTERAR SALDO DO RODRIGO)
+//  REGISTRAR ENTREGA MANUAL
 // =========================================================
 document.getElementById("btnSalvarEntregaManual").addEventListener("click", async () => {
   const idMotoboy = document.getElementById("entregaMotoboy").value;
@@ -304,25 +303,21 @@ document.getElementById("btnSalvarEntregaManual").addEventListener("click", asyn
   let nomeMotoboy = "";
   let valorPago = 0;
 
-  // OUTRO MOTOBOY
   if (idMotoboy === "outro") {
     nomeMotoboy = nomeOutro;
     valorPago = valorManual;
   }
 
-  // LUCAS HIAGO – sempre afeta saldo
   else if (idMotoboy === "lucas_hiago") {
     nomeMotoboy = "Lucas Hiago";
     valorPago = qtd * 6;
   }
 
-  // RODRIGO — NÃO altera saldo
   else if (idMotoboy === "rodrigo_goncalves") {
     nomeMotoboy = "Rodrigo Gonçalves";
     valorPago = 0;
   }
 
-  // Registrar apenas para relatórios
   await addDoc(collection(db, "entregasManuais"), {
     nomeMotoboy,
     motoboy: idMotoboy,
