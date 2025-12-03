@@ -319,33 +319,33 @@ select {
   }
 }
 
-/* ============================================================
-   🎨 AJUSTE VISUAL — BLOCO “REGISTRAR ENTREGAS”
-   ============================================================ */
 
-.admin-card label {
-  display: block;
-  font-size: 15px;
-  margin-bottom: 6px;
-  color: #ddd;
+/* ================================================
+   🔧 Correção de alinhamento — Card de Entregas
+================================================ */
+.admin-card-entregas {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.admin-card select,
-.admin-card input {
-  width: 100%;
-  padding: 12px 14px;
-  font-size: 15px;
+.admin-card-entregas label {
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #ffca28;
+}
+
+.admin-card-entregas select,
+.admin-card-entregas input {
+  width: 100% !important;
+  padding: 12px;
   border-radius: 10px;
-  background: #000;
-  border: 1px solid #222;
-  color: #fff;
-  margin-bottom: 16px;    /* 🔥 espaçamento uniforme */
+  border: 1px solid #333;
+  background: #111;
+  color: white;
+  font-size: 15px;
 }
 
 #grupoMotoboyOutro {
-  margin-top: -6px;
-}
-
-.admin-card button.admin-btn {
-  margin-top: 4px;
+  margin-top: 10px;
 }
