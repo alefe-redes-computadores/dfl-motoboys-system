@@ -1,5 +1,5 @@
 // =========================================================
-//  DFL — DASHBOARD ADMIN (VERSÃO FINAL ESTÁVEL 2025)
+//  DFL — DASHBOARD ADMIN (VERSÃO ESTÁVEL 2025 CORRIGIDA)
 // =========================================================
 
 import { auth, db } from "./firebase-config-v2.js";
@@ -75,7 +75,7 @@ function getClasseSaldo(saldo) {
 }
 
 // =========================================================
-//  LISTAR MOTOBOYS (COM COR CERTA + LAYOUT HORIZONTAL)
+//  LISTAR MOTOBOYS (LAYOUT HORIZONTAL CORRETO)
 // =========================================================
 async function carregarListaMotoboys() {
   const listaEl = document.getElementById("listaMotoboys");
@@ -177,7 +177,7 @@ const SUBITENS = {
 const categoriaSel = document.getElementById("estoqueCategoria");
 const itemSel = document.getElementById("estoqueItem");
 
-/* Preenche as categorias no select (sumiram porque o HTML ficou vazio) */
+/* CATEGORIAS DO ESTOQUE */
 const CATEGORIAS = [
   { id: "frios", label: "Frios" },
   { id: "refrigerantes", label: "Refrigerantes" },
@@ -202,29 +202,30 @@ function atualizarItens() {
 }
 
 categoriaSel?.addEventListener("change", atualizarItens);
-
-// deixa vazio até escolher uma categoria
 itemSel.innerHTML = "";
 
 // =========================================================
-//  REGISTRAR ESTOQUE
+//  REGISTRAR ESTOQUE (DATA ISO CORRIGIDA 👍)
 // =========================================================
 document.getElementById("btnSalvarEstoque").addEventListener("click", async () => {
   const item = itemSel.value;
   const categoria = categoriaSel.value;
   const quantidade = document.getElementById("estoqueQtd").value;
-  const data = document.getElementById("estoqueData").value;
+  const dataBruta = document.getElementById("estoqueData").value;
 
-  if (!item || !categoria || !quantidade || !data) {
+  if (!item || !categoria || !quantidade || !dataBruta) {
     alert("Preencha tudo.");
     return;
   }
+
+  // 👉 NORMALIZA A DATA PARA YYYY-MM-DD
+  const dataISO = new Date(dataBruta).toISOString().slice(0, 10);
 
   await addDoc(collection(db, "estoqueDia"), {
     item,
     categoria,
     quantidade,
-    data
+    data: dataISO
   });
 
   alert("Estoque salvo!");
@@ -247,7 +248,7 @@ async function verificarEstoqueHoje() {
 }
 
 // =========================================================
-//  ABRIR PDF
+//  IR PARA PDF
 // =========================================================
 document.getElementById("btnGerarPdfEstoque").addEventListener("click", () => {
   window.location.href = "pdf-estoque.html";
@@ -316,7 +317,7 @@ confirmarPagamentoBtn.addEventListener("click", async () => {
 
   let saldoAtual = snap.exists() ? Number(snap.data().saldo || 0) : 0;
 
-  // PAGAMENTO diminui saldo (vai em direção a 0 ou negativo)
+  // PAGAMENTO diminui saldo
   saldoAtual -= valor;
 
   await updateDoc(ref, { saldo: saldoAtual });
@@ -344,11 +345,8 @@ const selectMotoboy = document.getElementById("entregaMotoboy");
 const grupoOutro = document.getElementById("grupoMotoboyOutro");
 
 selectMotoboy.addEventListener("change", () => {
-  if (selectMotoboy.value === "outro") {
-    grupoOutro.classList.remove("hidden");
-  } else {
-    grupoOutro.classList.add("hidden");
-  }
+  // Apenas "outro" mostra campo manual
+  grupoOutro.classList.toggle("hidden", selectMotoboy.value !== "outro");
 });
 
 document.getElementById("btnSalvarEntregaManual").addEventListener("click", async () => {
@@ -366,7 +364,6 @@ document.getElementById("btnSalvarEntregaManual").addEventListener("click", asyn
   let nomeMotoboy = "";
   let valorPago = 0;
 
-  // OUTRO MOTOBOY – valor definido manualmente
   if (idMotoboy === "outro") {
     if (!nomeOutro) {
       alert("Informe o nome do motoboy.");
@@ -376,19 +373,16 @@ document.getElementById("btnSalvarEntregaManual").addEventListener("click", asyn
     valorPago = valorManual || 0;
   }
 
-  // LUCAS HIAGO – sempre afeta saldo via Pagar (então aqui é só para relatório)
   else if (idMotoboy === "lucas_hiago") {
     nomeMotoboy = "Lucas Hiago";
     valorPago = qtd * 6;
   }
 
-  // RODRIGO — NÃO altera saldo, apenas registro
   else if (idMotoboy === "rodrigo_goncalves") {
     nomeMotoboy = "Rodrigo Gonçalves";
     valorPago = 0;
   }
 
-  // Registrar apenas para relatórios
   await addDoc(collection(db, "entregasManuais"), {
     nomeMotoboy,
     motoboy: idMotoboy,
