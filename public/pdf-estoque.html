@@ -78,6 +78,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
+  <!-- ================================
+       IMPORTAÇÃO DO FIREBASE (CORRIGIDA)
+       ================================ -->
   <script type="module">
     import { db } from "./firebase-config-v2.js";
 
@@ -92,7 +95,7 @@
 
     window.onload = async () => {
 
-      // 🔥 PATCH ANDROID — usar sempre data real do dia
+      // FUSO ANDROID CORRIGIDO
       const hoje = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
         .toISOString()
         .slice(0, 10);
@@ -146,15 +149,13 @@
         document.getElementById("conteudo").innerHTML = tabela;
 
       } catch (e) {
-        console.error(e);
+        console.error("ERRO FIRESTORE:", e);
         document.getElementById("conteudo").innerHTML =
           "<p class='no-records'>Erro ao carregar dados.</p>";
       }
     };
 
-    // ==========================================================
-    // 🔽 DOWNLOAD PDF
-    // ==========================================================
+    // BOTÃO DE GERAR PDF
     window.baixarPDF = () => {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
