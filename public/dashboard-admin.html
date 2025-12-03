@@ -26,6 +26,9 @@
     </div>
   </header>
 
+  <!-- ===========================
+       📌 CONTAINER PRINCIPAL
+  ============================ -->
   <main class="admin-container">
 
     <!-- ===========================
@@ -33,6 +36,8 @@
     ============================ -->
     <section class="admin-card">
       <h2>Saldo por Motoboy</h2>
+
+      <!-- ESTE ELEMENTO RECEBE OS MOTOBOYS VIA JS -->
       <div id="listaMotoboys" class="lista-motoboys">
         <p>Carregando motoboys...</p>
       </div>
@@ -84,7 +89,7 @@
     </section>
 
     <!-- ===========================
-         🛵 ENTREGAS / PAGAMENTO MOTOS
+         🛵 ENTREGAS / PAGAMENTOS
     ============================ -->
     <section class="admin-card">
       <h2>Registrar Entregas / Pagamento p/ Motoboy</h2>
@@ -123,6 +128,7 @@
   <div id="modalPagamento" class="modal hidden">
     <div class="modal-content">
       <h3>Registrar Pagamento</h3>
+
       <p id="modalNomeMotoboy"></p>
 
       <label>Valor pago (R$)</label>
