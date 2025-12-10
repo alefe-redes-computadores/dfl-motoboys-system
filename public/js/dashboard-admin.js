@@ -1,5 +1,6 @@
 // ============================================================
 //  DFL — DASHBOARD ADMIN (VERSÃO 2025 CORRIGIDA + CAIXA DIÁRIO)
+//  Usando coleção oficial: caixaDiario
 // ============================================================
 
 import { auth, db } from "./firebase-config-v2.js";
@@ -20,7 +21,6 @@ import {
   where,
   orderBy
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-
 
 // ============================================================
 //  🔐 ACESSO APENAS ADMIN
@@ -47,7 +47,8 @@ onAuthStateChanged(auth, async (user) => {
   carregarListaMotoboys();
   carregarSaldoGeral();
   verificarEstoqueHoje();
-  carregarCaixaHoje(); // NOVO
+  carregarCaixaHoje(); // NOVO — CAIXA DIÁRIO
+  calcularResumoDia(); // NOVO — CÁLCULO DO RESUMO
 });
 
 // ============================================================
@@ -69,11 +70,10 @@ document.getElementById("btnRelatorios")?.addEventListener("click", () => {
 //  🎨 COR DO SALDO
 // ============================================================
 function getClasseSaldo(saldo) {
-  if (saldo > 0) return "negativo";
-  if (saldo < 0) return "positivo";
+  if (saldo > 0) return "positivo";
+  if (saldo < 0) return "negativo";
   return "neutral";
 }
-
 
 // ============================================================
 //  📌 LISTAR MOTOBOYS
@@ -88,11 +88,6 @@ async function carregarListaMotoboys() {
   snap.forEach((d) => {
     const x = d.data();
     let saldo = Number(x.saldo || 0);
-    const id = d.id;
-
-    if (id !== "lucas_hiago") {
-      saldo = 0;
-    }
 
     const classe = getClasseSaldo(saldo);
 
@@ -103,9 +98,9 @@ async function carregarListaMotoboys() {
           <span class="saldo">R$ ${saldo.toFixed(2).replace(".", ",")}</span>
         </div>
 
-        <button class="btnPagar" 
-          data-id="${d.id}" 
-          data-nome="${x.nome}" 
+        <button class="btnPagar"
+          data-id="${d.id}"
+          data-nome="${x.nome}"
           data-saldo="${saldo}">
           💸 Pagar
         </button>
@@ -119,7 +114,6 @@ async function carregarListaMotoboys() {
     btn.addEventListener("click", abrirModalPagamento);
   });
 }
-
 
 // ============================================================
 //  💰 SALDO GERAL
@@ -138,7 +132,6 @@ async function carregarSaldoGeral() {
   el.textContent = "R$ " + total.toFixed(2).replace(".", ",");
   el.className = "admin-value " + getClasseSaldo(total);
 }
-
 
 // ============================================================
 //  📦 CATEGORIAS / ITENS DE ESTOQUE
@@ -176,16 +169,7 @@ const SUBITENS = {
     "Sacola 38x48"
   ],
   paes: ["Pão Hambúrguer", "Pão Hot Dog"],
-  hortifruti: [
-    "Alface",
-    "Batata Palha",
-    "Cebola",
-    "Cebolinha",
-    "Milho",
-    "Óleo",
-    "Ovo",
-    "Tomate"
-  ],
+  hortifruti: ["Alface", "Cebola", "Tomate", "Milho", "Ovo", "Óleo", "Batata Palha"],
   outros_extra: ["Outro (Preencher manualmente)"]
 };
 
@@ -210,7 +194,6 @@ categoriaSel.addEventListener("change", () => {
   itemSel.innerHTML = lista.map(i => `<option value="${i}">${i}</option>`).join("");
 });
 
-
 // ============================================================
 //  📦 REGISTRAR ESTOQUE
 // ============================================================
@@ -218,15 +201,14 @@ document.getElementById("btnSalvarEstoque").addEventListener("click", async () =
   const item = itemSel.value;
   const categoria = categoriaSel.value;
   const quantidade = document.getElementById("estoqueQtd").value;
-  let dataBruta = document.getElementById("estoqueData").value;
+  const dataRaw = document.getElementById("estoqueData").value;
 
-  if (!item || !categoria || !quantidade || !dataBruta) {
+  if (!item || !categoria || !quantidade || !dataRaw) {
     alert("Preencha tudo.");
     return;
   }
 
-  const dataObj = new Date(dataBruta + "T12:00:00");
-  const data = dataObj.toISOString().slice(0, 10);
+  const data = new Date(dataRaw + "T12:00:00").toISOString().slice(0, 10);
 
   await addDoc(collection(db, "estoqueDia"), {
     item,
@@ -238,7 +220,6 @@ document.getElementById("btnSalvarEstoque").addEventListener("click", async () =
   alert("Estoque salvo!");
   verificarEstoqueHoje();
 });
-
 
 // ============================================================
 //  📦 MOSTRAR BOTÃO PDF
@@ -259,7 +240,6 @@ document.getElementById("btnGerarPdfEstoque")?.addEventListener("click", () => {
   window.location.href = "pdf-estoque.html";
 });
 
-
 // ============================================================
 //  🧾 REGISTRAR DESPESA
 // ============================================================
@@ -273,14 +253,12 @@ document.getElementById("btnSalvarDespesa").addEventListener("click", async () =
     return;
   }
 
-  const dataObj = new Date(dataRaw + "T12:00:00");
-  const data = dataObj.toISOString().slice(0, 10);
+  const data = new Date(dataRaw + "T12:00:00").toISOString().slice(0, 10);
 
   await addDoc(collection(db, "despesas"), { descricao: desc, valor, data });
 
   alert("Despesa registrada!");
 });
-
 
 // ============================================================
 //  💸 MODAL PAGAMENTO
@@ -306,7 +284,6 @@ cancelarPagamentoBtn.addEventListener("click", () => {
   pagamentoMotoboyId = null;
   inputValorPagamento.value = "";
 });
-
 
 // ============================================================
 //  💵 CONFIRMAR PAGAMENTO (LÓGICA OFICIAL)
@@ -355,9 +332,8 @@ confirmarPagamentoBtn.addEventListener("click", async () => {
   alert("Pagamento registrado!");
 });
 
-
 // ============================================================
-//  🛵 REGISTRAR ENTREGA MANUAL — LÓGICA FINAL
+//  🛵 REGISTRAR ENTREGA MANUAL
 // ============================================================
 const selectMotoboy = document.getElementById("entregaMotoboy");
 const grupoOutro = document.getElementById("grupoMotoboyOutro");
@@ -378,13 +354,11 @@ document.getElementById("btnSalvarEntregaManual").addEventListener("click", asyn
     return;
   }
 
-  const dataObj = new Date(dataRaw + "T12:00:00");
-  const data = dataObj.toISOString().slice(0, 10);
+  const data = new Date(dataRaw + "T12:00:00").toISOString().slice(0, 10);
 
   let nomeMotoboy = "";
   let valorPago = 0;
 
-  // REGRAS
   if (idMotoboy === "lucas_hiago") {
     nomeMotoboy = "Lucas Hiago";
     valorPago = qtd * 6;
@@ -427,9 +401,8 @@ document.getElementById("btnSalvarEntregaManual").addEventListener("click", asyn
   carregarSaldoGeral();
 });
 
-
 // ============================================================
-//  💸 CAIXA DIÁRIO — NOVO MÓDULO
+//  💸 CAIXA DIÁRIO — Usando coleção oficial caixaDiario
 // ============================================================
 
 // Registrar caixa
@@ -445,10 +418,9 @@ document.getElementById("btnRegistrarCaixa").addEventListener("click", async () 
     return;
   }
 
-  const dataObj = new Date(dataRaw + "T12:00:00");
-  const data = dataObj.toISOString().slice(0, 10);
+  const data = new Date(dataRaw + "T12:00:00").toISOString().slice(0, 10);
 
-  await addDoc(collection(db, "caixa"), {
+  await addDoc(collection(db, "caixaDiario"), {
     tipo,
     categoria,
     descricao,
@@ -459,10 +431,10 @@ document.getElementById("btnRegistrarCaixa").addEventListener("click", async () 
 
   alert("Movimentação registrada!");
   carregarCaixaHoje();
+  calcularResumoDia();
 });
 
-
-// Exibir registros de hoje
+// Carregar movimentações de hoje
 async function carregarCaixaHoje() {
   const lista = document.getElementById("listaCaixaHoje");
   lista.innerHTML = "<p>Carregando...</p>";
@@ -472,7 +444,7 @@ async function carregarCaixaHoje() {
     .slice(0, 10);
 
   const q = query(
-    collection(db, "caixa"),
+    collection(db, "caixaDiario"),
     where("data", "==", hoje),
     orderBy("timestamp", "desc")
   );
@@ -488,6 +460,7 @@ async function carregarCaixaHoje() {
 
   snap.forEach(doc => {
     const x = doc.data();
+
     const hora = new Date(x.timestamp).toLocaleTimeString("pt-BR", {
       hour: "2-digit",
       minute: "2-digit"
@@ -496,8 +469,7 @@ async function carregarCaixaHoje() {
     html += `
       <div class="caixa-item">
         <strong>${x.tipo.toUpperCase()}</strong> — ${x.categoria}
-        <br>
-        ${x.descricao}
+        <br>${x.descricao}
         <br>
         <span style="color:#ffca28;">R$ ${x.valor.toFixed(2).replace(".", ",")}</span>
         <span style="float:right; opacity:0.7;">${hora}</span>
@@ -507,4 +479,37 @@ async function carregarCaixaHoje() {
   });
 
   lista.innerHTML = html;
+}
+
+// ============================================================
+//  📊 RESUMO DO DIA — Entradas / Saídas / Saldo
+// ============================================================
+async function calcularResumoDia() {
+  const hoje = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+    .toISOString()
+    .slice(0, 10);
+
+  const q = query(collection(db, "caixaDiario"), where("data", "==", hoje));
+  const snap = await getDocs(q);
+
+  let entradas = 0;
+  let saidas = 0;
+
+  snap.forEach((d) => {
+    const x = d.data();
+
+    if (x.tipo === "entrada") entradas += Number(x.valor || 0);
+    else saidas += Number(x.valor || 0);
+  });
+
+  const saldo = entradas - saidas;
+
+  document.getElementById("resumoEntradas").textContent =
+    "R$ " + entradas.toFixed(2).replace(".", ",");
+
+  document.getElementById("resumoSaidas").textContent =
+    "R$ " + saidas.toFixed(2).replace(".", ",");
+
+  document.getElementById("resumoSaldoDia").textContent =
+    "R$ " + saldo.toFixed(2).replace(".", ",");
 }
