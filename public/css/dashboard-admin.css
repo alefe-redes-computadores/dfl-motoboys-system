@@ -1,34 +1,39 @@
-/* ============================================================
-   🎨 DFL — DASHBOARD ADMIN CSS (VERSÃO 2025 ATUALIZADA)
+/* ===========================================================
+   🎨 DFL - DASHBOARD ADMIN (CSS OFICIAL 2025)
    - Layout escuro premium
-   - Cartões sólidos
-   - Botões padronizados
-   - Compatível com todos os novos módulos (Caixa Diário, PDF, Estoque)
-   ============================================================ */
+   - Cores oficiais amarelo (#ffca28) e cinza carbono
+   - Saldo Geral reforçado (opção B)
+   =========================================================== */
 
 :root {
-  --bg: #0d0d0d;
-  --card: #1a1a1a;
-  --borda: #333;
   --amarelo: #ffca28;
-  --azul: #1e88e5;
-  --vermelho: #e53935;
-  --verde: #43a047;
-  --texto: #ffffff;
-  --radius: 12px;
-  --shadow: 0 0 18px rgba(0,0,0,0.35);
+  --amarelo-escuro: #e0b020;
+  --fundo: #0d0d0d;
+  --painel: #1a1a1a;
+  --borda: #333;
+  --txt: #ffffff;
+  --negativo: #e53935;
+  --positivo: #43a047;
 }
 
+/* ===========================
+   🌑 Base
+=========================== */
 body {
   margin: 0;
-  background: var(--bg);
+  padding: 0;
+  background: var(--fundo);
   font-family: system-ui, sans-serif;
-  color: var(--texto);
+  color: var(--txt);
 }
 
-/* ============================================================
-   HEADER
-   ============================================================ */
+.hidden {
+  display: none !important;
+}
+
+/* ===========================
+   🔝 Header
+=========================== */
 .admin-header {
   display: flex;
   justify-content: space-between;
@@ -45,194 +50,198 @@ body {
 }
 
 .admin-logo {
-  width: 50px;
-  height: 50px;
+  width: 45px;
+  height: 45px;
   border-radius: 12px;
   border: 2px solid var(--amarelo);
 }
 
+.admin-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .admin-btn-header {
-  background: var(--amarelo);
-  color: #000;
-  padding: 10px 16px;
-  font-weight: bold;
-  border-radius: 8px;
-  margin-left: 10px;
-  cursor: pointer;
+  padding: 10px 18px;
+  border-radius: 10px;
   border: none;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.admin-btn-header.amarelo {
+  background: var(--amarelo);
+  color: #111;
 }
 
 .admin-btn-header.azul {
-  background: var(--azul);
+  background: #1e88e5;
   color: #fff;
 }
 
-/* ============================================================
-   GRID PRINCIPAL
-   ============================================================ */
-.admin-container {
-  padding: 22px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
-  gap: 22px;
+.admin-btn-header.pdv {
+  background: var(--amarelo);
+  color: #111;
+  border: 2px solid #000;
+  font-weight: 900;
 }
 
-/* ============================================================
-   CARDS
-   ============================================================ */
-.admin-card {
-  background: var(--card);
+/* ===========================
+   📌 Container
+=========================== */
+.admin-container {
+  display: grid;
   padding: 22px;
-  border-radius: var(--radius);
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+}
+
+/* ===========================
+   🧱 Cards
+=========================== */
+.admin-card {
+  background: var(--painel);
   border: 1px solid var(--borda);
-  box-shadow: var(--shadow);
+  border-radius: 14px;
+  padding: 20px;
 }
 
 .admin-card h2 {
-  margin: 0 0 14px 0;
+  margin-top: 0;
   color: var(--amarelo);
-  font-size: 20px;
 }
 
-/* ============================================================
-   INPUTS / SELECT
-   ============================================================ */
-input, select {
+/* ===========================
+   🏷 Inputs
+=========================== */
+input,
+select {
   width: 100%;
-  padding: 10px 14px;
-  margin-top: 6px;
-  margin-bottom: 12px;
+  padding: 10px 12px;
+  margin: 6px 0 12px 0;
   background: #0f0f0f;
+  color: #fff;
   border: 1px solid var(--borda);
-  color: var(--texto);
   border-radius: 8px;
   font-size: 15px;
 }
 
-/* ============================================================
-   BOTÕES GERAIS
-   ============================================================ */
-.admin-btn,
-.admin-btn-pdf {
-  width: 100%;
-  padding: 11px;
-  font-weight: bold;
-  border-radius: 8px;
-  cursor: pointer;
-  border: none;
-  margin-top: 6px;
-  transition: 0.2s;
-}
-
+/* ===========================
+   🟨 Botões
+=========================== */
 .admin-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.admin-btn.amarelo {
   background: var(--amarelo);
-  color: #000;
+  color: #111;
 }
 
-.admin-btn:hover {
-  opacity: 0.85;
-}
-
-.admin-btn-pdf {
-  background: var(--azul);
+.admin-btn.azul {
+  background: #1e88e5;
   color: #fff;
 }
 
-.admin-btn-pdf:hover {
-  opacity: 0.85;
+/* ===========================
+   💰 Saldo Geral (reforçado)
+=========================== */
+.admin-value {
+  font-size: 2rem;               /* maior */
+  font-weight: 800;              /* mais forte */
+  letter-spacing: -0.5px;
+  margin-top: 10px;
+  text-shadow: 0 0 10px rgba(0,0,0,0.5);
+  color: var(--amarelo);
+  text-align: left;
 }
 
-/* ============================================================
-   MOTOBOYS LISTA
-   ============================================================ */
-.motoboy-item {
+.positivo {
+  color: var(--positivo) !important;
+}
+
+.negativo {
+  color: var(--negativo) !important;
+}
+
+.neutral {
+  color: var(--amarelo) !important;
+}
+
+/* ===========================
+   🛵 Lista Motoboys
+=========================== */
+.lista-motoboys .motoboy-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--borda);
+}
+
+.motoboy-info strong {
+  font-size: 1rem;
+}
+
+.motoboy-info .saldo {
+  font-weight: bold;
+}
+
+/* Botão pagar */
+.btnPagar {
+  padding: 8px 12px;
+  background: var(--negativo);
+  color: #fff;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+/* ===========================
+   💸 Modal Pagamento
+=========================== */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background: #111;
+  padding: 22px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 380px;
+  border: 1px solid var(--amarelo);
+}
+
+/* ===========================
+   📄 Caixa Diário
+=========================== */
+.caixa-dia-lista .caixa-item {
   padding: 10px 0;
   border-bottom: 1px solid var(--borda);
 }
 
-.motoboy-item .motoboy-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.btnPagar {
-  margin-top: 10px;
-  background: var(--vermelho);
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  color: #fff;
-  font-weight: bold;
-}
-
-.positivo { color: var(--verde)!important; }
-.negativo { color: var(--vermelho)!important; }
-.neutral { color: var(--texto)!important; }
-
-/* ============================================================
-   MODAL PAGAMENTO
-   ============================================================ */
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0,0,0,0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.modal.hidden {
-  display: none;
-}
-
-.modal-content {
-  background: var(--card);
-  padding: 22px;
-  width: 90%;
-  max-width: 380px;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-}
-
-/* ============================================================
-   CAIXA DIÁRIO — LISTA
-   ============================================================ */
-.caixa-item {
-  padding: 8px 0;
-}
-
-.caixa-item hr {
-  border: none;
-  border-bottom: 1px solid #333;
+/* ===========================
+   🧾 Tabelas / Organização
+=========================== */
+label {
+  font-weight: 600;
   margin-top: 6px;
-}
-
-/* ============================================================
-   RESUMO DO DIA (ENTRADAS, SAÍDAS, SALDO)
-   ============================================================ */
-#caixaResumo {
-  background: #111;
-  border: 1px solid #444;
-  padding: 15px;
-  border-radius: var(--radius);
-}
-
-#caixaResumo p {
-  margin: 5px 0;
-  font-size: 16px;
-  font-weight: 500;
-}
-
-/* ============================================================
-   RESPONSIVIDADE
-   ============================================================ */
-@media (max-width: 500px) {
-  .admin-header h1 {
-    font-size: 18px;
-  }
+  display: block;
+  color: #ddd;
 }
