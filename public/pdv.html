@@ -3,226 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DFL • Mini-PDV</title>
+    <title>Mini-PDV – DFL Administrativo</title>
 
-    <!-- Importa CSS principal -->
-    <link rel="stylesheet" href="style.css">
-
-    <!-- Estilos exclusivos do PDV (tema escuro + abas modernas) -->
-    <style>
-        body {
-            background: #111;
-            color: #fff;
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
-        /* Barra Superior */
-        .pdv-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background: #000;
-            padding: 15px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            z-index: 999;
-            border-bottom: 1px solid #222;
-        }
-
-        .pdv-header button {
-            background: #ffb300;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            color: #000;
-            font-weight: bold;
-        }
-
-        .pdv-header-title {
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        /* Container geral */
-        .pdv-container {
-            padding: 90px 15px 30px 15px;
-        }
-
-        /* Abas */
-        .pdv-tabs {
-            display: flex;
-            border-bottom: 1px solid #222;
-            margin-bottom: 20px;
-        }
-
-        .pdv-tab {
-            flex: 1;
-            text-align: center;
-            padding: 12px 0;
-            cursor: pointer;
-            background: #181818;
-            border-right: 1px solid #222;
-            font-weight: bold;
-            transition: 0.2s;
-        }
-
-        .pdv-tab:last-child {
-            border-right: none;
-        }
-
-        .pdv-tab.active {
-            background: #ffb300;
-            color: #000;
-        }
-
-        /* Conteúdo das abas */
-        .pdv-section {
-            display: none;
-        }
-
-        .pdv-section.active {
-            display: block;
-        }
-
-        /* Inputs */
-        .pdv-input {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            background: #1e1e1e;
-            border: 1px solid #333;
-            color: #fff;
-            margin-top: 10px;
-            margin-bottom: 20px;
-            font-size: 16px;
-        }
-
-        /* Botões */
-        .pdv-btn {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            background: #ffb300;
-            border: none;
-            color: #000;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 5px;
-        }
-
-        /* Extrato */
-        .extrato-item {
-            background: #1a1a1a;
-            border-radius: 8px;
-            padding: 12px;
-            border-left: 4px solid #ffb300;
-            margin-bottom: 10px;
-        }
-
-        .extrato-item .tipo {
-            font-weight: bold;
-        }
-
-        .extrato-item .valor {
-            font-size: 18px;
-            margin-top: 5px;
-        }
-
-        .entrada { color: #4caf50; }
-        .retirada { color: #ff5252; }
-
-        .fechamento-card {
-            background: #1a1a1a;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            border-left: 4px solid #ffb300;
-        }
-    </style>
+    <link rel="stylesheet" href="./css/dashboard-admin.css">
 </head>
 
 <body>
 
-    <!-- 🔥 Barra Superior -->
-    <div class="pdv-header">
-        <button onclick="window.location.href='dashboard-admin.html'">← Voltar</button>
-        <div class="pdv-header-title">DFL • Mini-PDV</div>
-    </div>
-
-    <!-- Conteúdo -->
-    <div class="pdv-container">
-
-        <!-- Abas -->
-        <div class="pdv-tabs">
-            <div class="pdv-tab active" data-tab="entradas">Entradas</div>
-            <div class="pdv-tab" data-tab="saidas">Saídas</div>
-            <div class="pdv-tab" data-tab="fechamento">Fechamento</div>
-            <div class="pdv-tab" data-tab="extrato">Extrato</div>
+    <!-- ===========================
+         🔝 HEADER PADRÃO DFL
+    ============================ -->
+    <header class="admin-header">
+        <div class="admin-header-left">
+            <img src="./img/logo-dfl.png" class="admin-logo" />
+            <h1>Mini-PDV – Caixa Interno</h1>
         </div>
 
-        <!-- ABA ENTRADAS -->
-        <div id="entradas" class="pdv-section active">
-            <h2>Registrar Entrada</h2>
-
-            <input type="number" id="entradaValor" class="pdv-input" placeholder="Valor recebido (R$)">
-            <input type="text" id="entradaDesc" class="pdv-input" placeholder="Descrição da entrada">
-
-            <button class="pdv-btn" onclick="registrarEntrada()">Registrar Entrada</button>
+        <div class="admin-header-right">
+            <button onclick="window.location.href='dashboard-admin.html'" class="admin-btn-header azul">
+                Voltar ao Painel
+            </button>
         </div>
+    </header>
 
-        <!-- ABA SAÍDAS -->
-        <div id="saidas" class="pdv-section">
-            <h2>Registrar Retirada</h2>
 
-            <input type="number" id="saidaValor" class="pdv-input" placeholder="Valor retirado (R$)">
-            <input type="text" id="saidaDesc" class="pdv-input" placeholder="Descrição da retirada">
+    <!-- ===========================
+         📦 CONTAINER PRINCIPAL
+    ============================ -->
+    <main class="admin-container">
 
-            <button class="pdv-btn" onclick="registrarSaida()">Registrar Retirada</button>
-        </div>
+        <!-- ===========================
+             💵 REGISTRAR ENTRADA
+        ============================ -->
+        <section class="admin-card">
+            <h2>Registrar ENTRADA</h2>
 
-        <!-- ABA FECHAMENTO -->
-        <div id="fechamento" class="pdv-section">
-            <h2>Fechamento do Caixa</h2>
+            <label>Valor (R$)</label>
+            <input id="entradaValor" type="number" step="0.01" placeholder="Ex: 49.90">
 
-            <div id="fechamentoResumo"></div>
+            <label>Forma de Pagamento</label>
+            <select id="entradaPagamento">
+                <option value="Dinheiro">Dinheiro</option>
+                <option value="Cartão de Crédito">Cartão de Crédito</option>
+                <option value="Cartão de Débito">Cartão de Débito</option>
+                <option value="PIX">PIX</option>
+                <option value="Ifood">Ifood</option>
+                <option value="Outros">Outros</option>
+            </select>
 
-            <button class="pdv-btn" onclick="fecharCaixa()">Fechar Caixa</button>
-        </div>
+            <label>Categoria</label>
+            <select id="entradaCategoria">
+                <option value="Venda Balcão">Venda Balcão</option>
+                <option value="PIX Direto">PIX Direto</option>
+                <option value="Venda por Fora">Venda por Fora</option>
+                <option value="Correção Manual">Correção Manual</option>
+                <option value="Outra Entrada">Outra Entrada</option>
+            </select>
 
-        <!-- ABA EXTRATO -->
-        <div id="extrato" class="pdv-section">
-            <h2>Extrato do Dia</h2>
+            <label>Descrição</label>
+            <input id="entradaDescricao" placeholder="Ex: Venda balcão, código X">
 
-            <div id="extratoLista"></div>
-        </div>
+            <button id="btnRegistrarEntrada" class="admin-btn amarelo">
+                Salvar Entrada
+            </button>
+        </section>
 
-    </div>
 
-    <!-- Arquivo JS do PDV (Agora corrigido com pasta /js/) -->
-    <script type="module" src="js/pdv.js"></script>
 
-    <!-- Script local para controle das abas -->
-    <script>
-        const tabs = document.querySelectorAll(".pdv-tab");
-        const sections = document.querySelectorAll(".pdv-section");
+        <!-- ===========================
+             💸 REGISTRAR SAÍDA
+        ============================ -->
+        <section class="admin-card">
+            <h2>Registrar SAÍDA</h2>
 
-        tabs.forEach(tab => {
-            tab.addEventListener("click", () => {
-                tabs.forEach(t => t.classList.remove("active"));
-                sections.forEach(s => s.classList.remove("active"));
+            <label>Valor (R$)</label>
+            <input id="saidaValor" type="number" step="0.01" placeholder="Ex: 25.00">
 
-                tab.classList.add("active");
+            <label>Categoria</label>
+            <select id="saidaCategoria">
+                <option value="Pagamento Motoboy">Pagamento Motoboy</option>
+                <option value="Compra de Estoque">Compra de Estoque</option>
+                <option value="Despesa Operacional">Despesa Operacional</option>
+                <option value="Sangria / Retirada">Sangria / Retirada</option>
+                <option value="Reembolso Cliente">Reembolso Cliente</option>
+                <option value="Outra Saída">Outra Saída</option>
+            </select>
 
-                document.getElementById(tab.dataset.tab).classList.add("active");
-            });
-        });
-    </script>
+            <label>Descrição</label>
+            <input id="saidaDescricao" placeholder="Ex: Compra no mercado">
+
+            <button id="btnRegistrarSaida" class="admin-btn azul">
+                Salvar Saída
+            </button>
+        </section>
+
+
+
+        <!-- ===========================
+             🟥 SANGRIA
+        ============================ -->
+        <section class="admin-card">
+            <h2>Sangria / Retirada</h2>
+
+            <label>Valor (R$)</label>
+            <input id="sangriaValor" type="number" step="0.01" placeholder="Ex: 50.00">
+
+            <label>Descrição</label>
+            <input id="sangriaDescricao" placeholder="Motivo da retirada">
+
+            <button id="btnRegistrarSangria" class="admin-btn vermelho">
+                Registrar Sangria
+            </button>
+        </section>
+
+
+
+        <!-- ===========================
+             🧾 MOVIMENTOS DO DIA
+        ============================ -->
+        <section class="admin-card">
+            <h2>Movimentações do Dia</h2>
+            <div id="listaMovimentos" class="lista-mov"></div>
+        </section>
+
+
+
+        <!-- ===========================
+             📊 FECHAMENTO DO CAIXA
+        ============================ -->
+        <section class="admin-card">
+            <h2>Fechamento Diário</h2>
+
+            <label>Observações</label>
+            <textarea id="fechamentoObs" rows="3" placeholder="Observações do dia (opcional)"></textarea>
+
+            <button id="btnFecharCaixa" class="admin-btn amarelo">
+                Gerar Fechamento do Dia
+            </button>
+
+            <div id="resultadoFechamento" class="fechamento-box"></div>
+        </section>
+
+    </main>
+
+
+    <!-- ===========================
+         📌 SCRIPT PRINCIPAL DO PDV
+    ============================ -->
+    <script type="module" src="./js/pdv.js"></script>
 
 </body>
 </html>
