@@ -22,10 +22,6 @@
 
     <div class="admin-header-right">
       <button id="btnRelatorios" class="admin-btn-header azul">Relatórios</button>
-
-      <!-- NOVO BOTÃO MINI-PDV (Opção A escolhida) -->
-      <button id="btnMiniPDV" class="admin-btn-header azul">Mini-PDV</button>
-
       <button id="logoutAdmin" class="admin-btn-header amarelo">Sair</button>
     </div>
   </header>
@@ -35,17 +31,18 @@
   ============================ -->
   <main class="admin-container">
 
+
     <!-- ===========================
          🛵 SALDO POR MOTOBOY
     ============================ -->
     <section class="admin-card">
       <h2>Saldo por Motoboy</h2>
 
-      <!-- ESTE ELEMENTO RECEBE OS MOTOBOYS VIA JS -->
       <div id="listaMotoboys" class="lista-motoboys">
         <p>Carregando motoboys...</p>
       </div>
     </section>
+
 
     <!-- ===========================
          💰 SALDO GERAL
@@ -54,6 +51,7 @@
       <h2>Saldo Geral</h2>
       <div id="saldoGeral" class="admin-value neutral">R$ 0,00</div>
     </section>
+
 
     <!-- ===========================
          🧾 DESPESAS
@@ -66,6 +64,51 @@
       <input id="dataDespesa" type="date" />
       <button id="btnSalvarDespesa" class="admin-btn amarelo">Salvar Despesa</button>
     </section>
+
+
+
+    <!-- =================================================
+         💸 CAIXA DIÁRIO (NOVO MÓDULO)
+    ================================================== -->
+    <section class="admin-card">
+      <h2>Caixa Diário</h2>
+
+      <label>Tipo</label>
+      <select id="caixaTipo">
+        <option value="entrada">Entrada</option>
+        <option value="saida">Saída</option>
+      </select>
+
+      <label>Categoria</label>
+      <select id="caixaCategoria">
+        <option value="Dinheiro">Dinheiro</option>
+        <option value="Crédito">Cartão de Crédito</option>
+        <option value="Débito">Cartão de Débito</option>
+        <option value="PIX">PIX</option>
+        <option value="iFood">iFood</option>
+        <option value="Outros">Outros</option>
+      </select>
+
+      <label>Descrição</label>
+      <input id="caixaDescricao" placeholder="Ex: Venda, sangria, taxa..." />
+
+      <label>Valor (R$)</label>
+      <input id="caixaValor" type="number" step="0.01" placeholder="Ex: 39.90" />
+
+      <label>Data</label>
+      <input id="caixaData" type="date" />
+
+      <button id="btnRegistrarCaixa" class="admin-btn amarelo">Registrar no Caixa</button>
+
+      <h3 style="margin-top:20px; color:#ffca28;">Movimentações de Hoje</h3>
+
+      <div id="listaCaixaHoje" class="caixa-dia-lista">
+        <p>Carregando...</p>
+      </div>
+    </section>
+
+
+
 
     <!-- ===========================
          📦 ESTOQUE
@@ -91,6 +134,7 @@
         📄 Gerar PDF – Estoque do Dia
       </button>
     </section>
+
 
     <!-- ===========================
          🛵 ENTREGAS / PAGAMENTOS
@@ -126,6 +170,7 @@
 
   </main>
 
+
   <!-- ===========================
        💸 MODAL DE PAGAMENTO
   ============================ -->
@@ -142,6 +187,7 @@
       <button id="cancelarPagamento" class="admin-btn azul">Cancelar</button>
     </div>
   </div>
+
 
   <!-- ===========================
        📌 JS FINAL
