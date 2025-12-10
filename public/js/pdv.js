@@ -1,229 +1,287 @@
 // ============================================================
-// 🔥 DFL • Mini-PDV (Modelo C – Profissional)
-// Versão: 1.0 (Tema Escuro + Abas Modernas)
-// Autor: ChatGPT + Álefe
-// Sistema completo de Entradas, Saídas, Extrato e Fechamento.
+//  DFL – MINI-PDV OFICIAL 2025
+//  Entradas, Saídas, Sangrias, Fechamento Diário
 // ============================================================
 
-import { db } from "./firebase-config-v2.js";
+import { auth, db } from "./firebase-config-v2.js";
+
 import {
-    collection,
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+
+import {
     addDoc,
+    collection,
+    getDocs,
     query,
     where,
-    getDocs,
-    orderBy,
-    serverTimestamp
+    doc,
+    setDoc
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-// ===========================
-// 📌 Função utilitária para pegar a data atual
-// ===========================
-function hoje() {
-    const d = new Date();
-    return d.toISOString().split("T")[0]; // YYYY-MM-DD
+
+// ============================================================
+//  🔐 REQUER LOGIN DE ADMIN
+// ============================================================
+const ADMINS = [
+    "6YczX4gLpUStlBVdQOXWc3uEYGG2",
+    "LYu3M8gyRdMCqhE90vmH9Jh5Ksj1",
+    "plSHKV043gTpEYfx7I3TI6FsJG93",
+    "zIfbMxD1SQNvtlX9y6YUsEz2TXC3"
+];
+
+let operadorUID = null;
+
+onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+        window.location.href = "index.html";
+        return;
+    }
+
+    if (!ADMINS.includes(user.uid)) {
+        alert("Acesso restrito.");
+        window.location.href = "dashboard.html";
+        return;
+    }
+
+    operadorUID = user.uid;
+
+    carregarMovimentosDoDia();
+});
+
+
+// ============================================================
+//  🗓️ DATA DO DIA (Formato YYYY-MM-DD)
+// ============================================================
+function dataHoje() {
+    return new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+        .toISOString()
+        .slice(0, 10);
 }
 
-// ===========================
-// 📌 Registrar ENTRADA
-// ===========================
-export async function registrarEntrada() {
-    const valor = parseFloat(document.getElementById("entradaValor").value);
-    const desc = document.getElementById("entradaDesc").value.trim();
+
+// ============================================================
+//  💵 REGISTRAR ENTRADA
+// ============================================================
+document.getElementById("btnRegistrarEntrada").addEventListener("click", async () => {
+    const valor = Number(document.getElementById("entradaValor").value);
+    const pagamento = document.getElementById("entradaPagamento").value;
+    const categoria = document.getElementById("entradaCategoria").value;
+    const descricao = document.getElementById("entradaDescricao").value || categoria;
 
     if (!valor || valor <= 0) {
-        alert("Digite um valor válido.");
+        alert("Valor inválido.");
         return;
     }
 
-    if (!desc) {
-        alert("Digite uma descrição.");
-        return;
-    }
-
-    const data = hoje();
-
-    await addDoc(collection(db, "movimentacoesCaixa"), {
+    await addDoc(collection(db, "caixa"), {
         tipo: "entrada",
         valor,
-        descricao: desc,
-        origem: "manual",
-        data,
-        hora: new Date().toLocaleTimeString("pt-BR"),
-        timestamp: serverTimestamp()
+        pagamento,
+        categoria,
+        descricao,
+        operador: operadorUID,
+        data: dataHoje(),
+        timestamp: Date.now()
     });
 
-    alert("Entrada registrada com sucesso!");
+    alert("Entrada registrada!");
+    limparCamposEntrada();
+    carregarMovimentosDoDia();
+});
 
+function limparCamposEntrada() {
     document.getElementById("entradaValor").value = "";
-    document.getElementById("entradaDesc").value = "";
-
-    carregarExtrato();
-    carregarResumoFechamento();
+    document.getElementById("entradaDescricao").value = "";
 }
 
-// ===========================
-// 📌 Registrar SAÍDA
-// ===========================
-export async function registrarSaida() {
-    const valor = parseFloat(document.getElementById("saidaValor").value);
-    const desc = document.getElementById("saidaDesc").value.trim();
+
+// ============================================================
+//  💸 REGISTRAR SAÍDA
+// ============================================================
+document.getElementById("btnRegistrarSaida").addEventListener("click", async () => {
+    const valor = Number(document.getElementById("saidaValor").value);
+    const categoria = document.getElementById("saidaCategoria").value;
+    const descricao = document.getElementById("saidaDescricao").value || categoria;
 
     if (!valor || valor <= 0) {
-        alert("Digite um valor válido.");
+        alert("Valor inválido.");
         return;
     }
 
-    if (!desc) {
-        alert("Digite uma descrição.");
-        return;
-    }
-
-    const data = hoje();
-
-    await addDoc(collection(db, "movimentacoesCaixa"), {
-        tipo: "retirada",
+    await addDoc(collection(db, "caixa"), {
+        tipo: "saida",
         valor,
-        descricao: desc,
-        origem: "manual",
-        data,
-        hora: new Date().toLocaleTimeString("pt-BR"),
-        timestamp: serverTimestamp()
+        pagamento: "—",
+        categoria,
+        descricao,
+        operador: operadorUID,
+        data: dataHoje(),
+        timestamp: Date.now()
     });
 
-    alert("Retirada registrada com sucesso!");
+    alert("Saída registrada!");
+    limparCamposSaida();
+    carregarMovimentosDoDia();
+});
 
+function limparCamposSaida() {
     document.getElementById("saidaValor").value = "";
-    document.getElementById("saidaDesc").value = "";
-
-    carregarExtrato();
-    carregarResumoFechamento();
+    document.getElementById("saidaDescricao").value = "";
 }
 
+
 // ============================================================
-// 📌 Carregar EXTRATO do dia
+//  🟥 REGISTRAR SANGRIA
 // ============================================================
-export async function carregarExtrato() {
-    const dataHoje = hoje();
-    const extratoLista = document.getElementById("extratoLista");
+document.getElementById("btnRegistrarSangria").addEventListener("click", async () => {
+    const valor = Number(document.getElementById("sangriaValor").value);
+    const descricao = document.getElementById("sangriaDescricao").value || "Sangria";
 
-    extratoLista.innerHTML = `<p style="color:#aaa;">Carregando movimentações...</p>`;
+    if (!valor || valor <= 0) {
+        alert("Valor inválido.");
+        return;
+    }
 
-    const q = query(
-        collection(db, "movimentacoesCaixa"),
-        where("data", "==", dataHoje),
-        orderBy("timestamp", "desc")
-    );
+    await addDoc(collection(db, "caixa"), {
+        tipo: "sangria",
+        valor,
+        pagamento: "—",
+        categoria: "Sangria / Retirada",
+        descricao,
+        operador: operadorUID,
+        data: dataHoje(),
+        timestamp: Date.now()
+    });
 
+    alert("Sangria registrada!");
+    limparCamposSangria();
+    carregarMovimentosDoDia();
+});
+
+function limparCamposSangria() {
+    document.getElementById("sangriaValor").value = "";
+    document.getElementById("sangriaDescricao").value = "";
+}
+
+
+// ============================================================
+//  📜 LISTAR MOVIMENTOS DO DIA
+// ============================================================
+async function carregarMovimentosDoDia() {
+    const listaEl = document.getElementById("listaMovimentos");
+    listaEl.innerHTML = "<p>Carregando...</p>";
+
+    const q = query(collection(db, "caixa"), where("data", "==", dataHoje()));
     const snap = await getDocs(q);
 
     if (snap.empty) {
-        extratoLista.innerHTML = `<p style="color:#aaa;">Nenhuma movimentação registrada hoje.</p>`;
+        listaEl.innerHTML = "<p>Nenhum movimento registrado hoje.</p>";
         return;
     }
 
     let html = "";
 
-    snap.forEach(doc => {
-        const mov = doc.data();
-        const tipoClasse = mov.tipo === "entrada" ? "entrada" : "retirada";
+    snap.forEach((d) => {
+        const x = d.data();
+        let cor = x.tipo === "entrada" ? "green" : x.tipo === "saida" ? "red" : "orange";
 
         html += `
-            <div class="extrato-item">
-                <div class="tipo ${tipoClasse}">
-                    ${mov.tipo.toUpperCase()}
-                </div>
-                <div class="valor ${tipoClasse}">
-                    R$ ${mov.valor.toFixed(2).replace(".", ",")}
-                </div>
-                <div class="desc">${mov.descricao}</div>
-                <div class="hora" style="color:#aaa; font-size:12px; margin-top:5px;">
-                    ${mov.hora}
-                </div>
+            <div class="mov-item" style="border-left: 4px solid ${cor}">
+                <strong>${x.tipo.toUpperCase()} — R$ ${x.valor.toFixed(2)}</strong><br>
+                <small>${x.categoria} — ${x.pagamento}</small><br>
+                <small>${x.descricao}</small><br>
             </div>
         `;
     });
 
-    extratoLista.innerHTML = html;
+    listaEl.innerHTML = html;
 }
 
+
 // ============================================================
-// 📌 Carregar RESUMO (Fechamento do Caixa)
+//  📊 FECHAMENTO DO DIA
 // ============================================================
-export async function carregarResumoFechamento() {
-    const dataHoje = hoje();
-    const box = document.getElementById("fechamentoResumo");
+document.getElementById("btnFecharCaixa").addEventListener("click", async () => {
+    const obs = document.getElementById("fechamentoObs").value;
 
-    box.innerHTML = `<p style="color:#aaa;">Carregando...</p>`;
-
-    const q = query(
-        collection(db, "movimentacoesCaixa"),
-        where("data", "==", dataHoje)
-    );
-
+    const q = query(collection(db, "caixa"), where("data", "==", dataHoje()));
     const snap = await getDocs(q);
 
-    let entradas = 0;
-    let retiradas = 0;
+    if (snap.empty) {
+        alert("Nenhum movimento registrado hoje.");
+        return;
+    }
 
-    snap.forEach(x => {
-        const mov = x.data();
-        if (mov.tipo === "entrada") entradas += mov.valor;
-        if (mov.tipo === "retirada") retiradas += mov.valor;
+    let totalEntradas = 0;
+    let totalSaidas = 0;
+    let totalSangrias = 0;
+
+    let formas = {
+        "Dinheiro": 0,
+        "Cartão de Crédito": 0,
+        "Cartão de Débito": 0,
+        "PIX": 0,
+        "Ifood": 0,
+        "Outros": 0
+    };
+
+    snap.forEach((d) => {
+        const x = d.data();
+
+        if (x.tipo === "entrada") {
+            totalEntradas += x.valor;
+            if (formas[x.pagamento] !== undefined) {
+                formas[x.pagamento] += x.valor;
+            }
+
+        } else if (x.tipo === "saida") {
+            totalSaidas += x.valor;
+
+        } else if (x.tipo === "sangria") {
+            totalSangrias += x.valor;
+        }
     });
 
-    const saldoFinal = entradas - retiradas;
+    const saldoFinal = totalEntradas - (totalSaidas + totalSangrias);
+
+    // Registrar o fechamento no Firestore
+    await setDoc(doc(db, "caixaFechamento", dataHoje()), {
+        data: dataHoje(),
+        operador: operadorUID,
+        observacoes: obs,
+        totalEntradas,
+        totalSaidas,
+        totalSangrias,
+        saldoFinal,
+        formasPagamento: formas,
+        timestamp: Date.now()
+    });
+
+    mostrarResultadoFechamento(totalEntradas, totalSaidas, totalSangrias, saldoFinal, formas);
+});
+
+
+function mostrarResultadoFechamento(entradas, saidas, sangrias, saldo, formas) {
+    const box = document.getElementById("resultadoFechamento");
+
+    let htmlFormas = "";
+    for (let f in formas) {
+        htmlFormas += `<li>${f}: R$ ${formas[f].toFixed(2)}</li>`;
+    }
 
     box.innerHTML = `
-        <div class="fechamento-card">
-            <p><strong>Entradas:</strong> R$ ${entradas.toFixed(2).replace(".", ",")}</p>
-            <p><strong>Retiradas:</strong> R$ ${retiradas.toFixed(2).replace(".", ",")}</p>
-            <hr style="border-color:#333; margin:10px 0;">
-            <h3>Saldo Final: R$ ${saldoFinal.toFixed(2).replace(".", ",")}</h3>
-        </div>
+        <h3>Fechamento do Dia</h3>
+
+        <p><strong>Total Entradas:</strong> R$ ${entradas.toFixed(2)}</p>
+        <p><strong>Total Saídas:</strong> R$ ${saidas.toFixed(2)}</p>
+        <p><strong>Total Sangrias:</strong> R$ ${sangrias.toFixed(2)}</p>
+
+        <h4>Por Forma de Pagamento</h4>
+        <ul>${htmlFormas}</ul>
+
+        <p><strong>Saldo Final:</strong> R$ ${saldo.toFixed(2)}</p>
+
+        <p><em>Fechamento salvo no sistema.</em></p>
     `;
 }
-
-// ============================================================
-// 📌 Fechar Caixa (gera documento do dia)
-// ============================================================
-export async function fecharCaixa() {
-    const dataHoje = hoje();
-
-    const q = query(
-        collection(db, "movimentacoesCaixa"),
-        where("data", "==", dataHoje)
-    );
-
-    const snap = await getDocs(q);
-
-    let entradas = 0;
-    let retiradas = 0;
-
-    snap.forEach(x => {
-        const mov = x.data();
-        if (mov.tipo === "entrada") entradas += mov.valor;
-        if (mov.tipo === "retirada") retiradas += mov.valor;
-    });
-
-    const saldoFinal = entradas - retiradas;
-
-    await addDoc(collection(db, "fechamentosCaixa"), {
-        data: dataHoje,
-        totalEntradas: entradas,
-        totalRetiradas: retiradas,
-        saldoFinal: saldoFinal,
-        criadoEm: serverTimestamp()
-    });
-
-    alert("Caixa fechado com sucesso!");
-    carregarResumoFechamento();
-}
-
-// ============================================================
-// 📌 Inicialização automática ao abrir o PDV
-// ============================================================
-window.onload = () => {
-    carregarExtrato();
-    carregarResumoFechamento();
-};
