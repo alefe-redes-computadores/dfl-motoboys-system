@@ -1,5 +1,7 @@
 // ============================================================
-//  DFL — DASHBOARD ADMIN (VERSÃO FINAL ESTÁVEL 2025 • PATCH ANDROID)
+//  DFL — DASHBOARD ADMIN (VERSÃO 2025 CORRIGIDA)
+//  Lógica oficial: Lucas Hiago acumula saldo.
+//  Rodrigo tem taxa diferenciada. Avulsos não acumulam.
 // ============================================================
 
 import { auth, db } from "./firebase-config-v2.js";
@@ -17,11 +19,12 @@ import {
   collection,
   getDocs,
   query,
-  where
+  where,
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
+
 // ============================================================
-//  ACESSO APENAS ADMIN
+//  🔐 ACESSO APENAS ADMIN
 // ============================================================
 const ADMINS = [
   "6YczX4gLpUStlBVdQOXWc3uEYGG2",
@@ -48,7 +51,7 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 // ============================================================
-//  LOGOUT
+//  🚪 LOGOUT
 // ============================================================
 document.getElementById("logoutAdmin")?.addEventListener("click", async () => {
   await signOut(auth);
@@ -56,23 +59,24 @@ document.getElementById("logoutAdmin")?.addEventListener("click", async () => {
 });
 
 // ============================================================
-//  BOTÃO RELATÓRIOS
+//  📁 BOTÃO RELATÓRIOS
 // ============================================================
 document.getElementById("btnRelatorios")?.addEventListener("click", () => {
   window.location.href = "relatorios.html";
 });
 
 // ============================================================
-//  COR DO SALDO
+//  🎨 COR DO SALDO
 // ============================================================
 function getClasseSaldo(saldo) {
-  if (saldo > 0) return "negativo";  
-  if (saldo < 0) return "positivo";  
+  if (saldo > 0) return "negativo";
+  if (saldo < 0) return "positivo";
   return "neutral";
 }
 
+
 // ============================================================
-//  LISTAR MOTOBOYS
+//  📌 LISTAR MOTOBOYS
 // ============================================================
 async function carregarListaMotoboys() {
   const listaEl = document.getElementById("listaMotoboys");
@@ -83,7 +87,14 @@ async function carregarListaMotoboys() {
   let html = "";
   snap.forEach((d) => {
     const x = d.data();
-    const saldo = Number(x.saldo || 0);
+    let saldo = Number(x.saldo || 0);
+    const id = d.id;
+
+    // 🔥 regra: somente lucas_hiago exibe saldo real
+    if (id !== "lucas_hiago") {
+      saldo = 0;
+    }
+
     const classe = getClasseSaldo(saldo);
 
     html += `
@@ -110,22 +121,28 @@ async function carregarListaMotoboys() {
   });
 }
 
+
 // ============================================================
-//  SALDO GERAL
+//  💰 SALDO GERAL
 // ============================================================
 async function carregarSaldoGeral() {
   const snap = await getDocs(collection(db, "motoboys"));
   let total = 0;
 
-  snap.forEach((d) => total += Number(d.data().saldo || 0));
+  snap.forEach((d) => {
+    if (d.id === "lucas_hiago") {
+      total += Number(d.data().saldo || 0);
+    }
+  });
 
   const el = document.getElementById("saldoGeral");
   el.textContent = "R$ " + total.toFixed(2).replace(".", ",");
   el.className = "admin-value " + getClasseSaldo(total);
 }
 
+
 // ============================================================
-//  CATEGORIAS + SUBITENS DO ESTOQUE
+//  📦 CATEGORIAS / ITENS DE ESTOQUE
 // ============================================================
 const SUBITENS = {
   frios: [
@@ -195,8 +212,9 @@ function atualizarItens() {
 }
 categoriaSel.addEventListener("change", atualizarItens);
 
+
 // ============================================================
-//  REGISTRAR ESTOQUE  (CORREÇÃO DO ANDROID)
+//  📦 REGISTRAR ESTOQUE
 // ============================================================
 document.getElementById("btnSalvarEstoque").addEventListener("click", async () => {
   const item = itemSel.value;
@@ -209,7 +227,6 @@ document.getElementById("btnSalvarEstoque").addEventListener("click", async () =
     return;
   }
 
-  // 📌 CORREÇÃO DO ANDROID — evita salvar dia errado
   const dataObj = new Date(dataBruta + "T12:00:00");
   const data = dataObj.toISOString().slice(0, 10);
 
@@ -224,12 +241,11 @@ document.getElementById("btnSalvarEstoque").addEventListener("click", async () =
   verificarEstoqueHoje();
 });
 
+
 // ============================================================
-//  MOSTRAR BOTÃO PDF (AGORA FUNCIONANDO SEM FALHAS)
+//  📦 MOSTRAR BOTÃO PDF
 // ============================================================
 async function verificarEstoqueHoje() {
-
-  // Também corrigido para Android (mantém sempre o dia correto)
   const hoje = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
     .toISOString()
     .slice(0, 10);
@@ -241,15 +257,13 @@ async function verificarEstoqueHoje() {
   if (btn) btn.style.display = snap.size > 0 ? "block" : "none";
 }
 
-// ============================================================
-//  ABRIR TELA DE PDF
-// ============================================================
 document.getElementById("btnGerarPdfEstoque")?.addEventListener("click", () => {
   window.location.href = "pdf-estoque.html";
 });
 
+
 // ============================================================
-//  REGISTRAR DESPESA (COM PATCH DO ANDROID)
+//  🧾 REGISTRAR DESPESA
 // ============================================================
 document.getElementById("btnSalvarDespesa").addEventListener("click", async () => {
   const desc = document.getElementById("descDespesa").value;
@@ -269,8 +283,9 @@ document.getElementById("btnSalvarDespesa").addEventListener("click", async () =
   alert("Despesa registrada!");
 });
 
+
 // ============================================================
-//  MODAL PAGAMENTO
+//  💸 MODAL PAGAMENTO
 // ============================================================
 const modal = document.getElementById("modalPagamento");
 const inputValorPagamento = document.getElementById("modalValorPagamento");
@@ -294,8 +309,9 @@ cancelarPagamentoBtn.addEventListener("click", () => {
   inputValorPagamento.value = "";
 });
 
+
 // ============================================================
-//  CONFIRMAR PAGAMENTO
+//  💵 CONFIRMAR PAGAMENTO (LÓGICA CORRIGIDA)
 // ============================================================
 confirmarPagamentoBtn.addEventListener("click", async () => {
   const valor = Number(inputValorPagamento.value);
@@ -308,14 +324,29 @@ confirmarPagamentoBtn.addEventListener("click", async () => {
   const ref = doc(db, "motoboys", pagamentoMotoboyId);
   const snap = await getDoc(ref);
 
-  let saldoAtual = snap.exists() ? Number(snap.data().saldo || 0) : 0;
+  if (!snap.exists()) {
+    alert("Erro: motoboy não encontrado.");
+    return;
+  }
 
-  saldoAtual -= valor;
+  const dados = snap.data();
 
-  await updateDoc(ref, { saldo: saldoAtual });
+  // 🔥 REGRAS DEFINITIVAS
+  if (pagamentoMotoboyId === "lucas_hiago") {
+    // ÚNICO acumulativo
+    let saldoAtual = Number(dados.saldo || 0);
+    saldoAtual -= valor;
 
+    await updateDoc(ref, { saldo: saldoAtual });
+
+  } else {
+    // Rodrigo e Avulsos → saldo sempre 0
+    await updateDoc(ref, { saldo: 0 });
+  }
+
+  // Registrar despesa
   await addDoc(collection(db, "despesas"), {
-    descricao: `Pagamento motoboy`,
+    descricao: `Pagamento motoboy - ${dados.nome}`,
     valor,
     data: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
       .toISOString()
@@ -331,8 +362,9 @@ confirmarPagamentoBtn.addEventListener("click", async () => {
   alert("Pagamento registrado!");
 });
 
+
 // ============================================================
-//  REGISTRAR ENTREGA MANUAL (COM PATCH ANDROID)
+//  🛵 REGISTRAR ENTREGA MANUAL — LÓGICA FINAL
 // ============================================================
 const selectMotoboy = document.getElementById("entregaMotoboy");
 const grupoOutro = document.getElementById("grupoMotoboyOutro");
@@ -359,27 +391,51 @@ document.getElementById("btnSalvarEntregaManual").addEventListener("click", asyn
   let nomeMotoboy = "";
   let valorPago = 0;
 
-  if (idMotoboy === "outro") {
+  // ============================================================
+  //  REGRAS DE ENTREGA (OFICIAIS)
+  // ============================================================
+
+  if (idMotoboy === "lucas_hiago") {
+    nomeMotoboy = "Lucas Hiago";
+    valorPago = qtd * 6; 
+
+    // Atualizar saldo de Lucas
+    const ref = doc(db, "motoboys", "lucas_hiago");
+    const snap = await getDoc(ref);
+    let saldoAtual = Number(snap.data().saldo || 0);
+    saldoAtual += valorPago;
+    await updateDoc(ref, { saldo: saldoAtual });
+
+  } else if (idMotoboy === "rodrigo_goncalves") {
+    nomeMotoboy = "Rodrigo Gonçalves";
+
+    // 💰 regra: até 10 = 100; acima = 7 por entrega extra
+    if (qtd <= 10) {
+      valorPago = 100;
+    } else {
+      valorPago = 100 + (qtd - 10) * 7;
+    }
+
+    // Rodrigo não acumula saldo
+    await updateDoc(doc(db, "motoboys", idMotoboy), { saldo: 0 });
+
+  } else if (idMotoboy === "outro") {
     if (!nomeOutro) {
       alert("Informe o nome do motoboy.");
       return;
     }
     nomeMotoboy = nomeOutro;
     valorPago = valorManual || 0;
-  } else if (idMotoboy === "lucas_hiago") {
-    nomeMotoboy = "Lucas Hiago";
-    valorPago = qtd * 6;
-  } else if (idMotoboy === "rodrigo_goncalves") {
-    nomeMotoboy = "Rodrigo Gonçalves";
-    valorPago = 0;
   }
 
+  // Registrar entrega
   await addDoc(collection(db, "entregasManuais"), {
     nomeMotoboy,
     motoboy: idMotoboy,
     quantidade: qtd,
     valorPago,
-    data
+    data,
+    timestamp: Date.now()
   });
 
   alert("Entrega registrada!");
