@@ -22,6 +22,10 @@
 
     <div class="admin-header-right">
       <button id="btnRelatorios" class="admin-btn-header azul">Relatórios</button>
+
+      <!-- ⭐ MINI PDV RESTAURADO ⭐ -->
+      <button id="btnMiniPDV" class="admin-btn-header verde">Mini PDV</button>
+
       <button id="logoutAdmin" class="admin-btn-header amarelo">Sair</button>
     </div>
   </header>
@@ -100,9 +104,6 @@
 
       <button id="btnRegistrarCaixa" class="admin-btn amarelo">Registrar no Caixa</button>
 
-      <!-- ===========================
-           📊 RESUMO DO DIA (NOVO)
-      ============================ -->
       <h3 style="margin-top:20px; color:#ffca28;">Resumo do Dia</h3>
 
       <div id="caixaResumo" 
@@ -118,18 +119,11 @@
         <p><strong>Saldo do Dia:</strong> <span id="resumoSaldoDia" style="color:#ffca28;">R$ 0,00</span></p>
       </div>
 
-
-      <!-- ===========================
-           📄 MOVIMENTAÇÕES DO DIA
-      ============================ -->
       <h3 style="margin-top:20px; color:#ffca28;">Movimentações de Hoje</h3>
-
       <div id="listaCaixaHoje" class="caixa-dia-lista">
         <p>Carregando...</p>
       </div>
     </section>
-
-
 
 
     <!-- ===========================
@@ -215,6 +209,13 @@
        📌 JS FINAL
   ============================ -->
   <script type="module" src="./js/dashboard-admin.js"></script>
+
+  <!-- ABRIR MINI PDV -->
+  <script>
+    document.getElementById("btnMiniPDV")?.addEventListener("click", () => {
+      window.location.href = "pdv.html"; // ajuste aqui se o nome do arquivo for outro
+    });
+  </script>
 
 </body>
 </html>
