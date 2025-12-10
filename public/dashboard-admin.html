@@ -100,6 +100,28 @@
 
       <button id="btnRegistrarCaixa" class="admin-btn amarelo">Registrar no Caixa</button>
 
+      <!-- ===========================
+           📊 RESUMO DO DIA (NOVO)
+      ============================ -->
+      <h3 style="margin-top:20px; color:#ffca28;">Resumo do Dia</h3>
+
+      <div id="caixaResumo" 
+          style="
+            background:#1a1a1a;
+            padding:15px;
+            border-radius:10px;
+            margin-bottom:20px;
+            border:1px solid #333;
+          ">
+        <p><strong>Entradas:</strong> <span id="resumoEntradas" style="color:#ffca28;">R$ 0,00</span></p>
+        <p><strong>Saídas:</strong> <span id="resumoSaidas" style="color:#ffca28;">R$ 0,00</span></p>
+        <p><strong>Saldo do Dia:</strong> <span id="resumoSaldoDia" style="color:#ffca28;">R$ 0,00</span></p>
+      </div>
+
+
+      <!-- ===========================
+           📄 MOVIMENTAÇÕES DO DIA
+      ============================ -->
       <h3 style="margin-top:20px; color:#ffca28;">Movimentações de Hoje</h3>
 
       <div id="listaCaixaHoje" class="caixa-dia-lista">
