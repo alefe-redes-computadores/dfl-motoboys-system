@@ -1,46 +1,41 @@
 /* ============================================================
-   🎨 DFL — CSS DO PAINEL ADMINISTRATIVO (VERSÃO FINAL 2025)
-   Visual estável, alinhamento perfeito, cores inteligentes
+   🎨 DFL — DASHBOARD ADMIN CSS (VERSÃO 2025 ATUALIZADA)
+   - Layout escuro premium
+   - Cartões sólidos
+   - Botões padronizados
+   - Compatível com todos os novos módulos (Caixa Diário, PDF, Estoque)
    ============================================================ */
 
 :root {
   --bg: #0d0d0d;
-  --card: #111;
-  --text: #fff;
-  --yellow: #ffca28;
-  --red: #d32f2f;
-  --green: #4caf50;
-  --border: #2a2a2a;
+  --card: #1a1a1a;
+  --borda: #333;
+  --amarelo: #ffca28;
+  --azul: #1e88e5;
+  --vermelho: #e53935;
+  --verde: #43a047;
+  --texto: #ffffff;
   --radius: 12px;
-  --shadow: 0 4px 12px rgba(0,0,0,0.25);
+  --shadow: 0 0 18px rgba(0,0,0,0.35);
 }
 
-/* ============================================================
-   BASE
-============================================================ */
 body {
   margin: 0;
-  padding: 0;
   background: var(--bg);
-  color: var(--text);
-  font-family: "Poppins", sans-serif;
-}
-
-/* Utilitário */
-.hidden {
-  display: none !important;
+  font-family: system-ui, sans-serif;
+  color: var(--texto);
 }
 
 /* ============================================================
    HEADER
-============================================================ */
+   ============================================================ */
 .admin-header {
-  background: #000;
-  padding: 20px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 2px solid var(--yellow);
+  background: #111;
+  padding: 15px 22px;
+  border-bottom: 2px solid var(--amarelo);
 }
 
 .admin-header-left {
@@ -50,233 +45,145 @@ body {
 }
 
 .admin-logo {
-  width: 48px;
-  height: 48px;
+  width: 50px;
+  height: 50px;
   border-radius: 12px;
-  border: 2px solid var(--yellow);
-  object-fit: cover;
-}
-
-.admin-header h1 {
-  margin: 0;
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--yellow);
-}
-
-.admin-header-right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  border: 2px solid var(--amarelo);
 }
 
 .admin-btn-header {
-  padding: 10px 18px;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.admin-btn-header.amarelo {
-  background: var(--yellow);
+  background: var(--amarelo);
   color: #000;
+  padding: 10px 16px;
+  font-weight: bold;
+  border-radius: 8px;
+  margin-left: 10px;
+  cursor: pointer;
+  border: none;
 }
 
 .admin-btn-header.azul {
-  background: #1976d2;
+  background: var(--azul);
   color: #fff;
 }
 
 /* ============================================================
-   CONTAINER
-============================================================ */
+   GRID PRINCIPAL
+   ============================================================ */
 .admin-container {
   padding: 22px;
   display: grid;
-  gap: 22px;
   grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+  gap: 22px;
 }
 
 /* ============================================================
    CARDS
-============================================================ */
+   ============================================================ */
 .admin-card {
   background: var(--card);
   padding: 22px;
   border-radius: var(--radius);
+  border: 1px solid var(--borda);
   box-shadow: var(--shadow);
-  border: 1px solid var(--border);
 }
 
 .admin-card h2 {
-  margin-top: 0;
-  margin-bottom: 14px;
-  color: var(--yellow);
+  margin: 0 0 14px 0;
+  color: var(--amarelo);
   font-size: 20px;
 }
 
 /* ============================================================
-   INPUTS / SELECTS
-============================================================ */
-input,
-select {
+   INPUTS / SELECT
+   ============================================================ */
+input, select {
   width: 100%;
-  padding: 11px;
-  background: #000;
-  color: var(--text);
-  border-radius: 10px;
-  border: 1px solid #333;
-  font-size: 15px;
+  padding: 10px 14px;
+  margin-top: 6px;
   margin-bottom: 12px;
-}
-
-input::placeholder {
-  color: #aaa;
-}
-
-/* deixa o select usar o controle nativo (evita bug no Android) */
-select {
-  -webkit-appearance: menulist;
-  appearance: menulist;
+  background: #0f0f0f;
+  border: 1px solid var(--borda);
+  color: var(--texto);
+  border-radius: 8px;
+  font-size: 15px;
 }
 
 /* ============================================================
    BOTÕES GERAIS
-============================================================ */
-.admin-btn {
+   ============================================================ */
+.admin-btn,
+.admin-btn-pdf {
   width: 100%;
-  padding: 13px;
-  border-radius: 10px;
-  border: none;
-  font-weight: 600;
-  font-size: 15px;
+  padding: 11px;
+  font-weight: bold;
+  border-radius: 8px;
   cursor: pointer;
-  margin-top: 5px;
+  border: none;
+  margin-top: 6px;
+  transition: 0.2s;
 }
 
-.amarelo {
-  background: var(--yellow);
+.admin-btn {
+  background: var(--amarelo);
   color: #000;
 }
 
-.azul {
-  background: #1976d2;
+.admin-btn:hover {
+  opacity: 0.85;
+}
+
+.admin-btn-pdf {
+  background: var(--azul);
   color: #fff;
 }
 
-/* ============================================================
-   LISTA DE MOTOBOYS
-============================================================ */
-.lista-motoboys {
-  margin-top: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.admin-btn-pdf:hover {
+  opacity: 0.85;
 }
 
-/* Cada linha */
+/* ============================================================
+   MOTOBOYS LISTA
+   ============================================================ */
 .motoboy-item {
-  padding: 12px 16px;
-  border-radius: 12px;
-  border: 1px solid #222;
-  background: #000;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--borda);
+}
+
+.motoboy-item .motoboy-info {
   display: flex;
-  justify-content: space-between; /* texto à esquerda / botão à direita */
+  justify-content: space-between;
   align-items: center;
-  gap: 12px;
 }
 
-/* Bloco texto (nome + saldo) */
-.motoboy-info {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: nowrap;
-}
-
-.motoboy-info strong {
-  font-weight: 600;
-  font-size: 16px;
-  color: var(--text);
-}
-
-.motoboy-info .saldo {
-  font-weight: 700;
-  font-size: 16px;
-}
-
-/* 🔥 Cores do saldo */
-.negativo .saldo {
-  color: var(--red);
-}
-
-.positivo .saldo {
-  color: var(--green);
-}
-
-.neutral .saldo {
-  color: var(--text);
-}
-
-/* Botão PAGAR */
 .btnPagar {
-  background: var(--yellow);
-  color: #000;
-  border: none;
-  padding: 8px 14px;
-  font-size: 14px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  white-space: nowrap;
-}
-
-.btnPagar img,
-.btnPagar svg {
-  width: 18px;
-  height: 18px;
-}
-
-/* ============================================================
-   SALDO GERAL
-============================================================ */
-.admin-value {
-  font-size: 30px;
-  font-weight: 700;
   margin-top: 10px;
+  background: var(--vermelho);
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+  font-weight: bold;
 }
 
-.admin-value.negativo {
-  color: var(--red);
-}
-
-.admin-value.positivo {
-  color: var(--green);
-}
-
-.admin-value.neutral {
-  color: var(--text);
-}
+.positivo { color: var(--verde)!important; }
+.negativo { color: var(--vermelho)!important; }
+.neutral { color: var(--texto)!important; }
 
 /* ============================================================
-   MODAL DE PAGAMENTO
-============================================================ */
+   MODAL PAGAMENTO
+   ============================================================ */
 .modal {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.60);
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.7);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 9999;
 }
 
 .modal.hidden {
@@ -284,68 +191,48 @@ select {
 }
 
 .modal-content {
-  background: #111;
+  background: var(--card);
   padding: 22px;
-  border-radius: 12px;
   width: 90%;
   max-width: 380px;
-  border: 1px solid var(--yellow);
-}
-
-.modal-content h3 {
-  margin-top: 0;
-  color: var(--yellow);
-}
-
-.btn-cancelar {
-  background: #444;
-  color: #fff;
-  margin-top: 8px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
 }
 
 /* ============================================================
-   RESPONSIVO
-============================================================ */
-@media (max-width: 470px) {
-  .admin-header {
-    flex-direction: column;
-    text-align: center;
-    gap: 14px;
-  }
-
-  .admin-header-right {
-    width: 100%;
-    justify-content: center;
-  }
+   CAIXA DIÁRIO — LISTA
+   ============================================================ */
+.caixa-item {
+  padding: 8px 0;
 }
 
-
-/* ================================================
-   🔧 Correção de alinhamento — Card de Entregas
-================================================ */
-.admin-card-entregas {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+.caixa-item hr {
+  border: none;
+  border-bottom: 1px solid #333;
+  margin-top: 6px;
 }
 
-.admin-card-entregas label {
-  font-weight: 600;
-  margin-bottom: 4px;
-  color: #ffca28;
-}
-
-.admin-card-entregas select,
-.admin-card-entregas input {
-  width: 100% !important;
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid #333;
+/* ============================================================
+   RESUMO DO DIA (ENTRADAS, SAÍDAS, SALDO)
+   ============================================================ */
+#caixaResumo {
   background: #111;
-  color: white;
-  font-size: 15px;
+  border: 1px solid #444;
+  padding: 15px;
+  border-radius: var(--radius);
 }
 
-#grupoMotoboyOutro {
-  margin-top: 10px;
+#caixaResumo p {
+  margin: 5px 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* ============================================================
+   RESPONSIVIDADE
+   ============================================================ */
+@media (max-width: 500px) {
+  .admin-header h1 {
+    font-size: 18px;
+  }
 }
