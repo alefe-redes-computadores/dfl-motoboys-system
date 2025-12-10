@@ -1,7 +1,5 @@
 // ============================================================
-//  DFL — DASHBOARD ADMIN (VERSÃO 2025 CORRIGIDA)
-//  Lógica oficial: Lucas Hiago acumula saldo.
-//  Rodrigo tem taxa diferenciada. Avulsos não acumulam.
+//  DFL — DASHBOARD ADMIN (VERSÃO 2025 CORRIGIDA + CAIXA DIÁRIO)
 // ============================================================
 
 import { auth, db } from "./firebase-config-v2.js";
@@ -20,7 +18,9 @@ import {
   getDocs,
   query,
   where,
+  orderBy
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
 
 // ============================================================
 //  🔐 ACESSO APENAS ADMIN
@@ -47,6 +47,7 @@ onAuthStateChanged(auth, async (user) => {
   carregarListaMotoboys();
   carregarSaldoGeral();
   verificarEstoqueHoje();
+  carregarCaixaHoje(); // NOVO
 });
 
 // ============================================================
@@ -65,13 +66,6 @@ document.getElementById("btnRelatorios")?.addEventListener("click", () => {
 });
 
 // ============================================================
-//  🆕 BOTÃO MINI-PDV (adicionado oficialmente)
-// ============================================================
-document.getElementById("btnMiniPDV")?.addEventListener("click", () => {
-  window.location.href = "pdv.html";
-});
-
-// ============================================================
 //  🎨 COR DO SALDO
 // ============================================================
 function getClasseSaldo(saldo) {
@@ -79,6 +73,7 @@ function getClasseSaldo(saldo) {
   if (saldo < 0) return "positivo";
   return "neutral";
 }
+
 
 // ============================================================
 //  📌 LISTAR MOTOBOYS
@@ -95,7 +90,6 @@ async function carregarListaMotoboys() {
     let saldo = Number(x.saldo || 0);
     const id = d.id;
 
-    // 🔥 regra: somente lucas_hiago exibe saldo real
     if (id !== "lucas_hiago") {
       saldo = 0;
     }
@@ -126,6 +120,7 @@ async function carregarListaMotoboys() {
   });
 }
 
+
 // ============================================================
 //  💰 SALDO GERAL
 // ============================================================
@@ -144,8 +139,9 @@ async function carregarSaldoGeral() {
   el.className = "admin-value " + getClasseSaldo(total);
 }
 
+
 // ============================================================
-//  📦 ESTOQUE
+//  📦 CATEGORIAS / ITENS DE ESTOQUE
 // ============================================================
 const SUBITENS = {
   frios: [
@@ -209,11 +205,11 @@ categoriaSel.innerHTML =
   `<option value="">Selecione...</option>` +
   CATEGORIAS.map(c => `<option value="${c.id}">${c.label}</option>`).join("");
 
-function atualizarItens() {
+categoriaSel.addEventListener("change", () => {
   const lista = SUBITENS[categoriaSel.value] || [];
   itemSel.innerHTML = lista.map(i => `<option value="${i}">${i}</option>`).join("");
-}
-categoriaSel.addEventListener("change", atualizarItens);
+});
+
 
 // ============================================================
 //  📦 REGISTRAR ESTOQUE
@@ -243,6 +239,7 @@ document.getElementById("btnSalvarEstoque").addEventListener("click", async () =
   verificarEstoqueHoje();
 });
 
+
 // ============================================================
 //  📦 MOSTRAR BOTÃO PDF
 // ============================================================
@@ -261,6 +258,7 @@ async function verificarEstoqueHoje() {
 document.getElementById("btnGerarPdfEstoque")?.addEventListener("click", () => {
   window.location.href = "pdf-estoque.html";
 });
+
 
 // ============================================================
 //  🧾 REGISTRAR DESPESA
@@ -282,6 +280,7 @@ document.getElementById("btnSalvarDespesa").addEventListener("click", async () =
 
   alert("Despesa registrada!");
 });
+
 
 // ============================================================
 //  💸 MODAL PAGAMENTO
@@ -308,8 +307,9 @@ cancelarPagamentoBtn.addEventListener("click", () => {
   inputValorPagamento.value = "";
 });
 
+
 // ============================================================
-//  💵 CONFIRMAR PAGAMENTO (OFICIAL)
+//  💵 CONFIRMAR PAGAMENTO (LÓGICA OFICIAL)
 // ============================================================
 confirmarPagamentoBtn.addEventListener("click", async () => {
   const valor = Number(inputValorPagamento.value);
@@ -329,19 +329,15 @@ confirmarPagamentoBtn.addEventListener("click", async () => {
 
   const dados = snap.data();
 
-  // 🔥 REGRAS DEFINITIVAS
   if (pagamentoMotoboyId === "lucas_hiago") {
-    // ÚNICO acumulativo
     let saldoAtual = Number(dados.saldo || 0);
     saldoAtual -= valor;
     await updateDoc(ref, { saldo: saldoAtual });
 
   } else {
-    // Rodrigo e Avulsos → saldo sempre 0
     await updateDoc(ref, { saldo: 0 });
   }
 
-  // Registrar despesa
   await addDoc(collection(db, "despesas"), {
     descricao: `Pagamento motoboy - ${dados.nome}`,
     valor,
@@ -358,6 +354,7 @@ confirmarPagamentoBtn.addEventListener("click", async () => {
 
   alert("Pagamento registrado!");
 });
+
 
 // ============================================================
 //  🛵 REGISTRAR ENTREGA MANUAL — LÓGICA FINAL
@@ -387,15 +384,11 @@ document.getElementById("btnSalvarEntregaManual").addEventListener("click", asyn
   let nomeMotoboy = "";
   let valorPago = 0;
 
-  // ============================================================
-  //  REGRAS OFICIAIS DE ENTREGA
-  // ============================================================
-
+  // REGRAS
   if (idMotoboy === "lucas_hiago") {
     nomeMotoboy = "Lucas Hiago";
     valorPago = qtd * 6;
 
-    // Lucas acumula saldo
     const ref = doc(db, "motoboys", "lucas_hiago");
     const snap = await getDoc(ref);
     let saldoAtual = Number(snap.data().saldo || 0);
@@ -405,14 +398,9 @@ document.getElementById("btnSalvarEntregaManual").addEventListener("click", asyn
   } else if (idMotoboy === "rodrigo_goncalves") {
     nomeMotoboy = "Rodrigo Gonçalves";
 
-    // 💰 regra: até 10 = 100; acima = 7 por entrega extra
-    if (qtd <= 10) {
-      valorPago = 100;
-    } else {
-      valorPago = 100 + (qtd - 10) * 7;
-    }
+    if (qtd <= 10) valorPago = 100;
+    else valorPago = 100 + (qtd - 10) * 7;
 
-    // Rodrigo nunca acumula saldo
     await updateDoc(doc(db, "motoboys", idMotoboy), { saldo: 0 });
 
   } else if (idMotoboy === "outro") {
@@ -424,7 +412,6 @@ document.getElementById("btnSalvarEntregaManual").addEventListener("click", asyn
     valorPago = valorManual || 0;
   }
 
-  // Registrar entrega
   await addDoc(collection(db, "entregasManuais"), {
     nomeMotoboy,
     motoboy: idMotoboy,
@@ -439,3 +426,85 @@ document.getElementById("btnSalvarEntregaManual").addEventListener("click", asyn
   carregarListaMotoboys();
   carregarSaldoGeral();
 });
+
+
+// ============================================================
+//  💸 CAIXA DIÁRIO — NOVO MÓDULO
+// ============================================================
+
+// Registrar caixa
+document.getElementById("btnRegistrarCaixa").addEventListener("click", async () => {
+  const tipo = document.getElementById("caixaTipo").value;
+  const categoria = document.getElementById("caixaCategoria").value;
+  const descricao = document.getElementById("caixaDescricao").value.trim();
+  const valor = Number(document.getElementById("caixaValor").value);
+  const dataRaw = document.getElementById("caixaData").value;
+
+  if (!descricao || !valor || !dataRaw) {
+    alert("Preencha tudo.");
+    return;
+  }
+
+  const dataObj = new Date(dataRaw + "T12:00:00");
+  const data = dataObj.toISOString().slice(0, 10);
+
+  await addDoc(collection(db, "caixa"), {
+    tipo,
+    categoria,
+    descricao,
+    valor,
+    data,
+    timestamp: Date.now()
+  });
+
+  alert("Movimentação registrada!");
+  carregarCaixaHoje();
+});
+
+
+// Exibir registros de hoje
+async function carregarCaixaHoje() {
+  const lista = document.getElementById("listaCaixaHoje");
+  lista.innerHTML = "<p>Carregando...</p>";
+
+  const hoje = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+    .toISOString()
+    .slice(0, 10);
+
+  const q = query(
+    collection(db, "caixa"),
+    where("data", "==", hoje),
+    orderBy("timestamp", "desc")
+  );
+
+  const snap = await getDocs(q);
+
+  if (snap.empty) {
+    lista.innerHTML = "<p>Nenhuma movimentação hoje.</p>";
+    return;
+  }
+
+  let html = "";
+
+  snap.forEach(doc => {
+    const x = doc.data();
+    const hora = new Date(x.timestamp).toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+
+    html += `
+      <div class="caixa-item">
+        <strong>${x.tipo.toUpperCase()}</strong> — ${x.categoria}
+        <br>
+        ${x.descricao}
+        <br>
+        <span style="color:#ffca28;">R$ ${x.valor.toFixed(2).replace(".", ",")}</span>
+        <span style="float:right; opacity:0.7;">${hora}</span>
+        <hr>
+      </div>
+    `;
+  });
+
+  lista.innerHTML = html;
+}
