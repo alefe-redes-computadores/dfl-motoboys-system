@@ -1,46 +1,59 @@
 /* ===========================================================
-   🎨 DFL - DASHBOARD ADMIN (CSS OFICIAL 2025)
-   - Layout escuro premium
-   - Cores oficiais amarelo (#ffca28) e cinza carbono
-   - Saldo Geral reforçado (opção B)
+   🎨 DFL – DASHBOARD ADMIN (CSS OFICIAL)
+   - Layout escuro com cartões
+   - Topo com logo + título + botões
+   - Cards para motoboys, despesas, estoque, caixa diário
    =========================================================== */
 
 :root {
-  --amarelo: #ffca28;
-  --amarelo-escuro: #e0b020;
-  --fundo: #0d0d0d;
-  --painel: #1a1a1a;
-  --borda: #333;
-  --txt: #ffffff;
-  --negativo: #e53935;
-  --positivo: #43a047;
+  --bg-body: #050505;
+  --bg-header: #101010;
+  --bg-card: #151515;
+  --bg-input: #111111;
+  --border-card: #262626;
+  --accent: #ffca28;
+  --accent-soft: #ffd95e;
+  --accent-blue: #1e88e5;
+  --danger: #e53935;
+  --success: #43a047;
+  --text-main: #ffffff;
+  --text-muted: #b3b3b3;
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --shadow-soft: 0 12px 35px rgba(0, 0, 0, 0.55);
 }
 
 /* ===========================
-   🌑 Base
+   🌙 BASE
 =========================== */
+
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
-  padding: 0;
-  background: var(--fundo);
-  font-family: system-ui, sans-serif;
-  color: var(--txt);
-}
-
-.hidden {
-  display: none !important;
+  padding: 0 0 40px 0;
+  background: radial-gradient(circle at top, #141414 0, #050505 45%, #000 100%);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--text-main);
 }
 
 /* ===========================
-   🔝 Header
+   🔝 HEADER - LOGO + TÍTULO + BOTÕES
 =========================== */
+
 .admin-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  background: #111;
-  padding: 15px 22px;
-  border-bottom: 2px solid var(--amarelo);
+  justify-content: space-between;
+  padding: 18px 22px;
+  background: linear-gradient(90deg, #050505 0, #111111 40%, #050505 100%);
+  border-bottom: 1px solid #262626;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
 }
 
 .admin-header-left {
@@ -50,198 +63,380 @@ body {
 }
 
 .admin-logo {
-  width: 45px;
-  height: 45px;
-  border-radius: 12px;
-  border: 2px solid var(--amarelo);
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: #000;
+  border: 2px solid var(--accent);
+  object-fit: cover;
+  box-shadow: 0 0 0 2px #000;
 }
 
+.admin-header-left h1 {
+  margin: 0;
+  font-size: 1.45rem;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.admin-header-left h1 span {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+/* Área dos botões do topo (Relatórios, Mini PDV, Sair) */
 .admin-header-right {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
+/* Botões do topo */
 .admin-btn-header {
-  padding: 10px 18px;
-  border-radius: 10px;
   border: none;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
   cursor: pointer;
-  font-weight: 700;
-  font-size: 15px;
-}
-
-.admin-btn-header.amarelo {
-  background: var(--amarelo);
-  color: #111;
+  transition: transform 0.14s ease, box-shadow 0.14s ease, background 0.14s ease;
+  white-space: nowrap;
 }
 
 .admin-btn-header.azul {
-  background: #1e88e5;
+  background: var(--accent-blue);
   color: #fff;
+  box-shadow: 0 6px 16px rgba(30, 136, 229, 0.45);
 }
 
-.admin-btn-header.pdv {
-  background: var(--amarelo);
-  color: #111;
-  border: 2px solid #000;
-  font-weight: 900;
+.admin-btn-header.amarelo {
+  background: var(--accent);
+  color: #000;
+  box-shadow: 0 6px 18px rgba(255, 202, 40, 0.55);
+}
+
+.admin-btn-header:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.45);
 }
 
 /* ===========================
-   📌 Container
+   🧱 CONTAINER PRINCIPAL
 =========================== */
+
 .admin-container {
+  max-width: 1200px;
+  margin: 20px auto 0 auto;
+  padding: 0 14px;
   display: grid;
-  padding: 22px;
-  gap: 20px;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  grid-template-columns: 1.2fr 1.2fr;
+  gap: 22px;
 }
 
-/* ===========================
-   🧱 Cards
-=========================== */
+/* Card base */
 .admin-card {
-  background: var(--painel);
-  border: 1px solid var(--borda);
-  border-radius: 14px;
-  padding: 20px;
+  background: radial-gradient(circle at top left, #202020 0, #151515 45%, #101010 100%);
+  padding: 18px 18px 20px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-card);
+  box-shadow: var(--shadow-soft);
 }
 
+/* Títulos dos cards */
 .admin-card h2 {
-  margin-top: 0;
-  color: var(--amarelo);
+  margin: 0 0 12px 0;
+  font-size: 1.15rem;
+  color: var(--accent);
 }
 
 /* ===========================
-   🏷 Inputs
+   💰 SALDO GERAL
 =========================== */
-input,
-select {
-  width: 100%;
-  padding: 10px 12px;
-  margin: 6px 0 12px 0;
-  background: #0f0f0f;
-  color: #fff;
-  border: 1px solid var(--borda);
-  border-radius: 8px;
-  font-size: 15px;
+
+#saldoGeral {
+  margin-top: 6px;
 }
 
-/* ===========================
-   🟨 Botões
-=========================== */
-.admin-btn {
-  width: 100%;
-  padding: 12px;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 15px;
-}
-
-.admin-btn.amarelo {
-  background: var(--amarelo);
-  color: #111;
-}
-
-.admin-btn.azul {
-  background: #1e88e5;
-  color: #fff;
-}
-
-/* ===========================
-   💰 Saldo Geral (reforçado)
-=========================== */
+/* Valor principal */
 .admin-value {
-  font-size: 2rem;               /* maior */
-  font-weight: 800;              /* mais forte */
-  letter-spacing: -0.5px;
-  margin-top: 10px;
-  text-shadow: 0 0 10px rgba(0,0,0,0.5);
-  color: var(--amarelo);
-  text-align: left;
+  font-size: 2.1rem;
+  font-weight: 700; /* negrito reforçado */
+  margin: 6px 0 0 0;
 }
 
-.positivo {
-  color: var(--positivo) !important;
+/* Cores de status via JS (positivo / negativo / neutral) */
+.admin-value.neutral {
+  color: var(--accent);
 }
-
-.negativo {
-  color: var(--negativo) !important;
+.admin-value.positivo {
+  color: var(--success);
 }
-
-.neutral {
-  color: var(--amarelo) !important;
+.admin-value.negativo {
+  color: var(--danger);
 }
 
 /* ===========================
-   🛵 Lista Motoboys
+   🛵 LISTA DE MOTOBOYS
 =========================== */
-.lista-motoboys .motoboy-item {
+
+.lista-motoboys {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.motoboy-item {
+  display: flex;
   align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--borda);
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.motoboy-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
 }
 
 .motoboy-info strong {
-  font-size: 1rem;
+  font-size: 0.98rem;
 }
 
 .motoboy-info .saldo {
-  font-weight: bold;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* Cores do saldo (para texto de cada motoboy) */
+.motoboy-item.negativo .saldo {
+  color: var(--danger);
+  font-weight: 600;
+}
+.motoboy-item.positivo .saldo {
+  color: var(--success);
+  font-weight: 600;
 }
 
 /* Botão pagar */
 .btnPagar {
-  padding: 8px 12px;
-  background: var(--negativo);
-  color: #fff;
-  border-radius: 8px;
   border: none;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background: var(--danger);
+  color: #fff;
   cursor: pointer;
-  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 5px 14px rgba(229, 57, 53, 0.65);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.btnPagar:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 9px 20px rgba(229, 57, 53, 0.85);
 }
 
 /* ===========================
-   💸 Modal Pagamento
+   🧾 FORMULÁRIOS (DESPESAS, ESTOQUE, CAIXA)
 =========================== */
+
+.admin-card label {
+  display: block;
+  margin-top: 10px;
+  margin-bottom: 4px;
+  font-size: 0.86rem;
+  color: var(--text-muted);
+}
+
+.admin-card input,
+.admin-card select {
+  width: 100%;
+  padding: 9px 11px;
+  border-radius: var(--radius-md);
+  border: 1px solid #333;
+  background: var(--bg-input);
+  color: var(--text-main);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.14s ease, box-shadow 0.14s ease;
+}
+
+.admin-card input::placeholder {
+  color: #666;
+}
+
+.admin-card input:focus,
+.admin-card select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px rgba(255, 202, 40, 0.5);
+}
+
+/* Botão amarelo padrão dos cards */
+.admin-btn {
+  margin-top: 12px;
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: none;
+  background: var(--accent);
+  color: #000;
+  font-size: 0.98rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 7px 18px rgba(255, 202, 40, 0.75);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.admin-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.7);
+}
+
+/* Botão azul auxiliar (PDF, cancelar, etc.) */
+.admin-btn-aux {
+  margin-top: 8px;
+  width: 100%;
+  padding: 9px 14px;
+  border-radius: 999px;
+  border: none;
+  background: var(--accent-blue);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 7px 18px rgba(30, 136, 229, 0.65);
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ===========================
+   💸 MODAL DE PAGAMENTO
+=========================== */
+
 .modal {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.65);
+  background: rgba(0, 0, 0, 0.72);
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 999;
+  justify-content: center;
+  z-index: 40;
 }
 
 .modal-content {
-  background: #111;
-  padding: 22px;
-  border-radius: 12px;
-  width: 90%;
+  background: #151515;
+  border-radius: var(--radius-lg);
+  padding: 18px 16px 18px;
+  width: 92%;
   max-width: 380px;
-  border: 1px solid var(--amarelo);
+  border: 1px solid #333;
+  box-shadow: var(--shadow-soft);
+}
+
+.modal-content h3 {
+  margin: 0 0 10px 0;
+  color: var(--accent);
+}
+
+.modal-content p {
+  margin: 0 0 10px 0;
 }
 
 /* ===========================
-   📄 Caixa Diário
+   📄 LISTA CAIXA DIÁRIO
 =========================== */
-.caixa-dia-lista .caixa-item {
-  padding: 10px 0;
-  border-bottom: 1px solid var(--borda);
+
+.caixa-item {
+  margin-top: 8px;
+  font-size: 0.9rem;
 }
 
-/* ===========================
-   🧾 Tabelas / Organização
-=========================== */
-label {
-  font-weight: 600;
+.caixa-item hr {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
   margin-top: 6px;
-  display: block;
-  color: #ddd;
+}
+
+/* ===========================
+   📱 RESPONSIVO (MOBILE)
+=========================== */
+
+@media (max-width: 900px) {
+  .admin-container {
+    grid-template-columns: 1fr;
+    max-width: 600px;
+  }
+}
+
+@media (max-width: 470px) {
+  .admin-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .admin-header-right {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .admin-container {
+    padding-inline: 10px;
+  }
+
+  .admin-card {
+    padding: 16px 14px 18px;
+  }
+
+  .admin-header-left h1 {
+    font-size: 1.25rem;
+  }
+}
+
+/* ===========================================
+   📱 Ajuste do header em telas menores
+   - Mantém logo + título
+   - Botões (Relatórios, Mini PDV, Sair) em faixa rolável
+   ============================================ */
+@media (max-width: 768px) {
+  .admin-header {
+    flex-wrap: nowrap;
+    gap: 10px;
+  }
+
+  .admin-header-left {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .admin-header-right {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .admin-header-right::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .admin-btn-header {
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding-inline: 12px;
+    font-size: 0.9rem;
+  }
 }
