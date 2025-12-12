@@ -277,6 +277,7 @@ function bindDespesas() {
 
     const data = new Date(dataRaw + "T12:00:00").toISOString().slice(0, 10);
 
+    // 1. Grava na coleção original "despesas"
     await addDoc(collection(db, "despesas"), {
       descricao: desc,
       valor,
@@ -284,7 +285,22 @@ function bindDespesas() {
       timestamp: Date.now()
     });
 
+    // ✅ AJUSTE OBRIGATÓRIO: Grava também no "caixaDiario" como SAÍDA
+    await addDoc(collection(db, "caixaDiario"), {
+      tipo: "saida",
+      categoria: "Despesa",
+      descricao: `Despesa - ${desc}`,
+      valor: valor,
+      data: data,
+      timestamp: Date.now()
+    });
+
     alert("Despesa registrada!");
+
+    // Atualiza a tela do caixa imediatamente
+    await carregarCaixaHoje();
+    await calcularResumoDia();
+    await carregarSaldoFinanceiro();
   }));
 }
 
