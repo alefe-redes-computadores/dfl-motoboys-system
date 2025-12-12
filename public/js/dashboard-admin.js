@@ -681,7 +681,10 @@ function bindEntregas() {
 
     } else if (idMotoboy === "rodrigo_goncalves") {
       nomeMotoboy = "Rodrigo Gonçalves";
+      
+      // ✅ AJUSTE: Garante que Rodrigo entra na logistica (valorPago) mesmo com saldo 0
       valorPago = (qtd <= 10) ? 100 : (100 + (qtd - 10) * 7);
+      motoboyDocId = "rodrigo_goncalves";
 
       await updateDoc(doc(db, "motoboys", idMotoboy), { saldo: 0 });
 
