@@ -1,10 +1,8 @@
-// ============================================================
-//  DFL — DASHBOARD ADMIN v3.0 (ESTÁVEL + BLINDADO)
-//  ✅ Estoque (categorias NÃO somem + PDF aparece)
-//  ✅ Motoboys + Saldo Operacional (ordem fixa + botão pagar)
-//  ✅ Caixa Diário + Saldo Financeiro (saldo do dia)
-//  ✅ Logística (últimos 7 dias)
-//  ✅ Mostra erro na tela se algo falhar (não fica "mudo")
+============================================================
+//  🔒 VERSÃO CONGELADA
+//  DFL — DASHBOARD ADMIN v3.0
+//  Status: ESTÁVEL
+//  Última correção: logística Rodrigo Gonçalves
 // ============================================================
 
 import { auth, db } from "./firebase-config-v2.js";
