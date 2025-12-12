@@ -1,7 +1,7 @@
 /* =========================================================
    🛵 DFL — DASHBOARD MOTOBOY
    Rodrigo Gonçalves
-   Visual exclusivo • Mobile First • Estável (FINAL)
+   Visual Premium • Mobile First • Estável
 ========================================================= */
 
 * {
@@ -12,7 +12,8 @@ body {
   margin: 0;
   background: #0d0d0d;
   color: #ffffff;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont,
+               "Segoe UI", Roboto, Arial, sans-serif;
 }
 
 /* ===========================
@@ -71,7 +72,7 @@ body {
 }
 
 .btn-logout:active {
-  transform: scale(0.97);
+  transform: scale(0.96);
 }
 
 /* ===========================
@@ -158,7 +159,7 @@ button {
 }
 
 button:active {
-  transform: scale(0.98);
+  transform: scale(0.97);
 }
 
 .btn-primary {
@@ -173,17 +174,36 @@ button:active {
 .btn-pdf {
   background: #1e88e5;
   color: #fff;
-  box-shadow: 0 6px 18px rgba(30,136,229,0.35);
 }
 
 .btn-pdf:hover {
   background: #2196f3;
-  box-shadow: 0 8px 22px rgba(30,136,229,0.55);
+}
+
+.btn-secondary {
+  background: #2e2e2e;
+  color: #fff;
+  border: 1px solid #444;
+}
+
+.btn-secondary:hover {
+  background: #3a3a3a;
 }
 
 /* ===========================
-   📊 HISTÓRICO (AJUSTADO)
+   📊 HISTÓRICO
 =========================== */
+.historico-filtros {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.historico-filtros button {
+  grid-column: span 2;
+}
+
 #listaHistorico {
   display: grid;
   gap: 10px;
@@ -192,27 +212,56 @@ button:active {
 .historico-item {
   background: #111;
   border-radius: 10px;
-  padding: 12px;
+  padding: 10px 12px;
   font-size: 14px;
   border: 1px solid #2a2a2a;
-  line-height: 1.4;
 }
 
 .historico-item strong {
   color: #ffca28;
-  display: block;
-  margin-bottom: 4px;
 }
 
-/* Destaque visual do saldo do dia */
-.historico-item .saldo-positivo {
-  color: #4caf50;
-  font-weight: 700;
+/* ===========================
+   💵 MODAL PAGAMENTO
+=========================== */
+#modalPagamento {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
 }
 
-.historico-item .saldo-negativo {
-  color: #e53935;
-  font-weight: 700;
+#modalPagamento.hidden {
+  display: none;
+}
+
+.modal-box {
+  background: #1a1a1a;
+  border-radius: 14px;
+  padding: 20px;
+  width: 100%;
+  max-width: 320px;
+  border: 1px solid #333;
+}
+
+.modal-box h3 {
+  margin-top: 0;
+  margin-bottom: 14px;
+  color: #ffca28;
+  text-align: center;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.modal-actions button {
+  flex: 1;
 }
 
 /* ===========================
@@ -220,7 +269,7 @@ button:active {
 =========================== */
 @media (min-width: 768px) {
   .dash-container {
-    max-width: 700px;
+    max-width: 720px;
     margin: 0 auto;
   }
 
