@@ -501,7 +501,7 @@ async function carregarListaMotoboys() {
   let html = "";
 
   for (const m of listaFinal) {
-    const classe = getClasseSaldo(Number(m.saldo || 0));
+    const classe = getClasseSaldo(-Number(m.saldo || 0));
 
     // botão pagar SÓ para fixos (Lucas/Rodrigo)
     const showPay = FIXED_ORDER.includes(m.id);
@@ -510,7 +510,7 @@ async function carregarListaMotoboys() {
       <div class="motoboy-item ${classe}">
         <div class="motoboy-info">
           <strong>${m.nome}</strong>
-          <span class="saldo">${moneyBR(m.saldo)}</span>
+          <span class="saldo">${moneyBR(-m.saldo)}</span>
         </div>
 
         ${showPay ? `
@@ -536,7 +536,7 @@ async function carregarSaldoGeral() {
   let total = 0;
 
   snap.forEach((d) => {
-    total += Number(d.data().saldo || 0);
+    total -= Number(d.data().saldo || 0);
   });
 
   const el = $("saldoGeral");
