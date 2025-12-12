@@ -308,3 +308,77 @@ body {
 .btnPagar:hover {
   opacity: 1;
 }
+
+/* ===========================
+   🎯 AJUSTE FINO — SALDOS
+   (v3.0 polish)
+=========================== */
+
+/* 🔹 Resumo Financeiro (valores grandes demais) */
+.resumo-box .admin-value {
+  font-size: 1.75rem;      /* ↓ menor que antes */
+  line-height: 1.2;
+  word-break: keep-all;
+  white-space: nowrap;
+}
+
+/* Mantém destaque sem estourar */
+.resumo-box.operacional .admin-value.negativo {
+  color: var(--danger);
+}
+
+.resumo-box.financeiro .admin-value {
+  color: var(--accent);
+}
+
+/* ===========================
+   🛵 SALDO POR MOTOBOY
+=========================== */
+
+.motoboy-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Bloco de texto do motoboy */
+.motoboy-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Nome do motoboy */
+.motoboy-info strong {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+/* Saldo individual */
+.motoboy-info .saldo {
+  font-size: 0.9rem;
+  font-weight: 700; /* negrito real */
+}
+
+/* Saldo negativo */
+.motoboy-item.negativo .saldo {
+  color: var(--danger);
+}
+
+/* Saldo positivo ou zero */
+.motoboy-item.positivo .saldo {
+  color: #ffffff;
+}
+
+/* Botão pagar mais discreto */
+.btnPagar {
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  opacity: 0.9;
+}
+
+.btnPagar:hover {
+  opacity: 1;
+}
