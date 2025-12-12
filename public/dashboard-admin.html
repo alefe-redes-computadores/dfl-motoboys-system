@@ -197,17 +197,28 @@
   </main>
 
   <!-- ===========================
-       💸 MODAL PAGAMENTO
+       💸 MODAL PAGAMENTO (FIX)
   ============================ -->
   <div id="modalPagamento" class="modal hidden">
     <div class="modal-content">
       <h3>Registrar Pagamento</h3>
       <p id="modalNomeMotoboy"></p>
 
-      <input id="modalValorPagamento" type="number" step="0.01" />
+      <input
+        id="modalValorPagamento"
+        type="number"
+        step="0.01"
+        placeholder="Ex: 50.00"
+      />
 
-      <button id="confirmarPagamento" class="admin-btn amarelo">Confirmar</button>
-      <button id="cancelarPagamento" class="admin-btn azul">Cancelar</button>
+      <div class="modal-actions">
+        <button id="confirmarPagamento" class="admin-btn amarelo">
+          Confirmar
+        </button>
+        <button id="cancelarPagamento" class="admin-btn-aux">
+          Cancelar
+        </button>
+      </div>
     </div>
   </div>
 
