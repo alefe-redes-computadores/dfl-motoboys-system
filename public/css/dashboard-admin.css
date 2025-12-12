@@ -278,3 +278,33 @@ body {
   font-weight: 600;
 }
 
+
+/* ===== AJUSTE VISUAL – SALDO POR MOTOBOY ===== */
+
+.motoboy-item {
+  align-items: center;
+  gap: 12px;
+}
+
+.motoboy-info strong {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.motoboy-info .saldo {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* Botão pagar mais discreto */
+.btnPagar {
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  box-shadow: none;
+  opacity: 0.9;
+}
+
+.btnPagar:hover {
+  opacity: 1;
+}
