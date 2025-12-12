@@ -455,3 +455,33 @@ body {
   padding-top: 18px;
   padding-bottom: 18px;
 }
+
+/* =========================================
+🎯 FIX – TÍTULO DO PAINEL ADMIN
+========================================= */
+
+.admin-header-left h1 {
+  font-size: 1.15rem;      /* antes estava grande demais */
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+@media (max-width: 600px) {
+  .admin-header-left h1 {
+    font-size: 1.05rem;
+  }
+}
+
+/* =========================================
+🎯 FIX – BOTÕES DO HEADER PADRONIZADOS
+========================================= */
+
+.admin-btn-header {
+  border-radius: 999px;   /* todos iguais */
+  padding: 10px 18px;     /* mesmo tamanho visual */
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
