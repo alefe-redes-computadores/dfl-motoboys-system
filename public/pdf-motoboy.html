@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Relatório Motoboy – DFL</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fff;
+      color: #000;
+      margin: 0;
+      padding: 30px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      border-bottom: 2px solid #ffca28;
+      padding-bottom: 15px;
+      margin-bottom: 20px;
+    }
+
+    .logo {
+      width: 70px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #555;
+    }
+
+    .box {
+      margin-top: 20px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .linha {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .linha strong {
+      font-weight: 700;
+    }
+
+    .total {
+      margin-top: 12px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #000;
+    }
+
+    footer {
+      margin-top: 30px;
+      font-size: 12px;
+      color: #777;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    <img src="img/logo-dfl.png" class="logo" />
+    <div>
+      <h1>Relatório de Entregas – Motoboy</h1>
+      <div class="subtitle">Da Família Lanches (DFL)</div>
+    </div>
+  </div>
+
+  <div class="box">
+    <div class="linha"><span>Motoboy:</span><strong id="pdfNome"></strong></div>
+    <div class="linha"><span>Data:</span><strong id="pdfData"></strong></div>
+    <hr>
+
+    <div class="linha"><span>Entregas:</span><strong id="pdfEntregas"></strong></div>
+    <div class="linha"><span>Ganho bruto:</span><strong id="pdfGanho"></strong></div>
+    <div class="linha"><span>Dinheiro recebido:</span><strong id="pdfDinheiro"></strong></div>
+    <div class="linha"><span>Consumo:</span><strong id="pdfConsumo"></strong></div>
+
+    <div class="total">
+      Saldo do dia: <span id="pdfSaldo"></span>
+    </div>
+  </div>
+
+  <footer>
+    Documento gerado automaticamente pelo sistema DFL
+  </footer>
+
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script type="module" src="pdf-motoboy.js"></script>
+
+</body>
+</html>
