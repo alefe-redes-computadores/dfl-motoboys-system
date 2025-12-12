@@ -79,6 +79,12 @@
       cursor: pointer;
       border-radius: 6px;
     }
+
+    @media print {
+      .btn-print {
+        display: none;
+      }
+    }
   </style>
 </head>
 
@@ -91,7 +97,7 @@
 
   <div class="info">
     <strong>Motoboy:</strong> Rodrigo Gonçalves<br>
-    <strong>Data:</strong> <span id="dataRelatorio"></span>
+    <strong>Data:</strong> <span id="pdfData"></span>
   </div>
 
   <div class="box">
@@ -130,7 +136,6 @@
     Da Família Lanches • Relatório gerado automaticamente
   </div>
 
-  <!-- ✅ JS AGORA VEM DA PASTA /js -->
   <script type="module" src="./js/pdf-motoboy.js"></script>
 </body>
 </html>
