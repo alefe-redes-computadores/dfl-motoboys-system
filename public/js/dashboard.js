@@ -1,6 +1,6 @@
 // ============================================================
 // 🛵 Painel Motoboy – DFL
-// Rodrigo Gonçalves (VERSÃO FINAL ESTÁVEL)
+// Rodrigo Gonçalves (VERSÃO FINAL + PAGAMENTO)
 // ============================================================
 
 import { auth, db } from "./firebase-config-v2.js";
@@ -57,15 +57,12 @@ async function carregarSaldoAtual() {
   if (!snap.exists()) return;
 
   const saldo = Number(snap.data().saldo || 0);
-  const el = document.getElementById("saldoAtual");
-
-  if (el) {
-    el.textContent = `R$ ${saldo.toFixed(2).replace(".", ",")}`;
-  }
+  document.getElementById("saldoAtual").textContent =
+    `R$ ${saldo.toFixed(2).replace(".", ",")}`;
 }
 
 // ============================================================
-// 🧮 CÁLCULO DE GANHO (REGRA RODRIGO)
+// 🧮 REGRA DE GANHO
 // ============================================================
 function calcularGanho(entregas) {
   if (entregas <= 0) return 0;
@@ -78,13 +75,9 @@ function calcularGanho(entregas) {
 // ============================================================
 document.getElementById("btnSalvar")?.addEventListener("click", async () => {
   try {
-    const entregasInput = document.getElementById("entregas");
-    const dinheiroInput = document.getElementById("dinheiro");
-    const consumoInput  = document.getElementById("consumo");
-
-    const entregas = Number(entregasInput?.value || 0);
-    const dinheiro = Number(dinheiroInput?.value || 0);
-    const consumo  = Number(consumoInput?.value || 0);
+    const entregas = Number(document.getElementById("entregas")?.value || 0);
+    const dinheiro = Number(document.getElementById("dinheiro")?.value || 0);
+    const consumo  = Number(document.getElementById("consumo")?.value || 0);
 
     if (entregas <= 0) {
       alert("Informe a quantidade de entregas.");
@@ -97,18 +90,11 @@ document.getElementById("btnSalvar")?.addEventListener("click", async () => {
     const ref = doc(db, "motoboys", MOTOBOY_ID);
     const snap = await getDoc(ref);
 
-    if (!snap.exists()) {
-      alert("Motoboy não encontrado.");
-      return;
-    }
-
     const saldoAnterior = Number(snap.data().saldo || 0);
     const saldoFinal = saldoAnterior + saldoDia;
 
-    // Atualiza saldo acumulado
     await updateDoc(ref, { saldo: saldoFinal });
 
-    // Salva histórico (BASE DO PDF)
     await addDoc(collection(db, "historicoMotoboy"), {
       motoboyId: MOTOBOY_ID,
       data: new Date().toISOString().slice(0, 10),
@@ -123,15 +109,13 @@ document.getElementById("btnSalvar")?.addEventListener("click", async () => {
     });
 
     alert("Fechamento salvo com sucesso!");
-
-    // Atualiza tela
     await carregarSaldoAtual();
     await carregarHistorico();
 
-    // Limpa campos
-    if (entregasInput) entregasInput.value = "";
-    if (dinheiroInput) dinheiroInput.value = "";
-    if (consumoInput) consumoInput.value = "";
+    ["entregas","dinheiro","consumo"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = "";
+    });
 
   } catch (e) {
     console.error(e);
@@ -140,7 +124,7 @@ document.getElementById("btnSalvar")?.addEventListener("click", async () => {
 });
 
 // ============================================================
-// 📊 HISTÓRICO DO MOTOBOY
+// 📊 HISTÓRICO
 // ============================================================
 async function carregarHistorico() {
   const lista = document.getElementById("listaHistorico");
@@ -181,7 +165,60 @@ async function carregarHistorico() {
 }
 
 // ============================================================
-// 📄 BOTÃO PDF DO DIA
+// 💵 PAGAMENTO DO MOTOBOY
+// ============================================================
+document.getElementById("btnAbrirPagamento")?.addEventListener("click", () => {
+  document.getElementById("modalPagamento")?.classList.remove("hidden");
+  document.getElementById("dataPagamento").value =
+    new Date().toISOString().slice(0,10);
+});
+
+document.getElementById("cancelarPagamento")?.addEventListener("click", () => {
+  document.getElementById("modalPagamento")?.classList.add("hidden");
+});
+
+document.getElementById("confirmarPagamento")?.addEventListener("click", async () => {
+  try {
+    const valor = Number(document.getElementById("valorPagamento")?.value || 0);
+    const data  = document.getElementById("dataPagamento")?.value;
+
+    if (valor <= 0) {
+      alert("Informe um valor válido.");
+      return;
+    }
+
+    const ref = doc(db, "motoboys", MOTOBOY_ID);
+    const snap = await getDoc(ref);
+
+    const saldoAnterior = Number(snap.data().saldo || 0);
+    const saldoFinal = saldoAnterior - valor;
+
+    await updateDoc(ref, { saldo: saldoFinal });
+
+    await addDoc(collection(db, "pagamentosMotoboy"), {
+      motoboyId: MOTOBOY_ID,
+      valor,
+      data,
+      saldoAnterior,
+      saldoFinal,
+      timestamp: Date.now()
+    });
+
+    alert("Pagamento registrado com sucesso!");
+
+    document.getElementById("modalPagamento")?.classList.add("hidden");
+    document.getElementById("valorPagamento").value = "";
+
+    await carregarSaldoAtual();
+
+  } catch (e) {
+    console.error(e);
+    alert("Erro ao registrar pagamento.");
+  }
+});
+
+// ============================================================
+// 📄 PDF
 // ============================================================
 document.getElementById("btnGerarPdf")?.addEventListener("click", () => {
   window.open("/pdf-motoboy.html", "_blank");
