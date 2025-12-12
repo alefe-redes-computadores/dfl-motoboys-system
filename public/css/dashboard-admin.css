@@ -485,3 +485,74 @@ body {
   justify-content: center;
 }
 
+/* ===========================================================
+🛵 AJUSTE DEFINITIVO — CARD SALDO POR MOTOBOY
+(estrutura + scroll + título)
+=========================================================== */
+
+/* Garante altura e largura padronizadas */
+.admin-card.saldo-motoboy {
+  display: flex;
+  flex-direction: column;
+  min-height: 320px;
+}
+
+/* Título centralizado do bloco */
+.saldo-motoboy-header {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.saldo-motoboy-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.saldo-motoboy-header span {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Área rolável dos motoboys */
+.saldo-motoboy-lista {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Scroll discreto */
+.saldo-motoboy-lista::-webkit-scrollbar {
+  width: 6px;
+}
+
+.saldo-motoboy-lista::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+}
+
+.saldo-motoboy-lista::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Ajuste fino nos itens */
+.saldo-motoboy-lista .motoboy-item {
+  padding: 8px 10px;
+}
+
+.saldo-motoboy-lista .motoboy-info strong {
+  font-size: 0.9rem;
+}
+
+.saldo-motoboy-lista .motoboy-info .saldo {
+  font-size: 0.88rem;
+  font-weight: 600;
+}
