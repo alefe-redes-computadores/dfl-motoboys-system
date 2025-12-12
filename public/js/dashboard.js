@@ -1,20 +1,18 @@
-// public/js/dashboard.js
-// =======================================
-// 📊 Painel Motoboy – DFL (BLINDADO)
-// - Novo campo oficial: saldoFinanceiro
-// - Campo legado mantido: saldo (compatibilidade)
-// - Atualizações com increment() para não conflitar com PAGAR do admin
-// =======================================
+// ============================================================
+// 📊 Painel Motoboy – DFL (VERSÃO ESTÁVEL E BLINDADA)
+// NÃO INTERFERE NO PAGAMENTO DO ADMIN
+// ============================================================
 
-// Importa auth e db da mesma config usada no login
+// Importa auth e db
 import { auth, db } from "./firebase-config-v2.js";
 
-// Importa Auth e Firestore via CDN (mesma versão)
+// Firebase Auth
 import {
   signOut,
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
+// Firestore
 import {
   doc,
   updateDoc,
@@ -23,169 +21,150 @@ import {
   addDoc,
   query,
   where,
-  getDocs,
-  increment
+  getDocs
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-// ID fixo do motoboy
+// ============================================================
+// ⚙️ CONFIG
+// ============================================================
 const MOTOBOY_ID = "lucas_hiago";
 
-// Botão sair
+// ============================================================
+// 🚪 LOGOUT
+// ============================================================
 document.getElementById("logoutBtn")?.addEventListener("click", async () => {
-  try {
-    await signOut(auth);
-  } catch (e) {
-    console.error("Erro ao deslogar:", e);
-  }
+  await signOut(auth);
   window.location.href = "index.html";
 });
 
-// Verificar login
+// ============================================================
+// 🔐 AUTENTICAÇÃO
+// ============================================================
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "index.html";
-  } else {
-    try {
-      await carregarSaldo();
-      await carregarGrafico();
-    } catch (e) {
-      console.error("Erro ao carregar painel:", e);
-    }
-  }
-});
-
-// ===========================
-// 🔹 Atualizar saldo na tela
-// ===========================
-async function carregarSaldo() {
-  const snap = await getDoc(doc(db, "motoboys", MOTOBOY_ID));
-
-  if (!snap.exists()) {
-    console.warn("Motoboy não encontrado na coleção motoboys.");
     return;
   }
 
-  const dados = snap.data();
+  await carregarSaldo();
+  await carregarGrafico();
+});
 
-  // ✅ Campo novo (oficial) com fallback pro legado
-  const saldo = Number(
-    (dados.saldoFinanceiro ?? dados.saldo ?? 0)
-  );
+// ============================================================
+// 💰 CARREGAR SALDO ATUAL (APENAS LEITURA)
+// ============================================================
+async function carregarSaldo() {
+  const snap = await getDoc(doc(db, "motoboys", MOTOBOY_ID));
+  if (!snap.exists()) return;
 
-  const elemSaldo = document.getElementById("saldoAtual");
-  if (elemSaldo) {
-    elemSaldo.innerText = "R$ " + saldo.toFixed(2).replace(".", ",");
+  const saldo = Number(snap.data().saldo || 0);
+
+  const el = document.getElementById("saldoAtual");
+  if (el) {
+    el.textContent = "R$ " + saldo.toFixed(2).replace(".", ",");
   }
 }
 
-// ===========================
-// 🔹 Registrar fechamento (BLINDADO)
-// - Não sobrescreve saldo absoluto
-// - Aplica apenas o "delta do dia" via increment()
-// ===========================
+// ============================================================
+// 🧾 REGISTRAR FECHAMENTO DIÁRIO
+// ⚠️ NÃO MEXE EM PAGAMENTO ADMIN
+// ============================================================
 document.getElementById("btnSalvar")?.addEventListener("click", async () => {
   try {
     const entregas = Number(document.getElementById("entregas").value || 0);
     const dinheiro = Number(document.getElementById("dinheiro").value || 0);
     const consumo  = Number(document.getElementById("consumo").value || 0);
 
-    const motoboyRef = doc(db, "motoboys", MOTOBOY_ID);
-    const mbSnap = await getDoc(motoboyRef);
+    const ref = doc(db, "motoboys", MOTOBOY_ID);
+    const snap = await getDoc(ref);
 
-    if (!mbSnap.exists()) {
-      alert("Motoboy não encontrado na base de dados.");
+    if (!snap.exists()) {
+      alert("Motoboy não encontrado.");
       return;
     }
 
-    const dadosMB = mbSnap.data();
+    const dados = snap.data();
+    const saldoAnterior = Number(dados.saldo || 0);
+    const taxaEntrega = Number(dados.taxaEntrega || 6);
 
-    const saldoAtual = Number(
-      (dadosMB.saldoFinanceiro ?? dadosMB.saldo ?? 0)
-    );
-
-    const taxaEntrega = Number(dadosMB.taxaEntrega || 0);
+    // 👉 GANHO DO DIA
     const ganhoEntregas = entregas * taxaEntrega;
 
-    // ✅ Movimento do dia (o que deve somar/subtrair do saldo financeiro)
-    const deltaDia = ganhoEntregas - dinheiro - consumo;
+    // 👉 CÁLCULO FINAL
+    const saldoFinal =
+      saldoAnterior +
+      ganhoEntregas -
+      dinheiro -
+      consumo;
 
-    // ✅ Novo saldo (apenas para registrar no histórico / gráfico)
-    const saldoFinal = saldoAtual + deltaDia;
-
-    // ✅ Atualiza de forma atômica (sem brigar com o "PAGAR" do admin)
-    // Mantém os 2 campos sincronizados (novo + legado)
-    await updateDoc(motoboyRef, {
-      saldoFinanceiro: increment(deltaDia),
-      saldo: increment(deltaDia)
+    // 🔒 Atualiza saldo FINAL
+    await updateDoc(ref, {
+      saldo: saldoFinal
     });
 
-    // Registra histórico do dia (informativo)
+    // 🧾 Histórico (APENAS REGISTRO)
     await addDoc(collection(db, "historico"), {
       motoboyid: MOTOBOY_ID,
       data: new Date().toISOString().split("T")[0],
       entregas,
+      ganhoEntregas,
       dinheiroRecebido: dinheiro,
       consumo,
-      taxaEntrega,
-      ganhoEntregas,
-      deltaDia,
-      saldoAnterior: saldoAtual,
+      saldoAnterior,
       saldoFinal,
-      timestamp: new Date()
+      timestamp: Date.now()
     });
 
-    alert("Registro salvo com sucesso!");
+    alert("Fechamento registrado com sucesso!");
+
     await carregarSaldo();
     await carregarGrafico();
 
   } catch (e) {
-    console.error("Erro ao salvar registro:", e);
-    alert("Erro ao salvar registro. Tente novamente.");
+    console.error("Erro no fechamento:", e);
+    alert("Erro ao salvar fechamento.");
   }
 });
 
-// ===========================
-// 🔹 Gráfico Chart.js
-// ===========================
+// ============================================================
+// 📈 GRÁFICO DE EVOLUÇÃO DO SALDO
+// ============================================================
 async function carregarGrafico() {
   const q = query(
     collection(db, "historico"),
     where("motoboyid", "==", MOTOBOY_ID)
   );
+
   const snap = await getDocs(q);
 
-  let datas = [];
-  let valores = [];
+  if (snap.empty) return;
 
-  snap.forEach((d) => {
-    const dado = d.data();
-    datas.push(dado.data);
-    valores.push(Number(dado.saldoFinal || 0));
+  let dados = [];
+
+  snap.forEach(d => {
+    const x = d.data();
+    dados.push({
+      data: x.data,
+      valor: Number(x.saldoFinal || 0)
+    });
   });
 
-  // Ordena por data (string ISO yyyy-mm-dd)
-  const combinado = datas.map((d, i) => ({ d, v: valores[i] }))
-    .sort((a, b) => a.d.localeCompare(b.d));
-
-  datas = combinado.map(x => x.d);
-  valores = combinado.map(x => x.v);
+  // Ordena por data
+  dados.sort((a, b) => a.data.localeCompare(b.data));
 
   const ctx = document.getElementById("graficoSaldo");
-  if (!ctx) {
-    console.warn("Elemento #graficoSaldo não encontrado.");
-    return;
-  }
+  if (!ctx) return;
 
   // eslint-disable-next-line no-undef
   new Chart(ctx, {
     type: "line",
     data: {
-      labels: datas,
+      labels: dados.map(d => d.data),
       datasets: [{
         label: "Saldo Final (R$)",
-        data: valores,
+        data: dados.map(d => d.valor),
         borderColor: "#ffb400",
-        backgroundColor: "rgba(255,180,0,0.3)",
+        backgroundColor: "rgba(255,180,0,0.25)",
         borderWidth: 3,
         tension: 0.3
       }]
