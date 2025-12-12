@@ -38,6 +38,11 @@
     <section class="card saldo-card">
       <h2>Saldo Atual</h2>
       <div id="saldoAtual" class="saldo-valor">R$ 0,00</div>
+
+      <!-- ✅ NOVO: PAGAMENTO -->
+      <button id="btnAbrirPagamento" class="btn-secondary" style="margin-top:12px;">
+        💵 Registrar Pagamento
+      </button>
     </section>
 
     <!-- ===========================
@@ -47,27 +52,13 @@
       <h2>Fechamento do Dia</h2>
 
       <label for="entregas">Quantidade de entregas</label>
-      <input
-        id="entregas"
-        type="number"
-        placeholder="Ex: 24"
-      />
+      <input id="entregas" type="number" placeholder="Ex: 24" />
 
       <label for="dinheiro">Dinheiro recebido (R$)</label>
-      <input
-        id="dinheiro"
-        type="number"
-        step="0.01"
-        placeholder="Ex: 50.00"
-      />
+      <input id="dinheiro" type="number" step="0.01" placeholder="Ex: 50.00" />
 
       <label for="consumo">Consumo na lanchonete (R$)</label>
-      <input
-        id="consumo"
-        type="number"
-        step="0.01"
-        placeholder="Ex: 18.00"
-      />
+      <input id="consumo" type="number" step="0.01" placeholder="Ex: 18.00" />
 
       <button id="btnSalvar" class="btn-primary">
         Salvar Fechamento
@@ -95,7 +86,6 @@
     <section class="card">
       <h2>Histórico de Fechamentos</h2>
 
-      <!-- 🔍 FILTRO (pronto para JS) -->
       <div class="historico-filtros">
         <div>
           <label for="filtroInicio">Data inicial</label>
@@ -112,13 +102,38 @@
         </button>
       </div>
 
-      <!-- 📋 LISTA -->
       <div id="listaHistorico" class="historico-lista">
         <p>Carregando...</p>
       </div>
     </section>
 
   </main>
+
+  <!-- ===========================
+       💵 MODAL PAGAMENTO
+  ============================ -->
+  <div id="modalPagamento" class="modal hidden">
+    <div class="modal-content card">
+
+      <h2>Registrar Pagamento</h2>
+
+      <label for="valorPagamento">Valor pago (R$)</label>
+      <input id="valorPagamento" type="number" step="0.01" placeholder="Ex: 150.00" />
+
+      <label for="dataPagamento">Data do pagamento</label>
+      <input id="dataPagamento" type="date" />
+
+      <div class="modal-actions">
+        <button id="confirmarPagamento" class="btn-primary">
+          Confirmar
+        </button>
+        <button id="cancelarPagamento" class="btn-secondary">
+          Cancelar
+        </button>
+      </div>
+
+    </div>
+  </div>
 
   <!-- ===========================
        ✅ JS DO MOTOBOY
