@@ -1,6 +1,9 @@
 // public/js/dashboard.js
 // =======================================
-// 📊 Painel Motoboy – DFL
+// 📊 Painel Motoboy – DFL (BLINDADO)
+// - Novo campo oficial: saldoFinanceiro
+// - Campo legado mantido: saldo (compatibilidade)
+// - Atualizações com increment() para não conflitar com PAGAR do admin
 // =======================================
 
 // Importa auth e db da mesma config usada no login
@@ -20,7 +23,8 @@ import {
   addDoc,
   query,
   where,
-  getDocs
+  getDocs,
+  increment
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 // ID fixo do motoboy
@@ -39,10 +43,8 @@ document.getElementById("logoutBtn")?.addEventListener("click", async () => {
 // Verificar login
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
-    // Se não estiver autenticado, volta para o login
     window.location.href = "index.html";
   } else {
-    // Se estiver logado, carrega dados do painel
     try {
       await carregarSaldo();
       await carregarGrafico();
@@ -64,7 +66,11 @@ async function carregarSaldo() {
   }
 
   const dados = snap.data();
-  const saldo = Number(dados.saldo || 0);
+
+  // ✅ Campo novo (oficial) com fallback pro legado
+  const saldo = Number(
+    (dados.saldoFinanceiro ?? dados.saldo ?? 0)
+  );
 
   const elemSaldo = document.getElementById("saldoAtual");
   if (elemSaldo) {
@@ -73,7 +79,9 @@ async function carregarSaldo() {
 }
 
 // ===========================
-// 🔹 Registrar fechamento
+// 🔹 Registrar fechamento (BLINDADO)
+// - Não sobrescreve saldo absoluto
+// - Aplica apenas o "delta do dia" via increment()
 // ===========================
 document.getElementById("btnSalvar")?.addEventListener("click", async () => {
   try {
@@ -91,25 +99,37 @@ document.getElementById("btnSalvar")?.addEventListener("click", async () => {
 
     const dadosMB = mbSnap.data();
 
-    const saldoAnterior = Number(dadosMB.saldo || 0);
+    const saldoAtual = Number(
+      (dadosMB.saldoFinanceiro ?? dadosMB.saldo ?? 0)
+    );
+
     const taxaEntrega = Number(dadosMB.taxaEntrega || 0);
     const ganhoEntregas = entregas * taxaEntrega;
 
-    const saldoFinal = saldoAnterior + ganhoEntregas - dinheiro - consumo;
+    // ✅ Movimento do dia (o que deve somar/subtrair do saldo financeiro)
+    const deltaDia = ganhoEntregas - dinheiro - consumo;
 
-    // Atualiza saldo do motoboy
+    // ✅ Novo saldo (apenas para registrar no histórico / gráfico)
+    const saldoFinal = saldoAtual + deltaDia;
+
+    // ✅ Atualiza de forma atômica (sem brigar com o "PAGAR" do admin)
+    // Mantém os 2 campos sincronizados (novo + legado)
     await updateDoc(motoboyRef, {
-      saldo: saldoFinal
+      saldoFinanceiro: increment(deltaDia),
+      saldo: increment(deltaDia)
     });
 
-    // Registra histórico do dia
+    // Registra histórico do dia (informativo)
     await addDoc(collection(db, "historico"), {
       motoboyid: MOTOBOY_ID,
       data: new Date().toISOString().split("T")[0],
       entregas,
       dinheiroRecebido: dinheiro,
       consumo,
-      saldoAnterior,
+      taxaEntrega,
+      ganhoEntregas,
+      deltaDia,
+      saldoAnterior: saldoAtual,
       saldoFinal,
       timestamp: new Date()
     });
