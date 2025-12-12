@@ -1,7 +1,7 @@
 /* =========================================================
    🛵 DFL — DASHBOARD MOTOBOY
    Rodrigo Gonçalves
-   Visual exclusivo • Mobile First • Estável
+   Visual exclusivo • Mobile First • Estável (FINAL)
 ========================================================= */
 
 * {
@@ -173,14 +173,16 @@ button:active {
 .btn-pdf {
   background: #1e88e5;
   color: #fff;
+  box-shadow: 0 6px 18px rgba(30,136,229,0.35);
 }
 
 .btn-pdf:hover {
   background: #2196f3;
+  box-shadow: 0 8px 22px rgba(30,136,229,0.55);
 }
 
 /* ===========================
-   📊 HISTÓRICO
+   📊 HISTÓRICO (AJUSTADO)
 =========================== */
 #listaHistorico {
   display: grid;
@@ -190,13 +192,27 @@ button:active {
 .historico-item {
   background: #111;
   border-radius: 10px;
-  padding: 10px 12px;
+  padding: 12px;
   font-size: 14px;
   border: 1px solid #2a2a2a;
+  line-height: 1.4;
 }
 
 .historico-item strong {
   color: #ffca28;
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* Destaque visual do saldo do dia */
+.historico-item .saldo-positivo {
+  color: #4caf50;
+  font-weight: 700;
+}
+
+.historico-item .saldo-negativo {
+  color: #e53935;
+  font-weight: 700;
 }
 
 /* ===========================
