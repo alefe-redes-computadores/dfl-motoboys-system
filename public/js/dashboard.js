@@ -1,22 +1,19 @@
 // ============================================================
-// 📊 Painel Motoboy – DFL (VERSÃO ESTÁVEL E BLINDADA)
-// NÃO INTERFERE NO PAGAMENTO DO ADMIN
+// 🛵 Painel Motoboy – DFL
+// Rodrigo Gonçalves (VERSÃO NOVA – ESTÁVEL)
 // ============================================================
 
-// Importa auth e db
 import { auth, db } from "./firebase-config-v2.js";
 
-// Firebase Auth
 import {
   signOut,
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
-// Firestore
 import {
   doc,
-  updateDoc,
   getDoc,
+  updateDoc,
   collection,
   addDoc,
   query,
@@ -27,7 +24,7 @@ import {
 // ============================================================
 // ⚙️ CONFIG
 // ============================================================
-const MOTOBOY_ID = "lucas_hiago";
+const MOTOBOY_ID = "rodrigo_goncalves";
 
 // ============================================================
 // 🚪 LOGOUT
@@ -46,34 +43,52 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  await carregarSaldo();
-  await carregarGrafico();
+  await carregarSaldoAtual();
+  await carregarHistorico();
 });
 
 // ============================================================
-// 💰 CARREGAR SALDO ATUAL (APENAS LEITURA)
+// 💰 SALDO ATUAL
 // ============================================================
-async function carregarSaldo() {
-  const snap = await getDoc(doc(db, "motoboys", MOTOBOY_ID));
+async function carregarSaldoAtual() {
+  const ref = doc(db, "motoboys", MOTOBOY_ID);
+  const snap = await getDoc(ref);
+
   if (!snap.exists()) return;
 
   const saldo = Number(snap.data().saldo || 0);
 
   const el = document.getElementById("saldoAtual");
   if (el) {
-    el.textContent = "R$ " + saldo.toFixed(2).replace(".", ",");
+    el.textContent = `R$ ${saldo.toFixed(2).replace(".", ",")}`;
   }
 }
 
 // ============================================================
-// 🧾 REGISTRAR FECHAMENTO DIÁRIO
-// ⚠️ NÃO MEXE EM PAGAMENTO ADMIN
+// 🧮 CÁLCULO AUTOMÁTICO DO GANHO
+// ============================================================
+function calcularGanho(entregas) {
+  if (entregas <= 0) return 0;
+  if (entregas <= 10) return 100;
+  return 100 + (entregas - 10) * 7;
+}
+
+// ============================================================
+// 🧾 FECHAMENTO DO DIA
 // ============================================================
 document.getElementById("btnSalvar")?.addEventListener("click", async () => {
   try {
     const entregas = Number(document.getElementById("entregas").value || 0);
     const dinheiro = Number(document.getElementById("dinheiro").value || 0);
     const consumo  = Number(document.getElementById("consumo").value || 0);
+
+    if (entregas <= 0) {
+      alert("Informe a quantidade de entregas.");
+      return;
+    }
+
+    const ganhoEntregas = calcularGanho(entregas);
+    const saldoDoDia = ganhoEntregas - dinheiro - consumo;
 
     const ref = doc(db, "motoboys", MOTOBOY_ID);
     const snap = await getDoc(ref);
@@ -83,97 +98,73 @@ document.getElementById("btnSalvar")?.addEventListener("click", async () => {
       return;
     }
 
-    const dados = snap.data();
-    const saldoAnterior = Number(dados.saldo || 0);
-    const taxaEntrega = Number(dados.taxaEntrega || 6);
+    const saldoAnterior = Number(snap.data().saldo || 0);
+    const saldoFinal = saldoAnterior + saldoDoDia;
 
-    // 👉 GANHO DO DIA
-    const ganhoEntregas = entregas * taxaEntrega;
-
-    // 👉 CÁLCULO FINAL
-    const saldoFinal =
-      saldoAnterior +
-      ganhoEntregas -
-      dinheiro -
-      consumo;
-
-    // 🔒 Atualiza saldo FINAL
+    // Atualiza saldo acumulado
     await updateDoc(ref, {
       saldo: saldoFinal
     });
 
-    // 🧾 Histórico (APENAS REGISTRO)
-    await addDoc(collection(db, "historico"), {
-      motoboyid: MOTOBOY_ID,
-      data: new Date().toISOString().split("T")[0],
+    // Salva histórico diário
+    await addDoc(collection(db, "historicoMotoboy"), {
+      motoboyId: MOTOBOY_ID,
+      data: new Date().toISOString().slice(0, 10),
       entregas,
       ganhoEntregas,
       dinheiroRecebido: dinheiro,
       consumo,
+      saldoDoDia,
       saldoAnterior,
       saldoFinal,
       timestamp: Date.now()
     });
 
-    alert("Fechamento registrado com sucesso!");
+    alert("Fechamento do dia registrado com sucesso!");
 
-    await carregarSaldo();
-    await carregarGrafico();
+    await carregarSaldoAtual();
+    await carregarHistorico();
 
   } catch (e) {
-    console.error("Erro no fechamento:", e);
+    console.error(e);
     alert("Erro ao salvar fechamento.");
   }
 });
 
 // ============================================================
-// 📈 GRÁFICO DE EVOLUÇÃO DO SALDO
+// 📊 HISTÓRICO (LISTA SIMPLES)
 // ============================================================
-async function carregarGrafico() {
+async function carregarHistorico() {
+  const lista = document.getElementById("listaHistorico");
+  if (!lista) return;
+
+  lista.innerHTML = "<p>Carregando...</p>";
+
   const q = query(
-    collection(db, "historico"),
-    where("motoboyid", "==", MOTOBOY_ID)
+    collection(db, "historicoMotoboy"),
+    where("motoboyId", "==", MOTOBOY_ID)
   );
 
   const snap = await getDocs(q);
 
-  if (snap.empty) return;
+  if (snap.empty) {
+    lista.innerHTML = "<p>Nenhum registro.</p>";
+    return;
+  }
 
-  let dados = [];
+  let html = "";
 
-  snap.forEach(d => {
-    const x = d.data();
-    dados.push({
-      data: x.data,
-      valor: Number(x.saldoFinal || 0)
-    });
+  snap.forEach(docu => {
+    const x = docu.data();
+    html += `
+      <div class="historico-item">
+        <strong>${x.data}</strong><br>
+        Entregas: ${x.entregas}<br>
+        Ganho: R$ ${x.ganhoEntregas.toFixed(2).replace(".", ",")}<br>
+        Saldo do dia: R$ ${x.saldoDoDia.toFixed(2).replace(".", ",")}
+      </div>
+    `;
   });
 
-  // Ordena por data
-  dados.sort((a, b) => a.data.localeCompare(b.data));
-
-  const ctx = document.getElementById("graficoSaldo");
-  if (!ctx) return;
-
-  // eslint-disable-next-line no-undef
-  new Chart(ctx, {
-    type: "line",
-    data: {
-      labels: dados.map(d => d.data),
-      datasets: [{
-        label: "Saldo Final (R$)",
-        data: dados.map(d => d.valor),
-        borderColor: "#ffb400",
-        backgroundColor: "rgba(255,180,0,0.25)",
-        borderWidth: 3,
-        tension: 0.3
-      }]
-    },
-    options: {
-      responsive: true,
-      scales: {
-        y: { beginAtZero: false }
-      }
-    }
-  });
+  lista.innerHTML = html;
 }
