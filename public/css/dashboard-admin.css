@@ -674,3 +674,80 @@ body {
     font-size: 1.05rem;
   }
 }
+
+/* ===========================================================
+📊 RESUMO DO DIA — ORGANIZAÇÃO VISUAL (CARDS)
+=========================================================== */
+
+.resumo-dia {
+  margin-top: 14px;
+}
+
+/* Grid dos valores */
+.resumo-dia-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+/* Card individual */
+.resumo-dia-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  text-align: center;
+}
+
+/* Label (Entradas / Saídas / Saldo) */
+.resumo-dia-card span {
+  display: block;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+/* Valor */
+.resumo-dia-card strong {
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+/* Cores */
+.resumo-dia-card.entrada strong {
+  color: var(--success);
+}
+
+.resumo-dia-card.saida strong {
+  color: var(--danger);
+}
+
+.resumo-dia-card.saldo strong {
+  color: var(--accent);
+}
+
+/* Lista de movimentações */
+.movimentacoes-hoje {
+  margin-top: 10px;
+  padding-top: 12px;
+  border-top: 1px solid #262626;
+}
+
+.movimentacoes-hoje h4 {
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+  color: var(--accent);
+}
+
+/* ===========================================================
+📱 MOBILE
+=========================================================== */
+
+@media (max-width: 600px) {
+  .resumo-dia-grid {
+    grid-template-columns: 1fr;
+  }
+}
