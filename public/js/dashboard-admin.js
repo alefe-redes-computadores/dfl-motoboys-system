@@ -1,10 +1,5 @@
 // ============================================================
-//  DFL — DASHBOARD ADMIN v3.0 (ESTÁVEL + BLINDADO)
-//  ✅ Estoque (categorias NÃO somem + PDF aparece)
-//  ✅ Motoboys + Saldo Operacional
-//  ✅ Caixa Diário + Saldo Financeiro (saldo do dia)
-//  ✅ Logística (últimos 7 dias)
-//  ✅ Mostra erro na tela se algo falhar (não fica "mudo")
+//  DFL — DASHBOARD ADMIN v3.1 (ESTÁVEL + AVULSOS)
 // ============================================================
 
 import { auth, db } from "./firebase-config-v2.js";
@@ -17,6 +12,7 @@ import {
 import {
   doc,
   getDoc,
+  setDoc,
   updateDoc,
   addDoc,
   collection,
@@ -27,7 +23,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 // ============================================================
-//  🔐 ACESSO APENAS ADMIN
+//  🔐 ADMINS
 // ============================================================
 const ADMINS = [
   "6YczX4gLpUStlBVdQOXWc3uEYGG2",
@@ -49,18 +45,13 @@ const todayISO_BR = () =>
     .toISOString()
     .slice(0, 10);
 
-// últimos X dias (inclui hoje)
-function lastDaysISO(count) {
-  const out = [];
-  for (let i = 0; i < count; i++) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    const iso = new Date(d.getTime() - d.getTimezoneOffset() * 60000)
-      .toISOString()
-      .slice(0, 10);
-    out.push(iso);
-  }
-  return out;
+function normalizeId(str) {
+  return str
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_|_$/g, "");
 }
 
 function safe(fn) {
@@ -70,13 +61,11 @@ function safe(fn) {
     } catch (e) {
       console.error("[DFL ADMIN] ERRO:", e);
       showFatalOnScreen(e);
-      return null;
     }
   };
 }
 
 function showFatalOnScreen(e) {
-  // não polui se já existir
   if (document.getElementById("dflAdminFatal")) return;
 
   const box = document.createElement("div");
@@ -87,367 +76,84 @@ function showFatalOnScreen(e) {
     right: 12px;
     bottom: 12px;
     z-index: 99999;
-    background: rgba(229,57,53,0.95);
+    background: rgba(229,57,53,.95);
     color: #fff;
-    padding: 12px 14px;
+    padding: 12px;
     border-radius: 12px;
-    font-family: system-ui, -apple-system, Segoe UI, sans-serif;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
     font-size: 13px;
-    line-height: 1.35;
   `;
-
-  const msg = (e && (e.message || String(e))) ? (e.message || String(e)) : "Erro desconhecido";
-  box.innerHTML = `
-    <strong>⚠️ Painel Admin: erro no JavaScript</strong><br>
-    ${msg}<br>
-    <span style="opacity:.9">Abra o console (F12) para ver detalhes.</span>
-  `;
+  box.innerHTML = `<strong>Erro no painel:</strong><br>${e.message || e}`;
   document.body.appendChild(box);
 }
 
 // ============================================================
-//  🎨 CLASSE DO SALDO
+//  🎨 SALDO
 // ============================================================
-function getClasseSaldo(valor) {
-  if (valor > 0) return "positivo";
-  if (valor < 0) return "negativo";
+function getClasseSaldo(v) {
+  if (v > 0) return "positivo";
+  if (v < 0) return "negativo";
   return "neutral";
 }
 
 // ============================================================
-//  🚪 LOGOUT
+//  🚪 HEADER
 // ============================================================
 function bindHeaderButtons() {
-  $("logoutAdmin")?.addEventListener("click", safe(async () => {
+  $("logoutAdmin")?.addEventListener("click", async () => {
     await signOut(auth);
     window.location.href = "index.html";
-  }));
-
-  $("btnRelatorios")?.addEventListener("click", () => {
-    window.location.href = "relatorios.html";
   });
 
-  // Mini PDV (se existir)
   $("btnMiniPDV")?.addEventListener("click", () => {
     window.location.href = "pdv.html";
   });
 }
 
 // ============================================================
-//  📦 CATEGORIAS / ITENS DE ESTOQUE (OFICIAL)
+//  🛵 MOTOBOYS (FIXOS + AVULSOS)
 // ============================================================
-const SUBITENS = {
-  frios: [
-    "Bacon",
-    "Carne Moída/Artesanais",
-    "Cheddar",
-    "Filé de Frango",
-    "Hambúrguer",
-    "Mussarela",
-    "Presunto",
-    "Salsicha"
-  ],
-  refrigerantes: [
-    "Coca 200ml",
-    "Coca 310ml",
-    "Coca 310ml Zero",
-    "Coca 1L",
-    "Coca 1L Zero",
-    "Coca 2L",
-    "Del Valle 450ml Uva",
-    "Del Valle 450ml Laranja",
-    "Fanta 1L",
-    "Kuat 2L"
-  ],
-  embalagens: [
-    "Bobina",
-    "Dogueira",
-    "Hamburgueira",
-    "Papel Kraft",
-    "Saco Plástico",
-    "Sacola 30x40",
-    "Sacola 38x48"
-  ],
-  paes: ["Pão Hambúrguer", "Pão Hot Dog"],
-  hortifruti: [
-    "Alface",
-    "Batata Palha",
-    "Cebola",
-    "Cebolinha",
-    "Milho",
-    "Óleo",
-    "Ovo",
-    "Tomate"
-  ],
-  outros_extra: ["Outro (Preencher manualmente)"]
-};
-
-const CATEGORIAS = [
-  { id: "frios", label: "Frios" },
-  { id: "refrigerantes", label: "Refrigerantes" },
-  { id: "embalagens", label: "Embalagens" },
-  { id: "paes", label: "Pães" },
-  { id: "hortifruti", label: "Hortifruti" },
-  { id: "outros_extra", label: "Outros / Extra" }
-];
-
-function initEstoqueUI() {
-  const categoriaSel = $("estoqueCategoria");
-  const itemSel = $("estoqueItem");
-
-  if (!categoriaSel || !itemSel) return;
-
-  categoriaSel.innerHTML =
-    `<option value="">Selecione...</option>` +
-    CATEGORIAS.map(c => `<option value="${c.id}">${c.label}</option>`).join("");
-
-  itemSel.innerHTML = `<option value="">Selecione a categoria...</option>`;
-
-  categoriaSel.addEventListener("change", () => {
-    const lista = SUBITENS[categoriaSel.value] || [];
-    if (!lista.length) {
-      itemSel.innerHTML = `<option value="">Selecione a categoria...</option>`;
-      return;
-    }
-
-    itemSel.innerHTML =
-      `<option value="">Selecione...</option>` +
-      lista.map(i => `<option value="${i}">${i}</option>`).join("");
-  });
-}
-
-// ============================================================
-//  📦 REGISTRAR ESTOQUE
-// ============================================================
-function bindEstoque() {
-  $("btnSalvarEstoque")?.addEventListener("click", safe(async () => {
-    const categoria = $("estoqueCategoria")?.value || "";
-    const item = $("estoqueItem")?.value || "";
-    const quantidade = ($("estoqueQtd")?.value || "").trim();
-    const dataRaw = $("estoqueData")?.value || "";
-
-    if (!categoria || !item || !quantidade || !dataRaw) {
-      alert("Preencha tudo.");
-      return;
-    }
-
-    const data = new Date(dataRaw + "T12:00:00").toISOString().slice(0, 10);
-
-    await addDoc(collection(db, "estoqueDia"), {
-      categoria,
-      item,
-      quantidade,
-      data,
-      timestamp: Date.now()
-    });
-
-    alert("Estoque salvo!");
-    await verificarEstoqueHoje();
-  }));
-
-  // botão PDF
-  $("btnGerarPdfEstoque")?.addEventListener("click", () => {
-    window.location.href = "pdf-estoque.html";
-  });
-}
-
-async function verificarEstoqueHoje() {
-  const btn = $("btnGerarPdfEstoque");
-  if (!btn) return;
-
-  const hoje = todayISO_BR();
-  const q = query(collection(db, "estoqueDia"), where("data", "==", hoje));
-  const snap = await getDocs(q);
-
-  btn.style.display = snap.size > 0 ? "block" : "none";
-}
-
-// ============================================================
-//  🧾 DESPESAS
-// ============================================================
-function bindDespesas() {
-  $("btnSalvarDespesa")?.addEventListener("click", safe(async () => {
-    const desc = ($("descDespesa")?.value || "").trim();
-    const valor = Number($("valorDespesa")?.value || 0);
-    const dataRaw = $("dataDespesa")?.value || "";
-
-    if (!desc || !valor || !dataRaw) {
-      alert("Preencha tudo.");
-      return;
-    }
-
-    const data = new Date(dataRaw + "T12:00:00").toISOString().slice(0, 10);
-
-    await addDoc(collection(db, "despesas"), {
-      descricao: desc,
-      valor,
-      data,
-      timestamp: Date.now()
-    });
-
-    alert("Despesa registrada!");
-  }));
-}
-
-// ============================================================
-//  💸 CAIXA DIÁRIO
-// ============================================================
-function bindCaixa() {
-  $("btnRegistrarCaixa")?.addEventListener("click", safe(async () => {
-    const tipo = $("caixaTipo")?.value || "";
-    const categoria = $("caixaCategoria")?.value || "";
-    const descricao = ($("caixaDescricao")?.value || "").trim();
-    const valor = Number($("caixaValor")?.value || 0);
-    const dataRaw = $("caixaData")?.value || "";
-
-    if (!descricao || !valor || !dataRaw) {
-      alert("Preencha tudo.");
-      return;
-    }
-
-    const data = new Date(dataRaw + "T12:00:00").toISOString().slice(0, 10);
-
-    await addDoc(collection(db, "caixaDiario"), {
-      tipo,
-      categoria,
-      descricao,
-      valor,
-      data,
-      timestamp: Date.now()
-    });
-
-    alert("Movimentação registrada!");
-    await carregarCaixaHoje();
-    await calcularResumoDia();
-    await carregarSaldoFinanceiro(); // mantém o card do topo alinhado com o resumo do dia
-  }));
-}
-
-async function carregarCaixaHoje() {
-  const lista = $("listaCaixaHoje");
+async function carregarListaMotoboys() {
+  const lista = $("listaMotoboys");
   if (!lista) return;
 
   lista.innerHTML = "<p>Carregando...</p>";
 
-  const hoje = todayISO_BR();
+  const snap = await getDocs(collection(db, "motoboys"));
 
-  const q = query(
-    collection(db, "caixaDiario"),
-    where("data", "==", hoje),
-    orderBy("timestamp", "desc")
-  );
+  const fixos = [];
+  const avulsos = [];
 
-  const snap = await getDocs(q);
+  snap.forEach(d => {
+    const data = d.data();
+    const item = {
+      id: d.id,
+      nome: data.nome || d.id,
+      saldo: Number(data.saldo || 0),
+      tipo: data.tipo || "fixo"
+    };
 
-  if (snap.empty) {
-    lista.innerHTML = "<p>Nenhuma movimentação hoje.</p>";
-    return;
-  }
+    if (item.tipo === "avulso") avulsos.push(item);
+    else fixos.push(item);
+  });
 
   let html = "";
 
-  snap.forEach((docu) => {
-    const x = docu.data();
-    const hora = new Date(x.timestamp || Date.now()).toLocaleTimeString("pt-BR", {
-      hour: "2-digit",
-      minute: "2-digit"
-    });
-
+  [...fixos, ...avulsos].forEach(m => {
     html += `
-      <div class="caixa-item ${x.tipo || ""}">
-        <strong>${String(x.tipo || "").toUpperCase()}</strong> — ${x.categoria || ""}
-        <br>${x.descricao || ""}
-        <br>
-        <span class="valor">${moneyBR(x.valor)}</span>
-        <span style="float:right; opacity:0.7;">${hora}</span>
-        <hr>
+      <div class="motoboy-item ${getClasseSaldo(m.saldo)}">
+        <div class="motoboy-info">
+          <strong>${m.nome}</strong>
+          <span class="saldo">${moneyBR(m.saldo)}</span>
+        </div>
+        ${m.tipo !== "avulso" ? `
+        <button class="btnPagar" data-id="${m.id}" data-nome="${m.nome}">
+          💸 Pagar
+        </button>` : ""}
       </div>
     `;
   });
 
   lista.innerHTML = html;
-}
-
-async function calcularResumoDia() {
-  const hoje = todayISO_BR();
-
-  const q = query(collection(db, "caixaDiario"), where("data", "==", hoje));
-  const snap = await getDocs(q);
-
-  let entradas = 0;
-  let saidas = 0;
-
-  snap.forEach((d) => {
-    const x = d.data();
-    if (x.tipo === "entrada") entradas += Number(x.valor || 0);
-    else saidas += Number(x.valor || 0);
-  });
-
-  const saldo = entradas - saidas;
-
-  $("resumoEntradas") && ($("resumoEntradas").textContent = moneyBR(entradas));
-  $("resumoSaidas") && ($("resumoSaidas").textContent = moneyBR(saidas));
-  $("resumoSaldoDia") && ($("resumoSaldoDia").textContent = moneyBR(saldo));
-}
-
-// Card “Saldo Financeiro (Caixa)” no topo
-async function carregarSaldoFinanceiro() {
-  const el = $("saldoFinanceiro");
-  if (!el) return;
-
-  const hoje = todayISO_BR();
-  const q = query(collection(db, "caixaDiario"), where("data", "==", hoje));
-  const snap = await getDocs(q);
-
-  let entradas = 0;
-  let saidas = 0;
-
-  snap.forEach((d) => {
-    const x = d.data();
-    if (x.tipo === "entrada") entradas += Number(x.valor || 0);
-    else saidas += Number(x.valor || 0);
-  });
-
-  const saldo = entradas - saidas;
-
-  el.textContent = moneyBR(saldo);
-  el.className = "admin-value " + getClasseSaldo(saldo);
-}
-
-// ============================================================
-//  🛵 MOTOBOYS + SALDO OPERACIONAL
-// ============================================================
-async function carregarListaMotoboys() {
-  const listaEl = $("listaMotoboys");
-  if (!listaEl) return;
-
-  listaEl.innerHTML = "<p>Carregando...</p>";
-
-  const snap = await getDocs(collection(db, "motoboys"));
-
-  let html = "";
-  snap.forEach((d) => {
-    const x = d.data();
-    const saldo = Number(x.saldo || 0);
-
-    html += `
-      <div class="motoboy-item ${getClasseSaldo(saldo)}">
-        <div class="motoboy-info">
-          <strong>${x.nome || d.id}</strong>
-          <span class="saldo">${moneyBR(saldo)}</span>
-        </div>
-
-        <button class="btnPagar"
-          data-id="${d.id}"
-          data-nome="${x.nome || d.id}">
-          💸 Pagar
-        </button>
-      </div>
-    `;
-  });
-
-  listaEl.innerHTML = html;
 
   document.querySelectorAll(".btnPagar").forEach(btn => {
     btn.addEventListener("click", abrirModalPagamento);
@@ -458,7 +164,7 @@ async function carregarSaldoGeral() {
   const snap = await getDocs(collection(db, "motoboys"));
   let total = 0;
 
-  snap.forEach((d) => {
+  snap.forEach(d => {
     total += Number(d.data().saldo || 0);
   });
 
@@ -468,109 +174,6 @@ async function carregarSaldoGeral() {
   el.textContent = moneyBR(total);
   el.className = "admin-value " + getClasseSaldo(total);
 }
-
-// ============================================================
-//  📦 LOGÍSTICA — ÚLTIMOS 7 DIAS (entregasManuais)
-// ============================================================
-async function carregarLogisticaSemana() {
-  const el = $("logisticaSemana");
-  if (!el) return;
-
-  const dias = lastDaysISO(7);
-
-  // Firestore não aceita where-in com lista enorme, mas 7 é OK.
-  // Usamos "in" com até 10 valores.
-  const q = query(
-    collection(db, "entregasManuais"),
-    where("data", "in", dias)
-  );
-
-  const snap = await getDocs(q);
-
-  let total = 0;
-  snap.forEach((d) => {
-    total += Number(d.data().valorPago || 0);
-  });
-
-  el.textContent = moneyBR(total);
-}
-
-// ============================================================
-//  💸 MODAL PAGAMENTO
-// ============================================================
-const modal = $("modalPagamento");
-const inputValorPagamento = $("modalValorPagamento");
-const confirmarPagamentoBtn = $("confirmarPagamento");
-const cancelarPagamentoBtn = $("cancelarPagamento");
-const modalNomeMotoboy = $("modalNomeMotoboy");
-
-let pagamentoMotoboyId = null;
-
-function abrirModalPagamento(e) {
-  const btn = e.currentTarget;
-  pagamentoMotoboyId = btn.dataset.id;
-
-  if (modalNomeMotoboy) modalNomeMotoboy.textContent = btn.dataset.nome || "";
-  modal?.classList.remove("hidden");
-}
-
-cancelarPagamentoBtn?.addEventListener("click", () => {
-  modal?.classList.add("hidden");
-  pagamentoMotoboyId = null;
-  if (inputValorPagamento) inputValorPagamento.value = "";
-});
-
-// ============================================================
-//  💵 CONFIRMAR PAGAMENTO (LÓGICA OFICIAL)
-// ============================================================
-confirmarPagamentoBtn?.addEventListener("click", safe(async () => {
-  const valor = Number(inputValorPagamento?.value || 0);
-
-  if (!valor || valor <= 0) {
-    alert("Valor inválido.");
-    return;
-  }
-
-  if (!pagamentoMotoboyId) {
-    alert("Motoboy inválido.");
-    return;
-  }
-
-  const ref = doc(db, "motoboys", pagamentoMotoboyId);
-  const snap = await getDoc(ref);
-
-  if (!snap.exists()) {
-    alert("Erro: motoboy não encontrado.");
-    return;
-  }
-
-  const dados = snap.data();
-
-  if (pagamentoMotoboyId === "lucas_hiago") {
-    let saldoAtual = Number(dados.saldo || 0);
-    saldoAtual -= valor; // abate
-    await updateDoc(ref, { saldo: saldoAtual });
-  } else {
-    await updateDoc(ref, { saldo: 0 });
-  }
-
-  await addDoc(collection(db, "despesas"), {
-    descricao: `Pagamento motoboy - ${dados.nome || pagamentoMotoboyId}`,
-    valor,
-    data: todayISO_BR(),
-    timestamp: Date.now()
-  });
-
-  modal?.classList.add("hidden");
-  if (inputValorPagamento) inputValorPagamento.value = "";
-  pagamentoMotoboyId = null;
-
-  await carregarListaMotoboys();
-  await carregarSaldoGeral();
-  await carregarLogisticaSemana();
-
-  alert("Pagamento registrado!");
-}));
 
 // ============================================================
 //  🛵 REGISTRAR ENTREGA MANUAL
@@ -584,11 +187,11 @@ function bindEntregas() {
   });
 
   $("btnSalvarEntregaManual")?.addEventListener("click", safe(async () => {
-    const idMotoboy = selectMotoboy?.value || "";
-    const qtd = Number($("entregaQtd")?.value || 0);
-    const valorManual = Number($("valorPagoMotoboy")?.value || 0);
-    const dataRaw = $("entregaData")?.value || "";
-    const nomeOutro = ($("entregaMotoboyOutro")?.value || "").trim();
+    const tipo = selectMotoboy.value;
+    const qtd = Number($("entregaQtd").value || 0);
+    const valorManual = Number($("valorPagoMotoboy").value || 0);
+    const dataRaw = $("entregaData").value;
+    const nomeOutro = $("entregaMotoboyOutro").value.trim();
 
     if (!qtd || !dataRaw) {
       alert("Preencha tudo.");
@@ -600,34 +203,30 @@ function bindEntregas() {
     let nomeMotoboy = "";
     let valorPago = 0;
 
-    if (idMotoboy === "lucas_hiago") {
-      nomeMotoboy = "Lucas Hiago";
-      valorPago = qtd * 6;
-
-      const ref = doc(db, "motoboys", "lucas_hiago");
-      const snap = await getDoc(ref);
-      let saldoAtual = Number(snap.data()?.saldo || 0);
-      saldoAtual += valorPago; // acumula dívida
-      await updateDoc(ref, { saldo: saldoAtual });
-
-    } else if (idMotoboy === "rodrigo_goncalves") {
-      nomeMotoboy = "Rodrigo Gonçalves";
-      valorPago = (qtd <= 10) ? 100 : (100 + (qtd - 10) * 7);
-
-      await updateDoc(doc(db, "motoboys", idMotoboy), { saldo: 0 });
-
-    } else if (idMotoboy === "outro") {
+    if (tipo === "outro") {
       if (!nomeOutro) {
         alert("Informe o nome do motoboy.");
         return;
       }
+
       nomeMotoboy = nomeOutro;
-      valorPago = valorManual || 0;
+      valorPago = valorManual;
+
+      const id = normalizeId(nomeOutro);
+      const ref = doc(db, "motoboys", id);
+      const snap = await getDoc(ref);
+
+      if (!snap.exists()) {
+        await setDoc(ref, {
+          nome: nomeOutro,
+          saldo: 0,
+          tipo: "avulso"
+        });
+      }
     }
 
     await addDoc(collection(db, "entregasManuais"), {
       nomeMotoboy,
-      motoboy: idMotoboy,
       quantidade: qtd,
       valorPago,
       data,
@@ -635,53 +234,73 @@ function bindEntregas() {
     });
 
     alert("Entrega registrada!");
-
     await carregarListaMotoboys();
     await carregarSaldoGeral();
-    await carregarLogisticaSemana();
   }));
 }
 
 // ============================================================
-//  ✅ INIT GERAL (DOM + AUTH)
+//  💸 MODAL (lógica intacta – UI vem depois)
 // ============================================================
-function initUIBindings() {
-  bindHeaderButtons();
-  initEstoqueUI();
-  bindEstoque();
-  bindDespesas();
-  bindEntregas();
-  bindCaixa();
+const modal = $("modalPagamento");
+const modalNomeMotoboy = $("modalNomeMotoboy");
+const inputValorPagamento = $("modalValorPagamento");
+const confirmarPagamentoBtn = $("confirmarPagamento");
+const cancelarPagamentoBtn = $("cancelarPagamento");
+
+let pagamentoMotoboyId = null;
+
+function abrirModalPagamento(e) {
+  pagamentoMotoboyId = e.currentTarget.dataset.id;
+  modalNomeMotoboy.textContent = e.currentTarget.dataset.nome;
+  modal.classList.remove("hidden");
 }
 
-async function initDataAfterAuth() {
-  await verificarEstoqueHoje();
+cancelarPagamentoBtn?.addEventListener("click", () => {
+  modal.classList.add("hidden");
+  inputValorPagamento.value = "";
+  pagamentoMotoboyId = null;
+});
+
+confirmarPagamentoBtn?.addEventListener("click", safe(async () => {
+  const valor = Number(inputValorPagamento.value || 0);
+  if (!valor) return alert("Valor inválido");
+
+  const ref = doc(db, "motoboys", pagamentoMotoboyId);
+  const snap = await getDoc(ref);
+
+  let saldo = Number(snap.data().saldo || 0);
+  saldo -= valor;
+
+  await updateDoc(ref, { saldo });
+
+  modal.classList.add("hidden");
+  inputValorPagamento.value = "";
 
   await carregarListaMotoboys();
   await carregarSaldoGeral();
 
-  await carregarCaixaHoje();
-  await calcularResumoDia();
-  await carregarSaldoFinanceiro();
+  alert("Pagamento registrado!");
+}));
 
-  await carregarLogisticaSemana();
+// ============================================================
+//  INIT
+// ============================================================
+function init() {
+  bindHeaderButtons();
+  bindEntregas();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  initUIBindings();
+  init();
 
-  onAuthStateChanged(auth, safe(async (user) => {
-    if (!user) {
+  onAuthStateChanged(auth, async user => {
+    if (!user || !ADMINS.includes(user.uid)) {
       window.location.href = "index.html";
       return;
     }
 
-    if (!ADMINS.includes(user.uid)) {
-      alert("Acesso restrito.");
-      window.location.href = "dashboard.html";
-      return;
-    }
-
-    await initDataAfterAuth();
-  }));
+    await carregarListaMotoboys();
+    await carregarSaldoGeral();
+  });
 });
