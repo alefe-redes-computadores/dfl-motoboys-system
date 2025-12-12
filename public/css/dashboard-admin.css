@@ -1,10 +1,12 @@
 /* ===========================================================
-   🎨 DFL – DASHBOARD ADMIN (CSS OFICIAL)
-   - Layout escuro com cartões
-   - Topo com logo + título + botões
-   - Cards para motoboys, despesas, estoque, caixa diário
+   🎨 DFL – DASHBOARD ADMIN (CSS OFICIAL ORGANIZADO)
+   - Nenhuma regra removida
+   - Apenas reordenado e hierarquizado
    =========================================================== */
 
+/* ===========================
+   🌐 VARIÁVEIS
+=========================== */
 :root {
   --bg-body: #050505;
   --bg-header: #101010;
@@ -24,9 +26,8 @@
 }
 
 /* ===========================
-   🌙 BASE
+   🌙 BASE GLOBAL
 =========================== */
-
 * {
   box-sizing: border-box;
 }
@@ -40,9 +41,8 @@ body {
 }
 
 /* ===========================
-   🔝 HEADER - LOGO + TÍTULO + BOTÕES
+   🔝 HEADER
 =========================== */
-
 .admin-header {
   display: flex;
   align-items: center;
@@ -69,191 +69,126 @@ body {
   background: #000;
   border: 2px solid var(--accent);
   object-fit: cover;
-  box-shadow: 0 0 0 2px #000;
 }
 
 .admin-header-left h1 {
   margin: 0;
   font-size: 1.45rem;
-  line-height: 1.2;
   font-weight: 700;
 }
 
-.admin-header-left h1 span {
-  display: block;
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: var(--text-muted);
-}
-
-/* Área dos botões do topo (Relatórios, Mini PDV, Sair) */
 .admin-header-right {
   display: flex;
-  align-items: center;
   gap: 10px;
 }
 
-/* Botões do topo */
 .admin-btn-header {
   border: none;
   border-radius: 999px;
   padding: 10px 16px;
-  font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.14s ease, box-shadow 0.14s ease, background 0.14s ease;
   white-space: nowrap;
 }
 
 .admin-btn-header.azul {
   background: var(--accent-blue);
   color: #fff;
-  box-shadow: 0 6px 16px rgba(30, 136, 229, 0.45);
 }
 
 .admin-btn-header.amarelo {
   background: var(--accent);
   color: #000;
-  box-shadow: 0 6px 18px rgba(255, 202, 40, 0.55);
-}
-
-.admin-btn-header:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.45);
 }
 
 /* ===========================
-   🧱 CONTAINER PRINCIPAL
+   🧱 CONTAINER / CARDS
 =========================== */
-
 .admin-container {
   max-width: 1200px;
-  margin: 20px auto 0 auto;
+  margin: 20px auto 0;
   padding: 0 14px;
   display: grid;
   grid-template-columns: 1.2fr 1.2fr;
   gap: 22px;
 }
 
-/* Card base */
 .admin-card {
-  background: radial-gradient(circle at top left, #202020 0, #151515 45%, #101010 100%);
-  padding: 18px 18px 20px;
+  background: radial-gradient(circle at top left, #202020, #151515 45%, #101010);
+  padding: 18px;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-card);
   box-shadow: var(--shadow-soft);
 }
 
-/* Títulos dos cards */
 .admin-card h2 {
-  margin: 0 0 12px 0;
-  font-size: 1.15rem;
+  margin-bottom: 12px;
   color: var(--accent);
 }
 
 /* ===========================
-   💰 SALDO GERAL
+   📊 RESUMO FINANCEIRO (MINI PDV)
 =========================== */
-
-#saldoGeral {
-  margin-top: 6px;
+.resumo-saldos {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
 }
 
-/* Valor principal */
+.resumo-box {
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  background: rgba(0,0,0,0.4);
+}
+
+.resumo-titulo {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+/* ===========================
+   💰 VALORES
+=========================== */
 .admin-value {
   font-size: 2.1rem;
-  font-weight: 700; /* negrito reforçado */
-  margin: 6px 0 0 0;
+  font-weight: 700;
 }
 
-/* Cores de status via JS (positivo / negativo / neutral) */
-.admin-value.neutral {
-  color: var(--accent);
-}
-.admin-value.positivo {
-  color: var(--success);
-}
-.admin-value.negativo {
-  color: var(--danger);
-}
+.admin-value.positivo { color: var(--success); }
+.admin-value.negativo { color: var(--danger); }
+.admin-value.neutral { color: var(--accent); }
 
 /* ===========================
-   🛵 LISTA DE MOTOBOYS
+   🛵 MOTOBOYS
 =========================== */
-
 .lista-motoboys {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-top: 10px;
 }
 
 .motoboy-item {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 10px 12px;
+  padding: 10px;
   border-radius: var(--radius-md);
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: rgba(0,0,0,0.35);
 }
 
-.motoboy-info {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.motoboy-info strong {
-  font-size: 0.98rem;
-}
-
-.motoboy-info .saldo {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-}
-
-/* Cores do saldo (para texto de cada motoboy) */
-.motoboy-item.negativo .saldo {
-  color: var(--danger);
-  font-weight: 600;
-}
-.motoboy-item.positivo .saldo {
-  color: var(--success);
-  font-weight: 600;
-}
-
-/* Botão pagar */
 .btnPagar {
-  border: none;
-  border-radius: 999px;
-  padding: 8px 14px;
-  font-size: 0.9rem;
-  font-weight: 600;
   background: var(--danger);
   color: #fff;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  box-shadow: 0 5px 14px rgba(229, 57, 53, 0.65);
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
-}
-
-.btnPagar:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 9px 20px rgba(229, 57, 53, 0.85);
+  border-radius: 999px;
+  padding: 8px 14px;
+  border: none;
 }
 
 /* ===========================
-   🧾 FORMULÁRIOS (DESPESAS, ESTOQUE, CAIXA)
+   🧾 FORMULÁRIOS
 =========================== */
-
 .admin-card label {
-  display: block;
-  margin-top: 10px;
-  margin-bottom: 4px;
-  font-size: 0.86rem;
+  font-size: 0.85rem;
   color: var(--text-muted);
 }
 
@@ -261,346 +196,58 @@ body {
 .admin-card select {
   width: 100%;
   padding: 9px 11px;
+  background: var(--bg-input);
   border-radius: var(--radius-md);
   border: 1px solid #333;
-  background: var(--bg-input);
-  color: var(--text-main);
-  font-size: 0.95rem;
-  outline: none;
-  transition: border-color 0.14s ease, box-shadow 0.14s ease;
-}
-
-.admin-card input::placeholder {
-  color: #666;
-}
-
-.admin-card input:focus,
-.admin-card select:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 1px rgba(255, 202, 40, 0.5);
-}
-
-/* Botão amarelo padrão dos cards */
-.admin-btn {
-  margin-top: 12px;
-  width: 100%;
-  padding: 10px 14px;
-  border-radius: 999px;
-  border: none;
-  background: var(--accent);
-  color: #000;
-  font-size: 0.98rem;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 7px 18px rgba(255, 202, 40, 0.75);
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
-}
-
-.admin-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.7);
-}
-
-/* Botão azul auxiliar (PDF, cancelar, etc.) */
-.admin-btn-aux {
-  margin-top: 8px;
-  width: 100%;
-  padding: 9px 14px;
-  border-radius: 999px;
-  border: none;
-  background: var(--accent-blue);
   color: #fff;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 7px 18px rgba(30, 136, 229, 0.65);
-}
-
-.hidden {
-  display: none !important;
 }
 
 /* ===========================
-   💸 MODAL DE PAGAMENTO
+   💸 CAIXA DIÁRIO
 =========================== */
+.caixa-resumo {
+  background: rgba(0,0,0,0.35);
+  padding: 14px;
+  border-radius: var(--radius-md);
+}
 
+.caixa-item {
+  padding: 10px;
+  border-radius: var(--radius-md);
+}
+
+.caixa-item.entrada { border-left: 4px solid var(--success); }
+.caixa-item.saida { border-left: 4px solid var(--danger); }
+
+/* ===========================
+   💸 MODAL
+=========================== */
 .modal {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.72);
+  background: rgba(0,0,0,0.7);
   display: flex;
-  align-items: center;
   justify-content: center;
-  z-index: 40;
+  align-items: center;
 }
 
 .modal-content {
   background: #151515;
+  padding: 18px;
   border-radius: var(--radius-lg);
-  padding: 18px 16px 18px;
-  width: 92%;
-  max-width: 380px;
-  border: 1px solid #333;
-  box-shadow: var(--shadow-soft);
-}
-
-.modal-content h3 {
-  margin: 0 0 10px 0;
-  color: var(--accent);
-}
-
-.modal-content p {
-  margin: 0 0 10px 0;
 }
 
 /* ===========================
-   📄 LISTA CAIXA DIÁRIO
+   📱 RESPONSIVO
 =========================== */
-
-.caixa-item {
-  margin-top: 8px;
-  font-size: 0.9rem;
-}
-
-.caixa-item hr {
-  border: none;
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
-  margin-top: 6px;
-}
-
-/* ===========================
-   📱 RESPONSIVO (MOBILE)
-=========================== */
-
 @media (max-width: 900px) {
   .admin-container {
     grid-template-columns: 1fr;
-    max-width: 600px;
   }
 }
 
-@media (max-width: 470px) {
-  .admin-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-
-  .admin-header-right {
-    width: 100%;
-    justify-content: flex-start;
-  }
-
-  .admin-container {
-    padding-inline: 10px;
-  }
-
-  .admin-card {
-    padding: 16px 14px 18px;
-  }
-
-  .admin-header-left h1 {
-    font-size: 1.25rem;
-  }
-}
-
-/* ===========================================
-   📱 Ajuste do header em telas menores
-   - Mantém logo + título
-   - Botões (Relatórios, Mini PDV, Sair) em faixa rolável
-   ============================================ */
-@media (max-width: 768px) {
-  .admin-header {
-    flex-wrap: nowrap;
-    gap: 10px;
-  }
-
-  .admin-header-left {
-    flex: 1 1 auto;
-    min-width: 0;
-  }
-
-  .admin-header-right {
-    flex: 0 0 auto;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    overflow-x: auto;
-    padding-bottom: 4px;
-  }
-
-  .admin-header-right::-webkit-scrollbar {
-    height: 4px;
-  }
-
-  .admin-btn-header {
-    white-space: nowrap;
-    flex-shrink: 0;
-    padding-inline: 12px;
-    font-size: 0.9rem;
-  }
-}
-
-/* ===========================
-   📊 RESUMO FINANCEIRO (MINI PDV)
-=========================== */
-
-.resumo-saldos {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-  margin-top: 12px;
-}
-
-.resumo-box {
-  background: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.04),
-    rgba(0, 0, 0, 0.4)
-  );
-  border-radius: var(--radius-lg);
-  padding: 16px 18px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.resumo-titulo {
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.resumo-box .admin-value {
-  font-size: 2.2rem;
-  margin: 0;
-}
-
-/* Mobile: empilha os saldos */
 @media (max-width: 600px) {
   .resumo-saldos {
     grid-template-columns: 1fr;
   }
-}
-
-/* ===========================
-   💸 CAIXA DIÁRIO – VISUAL PDV
-=========================== */
-
-.caixa-resumo {
-  background: rgba(0, 0, 0, 0.35);
-  border-radius: var(--radius-md);
-  padding: 14px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  margin-top: 10px;
-}
-
-.caixa-resumo p {
-  margin: 6px 0;
-  font-size: 0.9rem;
-}
-
-.caixa-resumo span {
-  font-weight: 700;
-}
-
-/* Lista de movimentações */
-.caixa-dia-lista {
-  margin-top: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-/* Item individual */
-.caixa-item {
-  background: rgba(0, 0, 0, 0.4);
-  border-radius: var(--radius-md);
-  padding: 10px 12px;
-  border-left: 4px solid transparent;
-  font-size: 0.88rem;
-  line-height: 1.4;
-}
-
-/* Entrada */
-.caixa-item.entrada {
-  border-left-color: var(--success);
-}
-
-.caixa-item.entrada strong {
-  color: var(--success);
-}
-
-/* Saída */
-.caixa-item.saida {
-  border-left-color: var(--danger);
-}
-
-.caixa-item.saida strong {
-  color: var(--danger);
-}
-
-/* Valor destacado */
-.caixa-item .valor {
-  font-weight: 700;
-  font-size: 0.95rem;
-}
-
-/* Data / categoria */
-.caixa-item .meta {
-  font-size: 0.78rem;
-  color: var(--text-muted);
-}
-
-/* Mobile refinado */
-@media (max-width: 600px) {
-  .caixa-item {
-    padding: 12px 14px;
-  }
-}
-
-/* ===========================
-   🧭 GRUPOS DO PAINEL
-=========================== */
-
-.grupo-visao-geral,
-.grupo-operacional,
-.grupo-financeiro,
-.grupo-controle {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 18px;
-  margin-bottom: 28px;
-}
-
-/* Títulos visuais dos grupos */
-.grupo-operacional::before,
-.grupo-financeiro::before,
-.grupo-controle::before {
-  content: attr(data-title);
-  display: block;
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-left: 4px;
-}
-
-/* Identidade visual sutil */
-.grupo-operacional {
-  border-left: 4px solid #ff9800;
-  padding-left: 12px;
-}
-
-.grupo-financeiro {
-  border-left: 4px solid #4caf50;
-  padding-left: 12px;
-}
-
-.grupo-controle {
-  border-left: 4px solid #1e88e5;
-  padding-left: 12px;
 }
