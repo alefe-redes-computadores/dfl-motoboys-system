@@ -1,114 +1,224 @@
+/* ===========================================================
+   🛵 DFL — PAINEL DO MOTOBOY (CSS OFICIAL)
+   Isolado do Admin | Mobile-first | Estável
+=========================================================== */
+
+:root {
+  --bg-body: #0e0e0e;
+  --bg-card: #1b1b1b;
+  --bg-header: #000;
+  --border: #2a2a2a;
+  --accent: #ffb400;
+  --accent-soft: #ffd266;
+  --danger: #e53935;
+  --success: #43a047;
+  --text-main: #ffffff;
+  --text-muted: #bdbdbd;
+  --radius: 14px;
+  --shadow: 0 10px 28px rgba(0,0,0,0.55);
+}
+
 /* ===========================
-   🎨 Estilo Premium – DFL Painel
-   =========================== */
+   🔹 BASE
+=========================== */
+
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
-  background: #111;
-  color: white;
-  font-family: Arial, sans-serif;
+  background: radial-gradient(circle at top, #1a1a1a 0%, #0e0e0e 45%, #000 100%);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--text-main);
 }
 
-header {
-  background: #000;
-  padding: 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+/* ===========================
+   🔝 HEADER
+=========================== */
 
-.logo, .logo-sm {
-  width: 120px;
-  display: block;
-  margin: auto;
-}
-
-.logo-sm {
-  width: 70px;
-}
-
-.login-container {
-  max-width: 350px;
-  margin: 60px auto;
-  background: #1b1b1b;
-  padding: 25px;
-  border-radius: 12px;
-  text-align: center;
-}
-
-input {
-  width: 100%;
-  padding: 12px;
-  margin: 6px 0 12px;
-  border: none;
-  border-radius: 6px;
-  background: #222;
-  color: #fff;
-  font-size: 16px;
-}
-
-button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  background: #ffb400;
-  border: none;
-  border-radius: 6px;
-  font-size: 17px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #ffc833;
-}
-
-main {
-  padding: 20px;
-}
-
-.form-card, .grafico-card {
-  background: #1f1f1f;
-  padding: 20px;
-  border-radius: 12px;
-  margin-top: 20px;
-}
-
-.saldo-valor {
-  font-size: 40px;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 20px;
-}
-/* Dashboard – Logo */
-.dash-header {
+header.dash-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 14px;
+  padding: 14px 18px;
+  background: linear-gradient(90deg, #000, #111, #000);
+  border-bottom: 2px solid var(--accent);
+  box-shadow: 0 6px 18px rgba(0,0,0,.6);
 }
 
 .dash-logo {
-  width: 50px;
-  height: 50px;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  border: 2px solid var(--accent);
   object-fit: contain;
-  border-radius: 10px;
 }
 
 .dash-title {
   display: flex;
   flex-direction: column;
-  color: #fff;
   line-height: 1.1;
 }
 
 .dash-title span:first-child {
-  font-size: 12px;
-  opacity: 0.7;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
+  color: var(--text-muted);
 }
 
 .dash-title span:last-child {
-  font-size: 20px;
+  font-size: 1.05rem;
   font-weight: 700;
+  color: var(--text-main);
+}
+
+/* Botão sair */
+#logoutBtn {
+  margin-left: auto;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#logoutBtn:hover {
+  background: var(--accent-soft);
+}
+
+/* ===========================
+   📦 CONTEÚDO
+=========================== */
+
+main {
+  padding: 18px;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+/* ===========================
+   🧱 CARDS
+=========================== */
+
+.form-card {
+  background: radial-gradient(circle at top left, #242424, #1b1b1b 45%, #141414);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 18px;
+  box-shadow: var(--shadow);
+}
+
+.form-card h2 {
+  margin: 0 0 14px;
+  font-size: 1.05rem;
+  color: var(--accent);
+}
+
+/* ===========================
+   💰 SALDO
+=========================== */
+
+.saldo-card {
+  text-align: center;
+}
+
+.saldo-valor {
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: var(--accent);
+  margin-top: 6px;
+}
+
+/* ===========================
+   🧾 FORMULÁRIO
+=========================== */
+
+label {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+input {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  border: 1px solid #333;
+  background: #101010;
+  color: var(--text-main);
+  font-size: 0.95rem;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* ===========================
+   🔘 BOTÕES
+=========================== */
+
+button {
+  width: 100%;
+  padding: 11px;
+  border-radius: 999px;
+  border: none;
+  background: var(--accent);
+  color: #000;
+  font-weight: 800;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+button:hover {
+  background: var(--accent-soft);
+}
+
+/* ===========================
+   📊 HISTÓRICO
+=========================== */
+
+#listaHistorico {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.historico-item {
+  background: rgba(255,255,255,0.04);
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #2a2a2a;
+}
+
+.historico-item strong {
+  display: block;
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+}
+
+.historico-item span {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* ===========================
+   📱 RESPONSIVO
+=========================== */
+
+@media (max-width: 480px) {
+  .saldo-valor {
+    font-size: 2.1rem;
+  }
+
+  main {
+    padding: 14px;
+  }
 }
