@@ -556,3 +556,121 @@ body {
   font-size: 0.88rem;
   font-weight: 600;
 }
+
+
+/* ===========================================================
+🔧 AJUSTES FINAIS – ETAPA 1 (APENAS ADIÇÃO)
+=========================================================== */
+
+/* ---------- HEADER ---------- */
+
+/* Container do título */
+.admin-title {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+/* Título principal menor e elegante */
+.admin-title h1 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Subtítulo DFL discreto */
+.admin-subtitle {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  margin-top: 2px;
+}
+
+/* Garante que TODOS os botões do header sejam iguais */
+.admin-header-right .admin-btn-header {
+  border-radius: 999px;
+  padding: 9px 15px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* ---------- RESUMO FINANCEIRO ---------- */
+
+/* Mais respiro entre título e valor */
+.resumo-box .admin-value {
+  margin-top: 10px;
+  display: block;
+}
+
+/* ---------- SALDO POR MOTOBOY ---------- */
+
+/* Título contextual bonito */
+.motoboy-section-title {
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--accent);
+}
+
+.motoboy-section-subtitle {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* Área com rolagem vertical */
+.motoboy-scroll {
+  max-height: 260px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* Scroll discreto */
+.motoboy-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+.motoboy-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.15);
+  border-radius: 10px;
+}
+
+/* Ajuste fino dos itens */
+.motoboy-item {
+  align-items: center;
+}
+
+/* Nome do motoboy */
+.motoboy-info strong {
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+/* Saldo alinhado, menor e mais legível */
+.motoboy-info .saldo {
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+/* ---------- BOTÃO PAGAR ---------- */
+
+.btnPagar {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+}
+
+/* ---------- RESPONSIVO ---------- */
+
+@media (max-width: 600px) {
+  .motoboy-scroll {
+    max-height: 220px;
+  }
+
+  .admin-title h1 {
+    font-size: 1.05rem;
+  }
+}
