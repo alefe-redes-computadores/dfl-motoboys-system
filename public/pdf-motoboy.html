@@ -2,24 +2,22 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Relatório Motoboy – DFL</title>
+  <title>Relatório Diário – Motoboy | DFL</title>
 
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #fff;
-      color: #000;
-      margin: 0;
-      padding: 30px;
+      margin: 30px;
+      color: #111;
     }
 
     .header {
       display: flex;
       align-items: center;
       gap: 15px;
-      border-bottom: 2px solid #ffca28;
-      padding-bottom: 15px;
       margin-bottom: 20px;
+      border-bottom: 2px solid #ffb400;
+      padding-bottom: 10px;
     }
 
     .logo {
@@ -31,41 +29,55 @@
       font-size: 22px;
     }
 
-    .subtitle {
+    .info {
+      margin: 20px 0;
       font-size: 14px;
-      color: #555;
     }
 
     .box {
-      margin-top: 20px;
       border: 1px solid #ddd;
+      padding: 12px;
       border-radius: 8px;
-      padding: 16px;
+      margin-bottom: 15px;
     }
 
-    .linha {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 8px;
+    .box strong {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
       font-size: 14px;
     }
 
-    .linha strong {
-      font-weight: 700;
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
     }
 
-    .total {
-      margin-top: 12px;
-      font-size: 18px;
-      font-weight: bold;
-      color: #000;
+    th {
+      background: #f4f4f4;
     }
 
-    footer {
+    .footer {
       margin-top: 30px;
       font-size: 12px;
-      color: #777;
       text-align: center;
+      color: #555;
+    }
+
+    .btn-print {
+      margin-top: 20px;
+      padding: 10px 18px;
+      background: #ffb400;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 6px;
     }
   </style>
 </head>
@@ -73,35 +85,52 @@
 <body>
 
   <div class="header">
-    <img src="img/logo-dfl.png" class="logo" />
-    <div>
-      <h1>Relatório de Entregas – Motoboy</h1>
-      <div class="subtitle">Da Família Lanches (DFL)</div>
-    </div>
+    <img src="./img/logo-dfl.png" class="logo" />
+    <h1>Relatório Diário – Motoboy</h1>
+  </div>
+
+  <div class="info">
+    <strong>Motoboy:</strong> Rodrigo Gonçalves<br>
+    <strong>Data:</strong> <span id="dataRelatorio"></span>
   </div>
 
   <div class="box">
-    <div class="linha"><span>Motoboy:</span><strong id="pdfNome"></strong></div>
-    <div class="linha"><span>Data:</span><strong id="pdfData"></strong></div>
-    <hr>
-
-    <div class="linha"><span>Entregas:</span><strong id="pdfEntregas"></strong></div>
-    <div class="linha"><span>Ganho bruto:</span><strong id="pdfGanho"></strong></div>
-    <div class="linha"><span>Dinheiro recebido:</span><strong id="pdfDinheiro"></strong></div>
-    <div class="linha"><span>Consumo:</span><strong id="pdfConsumo"></strong></div>
-
-    <div class="total">
-      Saldo do dia: <span id="pdfSaldo"></span>
-    </div>
+    <strong>Resumo do Dia</strong>
+    Entregas realizadas: <span id="pdfEntregas">0</span><br>
+    Ganho bruto: <span id="pdfGanho">R$ 0,00</span><br>
+    Dinheiro recebido: <span id="pdfDinheiro">R$ 0,00</span><br>
+    Consumo: <span id="pdfConsumo">R$ 0,00</span><br>
+    <strong>Saldo do dia:</strong> <span id="pdfSaldoDia">R$ 0,00</span>
   </div>
 
-  <footer>
-    Documento gerado automaticamente pelo sistema DFL
-  </footer>
+  <table>
+    <thead>
+      <tr>
+        <th>Entregas</th>
+        <th>Ganho</th>
+        <th>Dinheiro</th>
+        <th>Consumo</th>
+        <th>Saldo do Dia</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td id="tEntregas">0</td>
+        <td id="tGanho">R$ 0,00</td>
+        <td id="tDinheiro">R$ 0,00</td>
+        <td id="tConsumo">R$ 0,00</td>
+        <td id="tSaldo">R$ 0,00</td>
+      </tr>
+    </tbody>
+  </table>
 
-  <!-- jsPDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script type="module" src="pdf-motoboy.js"></script>
+  <button class="btn-print" onclick="window.print()">📄 Gerar PDF</button>
 
+  <div class="footer">
+    Da Família Lanches • Relatório gerado automaticamente
+  </div>
+
+  <!-- ✅ JS AGORA VEM DA PASTA /js -->
+  <script type="module" src="./js/pdf-motoboy.js"></script>
 </body>
 </html>
