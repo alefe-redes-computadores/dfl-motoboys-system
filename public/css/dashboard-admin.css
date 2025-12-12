@@ -251,3 +251,24 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* ===========================
+   🔍 MINI PDV – REFINO VISUAL
+=========================== */
+
+.resumo-box.operacional {
+  border-left: 5px solid var(--accent);
+}
+
+.resumo-box.financeiro {
+  border-left: 5px solid var(--success);
+}
+
+.resumo-box.financeiro.negativo {
+  border-left-color: var(--danger);
+}
+
+.resumo-box .icone {
+  font-size: 1.2rem;
+  opacity: 0.85;
+}
