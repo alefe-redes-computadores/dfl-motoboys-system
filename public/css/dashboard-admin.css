@@ -433,3 +433,25 @@ body {
     grid-column: span 1;
   }
 }
+
+/* =========================================
+🎯 AJUSTE FINO – ESPAÇAMENTO DO RESUMO FINANCEIRO
+========================================= */
+
+/* Título do box (ícone + texto) */
+.resumo-titulo {
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+
+/* Valor principal (saldo) */
+.resumo-box .admin-value {
+  margin-top: 8px;
+  line-height: 1.1;
+}
+
+/* Pequeno respiro extra só no Resumo Financeiro */
+.resumo-box {
+  padding-top: 18px;
+  padding-bottom: 18px;
+}
