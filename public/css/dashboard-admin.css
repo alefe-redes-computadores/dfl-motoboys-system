@@ -440,3 +440,48 @@ body {
     font-size: 0.9rem;
   }
 }
+
+/* ===========================
+   📊 RESUMO FINANCEIRO (MINI PDV)
+=========================== */
+
+.resumo-saldos {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.resumo-box {
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.04),
+    rgba(0, 0, 0, 0.4)
+  );
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.resumo-titulo {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.resumo-box .admin-value {
+  font-size: 2.2rem;
+  margin: 0;
+}
+
+/* Mobile: empilha os saldos */
+@media (max-width: 600px) {
+  .resumo-saldos {
+    grid-template-columns: 1fr;
+  }
+}
