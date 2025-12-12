@@ -191,7 +191,9 @@ document.getElementById("confirmarPagamento")?.addEventListener("click", async (
     const snap = await getDoc(ref);
 
     const saldoAnterior = Number(snap.data().saldo || 0);
-    const saldoFinal = saldoAnterior - valor;
+
+    // ✅ CORREÇÃO APLICADA (saldo nunca negativo)
+    const saldoFinal = Math.max(0, saldoAnterior - valor);
 
     await updateDoc(ref, { saldo: saldoFinal });
 
