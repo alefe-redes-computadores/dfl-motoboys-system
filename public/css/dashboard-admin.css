@@ -382,3 +382,54 @@ body {
 .btnPagar:hover {
   opacity: 1;
 }
+
+/* ===========================================================
+📐 PADRONIZAÇÃO DE LARGURA + ALTURA DOS CARDS (GRID FIX)
+=========================================================== */
+
+/* Força cards principais a ocuparem largura total */
+.admin-card {
+  grid-column: span 2;
+  min-height: 220px;
+}
+
+/* Cards que DEVEM ficar lado a lado (se quiser no futuro) */
+/* por enquanto, deixamos todos full-width para consistência */
+
+/* ===========================
+🛵 SALDO POR MOTOBOY — FIX TOTAL
+=========================== */
+
+.lista-motoboys {
+  width: 100%;
+}
+
+.motoboy-item {
+  width: 100%;
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Texto do motoboy */
+.motoboy-info strong {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+/* Saldo do motoboy */
+.motoboy-info .saldo {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+/* ===========================
+📱 MOBILE — mantém tudo alinhado
+=========================== */
+
+@media (max-width: 900px) {
+  .admin-card {
+    grid-column: span 1;
+  }
+}
