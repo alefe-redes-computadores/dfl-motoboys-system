@@ -2,195 +2,76 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Painel Administrativo – DFL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Painel Motoboy – DFL</title>
 
-  <link rel="stylesheet" href="dashboard-admin.css" />
-
-  <style>
-    body {
-      margin: 0;
-      background: #0d0d0d;
-      font-family: system-ui, sans-serif;
-      color: #fff;
-    }
-    .admin-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #111;
-      padding: 15px 22px;
-      border-bottom: 2px solid #ffca28;
-    }
-    .admin-header-left {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-    .admin-logo {
-      width: 45px;
-      height: 45px;
-      border-radius: 12px;
-      border: 2px solid #ffca28;
-    }
-    .admin-logout {
-      background: #ffca28;
-      color: #111;
-      border: none;
-      padding: 10px 18px;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .admin-container {
-      padding: 20px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
-      gap: 20px;
-    }
-    .admin-card {
-      background: #1a1a1a;
-      padding: 22px;
-      border-radius: 14px;
-      border: 1px solid #333;
-    }
-    .admin-card h2 {
-      margin-top: 0;
-    }
-    .admin-value {
-      font-size: 28px;
-      font-weight: bold;
-      color: #ffca28;
-    }
-    input, select {
-      width: 100%;
-      padding: 9px 12px;
-      margin-top: 6px;
-      margin-bottom: 12px;
-      border: 1px solid #444;
-      background: #0f0f0f;
-      color: #fff;
-      border-radius: 8px;
-      font-size: 15px;
-    }
-    .admin-btn {
-      width: 100%;
-      background: #ffca28;
-      color: #111;
-      padding: 10px;
-      border-radius: 8px;
-      border: none;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 5px;
-    }
-    .admin-btn-pdf {
-      background: #1e88e5;
-      color: white;
-      border: none;
-      padding: 10px;
-      margin-top: 10px;
-      width: 100%;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .motoboy-item { 
-      margin-top: 8px; 
-      padding: 8px 0; 
-      border-bottom: 1px solid #333;
-    }
-    .negativo { color: #e53935 !important; font-weight: bold; }
-    .positivo { color: #43a047 !important; font-weight: bold; }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
 
-  <header class="admin-header">
-    <div class="admin-header-left">
-      <img src="./img/logo-dfl.png" class="admin-logo" />
-      <h1>Painel Administrativo – DFL</h1>
+  <!-- ===========================
+       🔝 HEADER
+  ============================ -->
+  <header class="dash-header">
+    <img src="./img/logo-dfl.png" class="dash-logo" alt="DFL" />
+
+    <div class="dash-title">
+      <span>Motoboy</span>
+      <span>Rodrigo Gonçalves</span>
     </div>
-    <button id="logoutAdmin" class="admin-logout">Sair</button>
+
+    <button id="logoutBtn" class="logout-btn">Sair</button>
   </header>
 
-  <div class="admin-container">
+  <!-- ===========================
+       📦 CONTEÚDO
+  ============================ -->
+  <main>
 
-    <!-- SALDO POR MOTOBOY -->
-    <div class="admin-card">
-      <h2>Saldo por Motoboy</h2>
+    <!-- ===========================
+         💰 SALDO ATUAL
+    ============================ -->
+    <div class="form-card saldo-card">
+      <h2>Saldo Atual</h2>
+      <div id="saldoAtual" class="saldo-valor">R$ 0,00</div>
+    </div>
 
-      <div class="motoboy-item">
-        <strong>Lucas Hiago</strong> —
-        <span id="saldo_lucas_hiago">R$ 0,00</span>
+    <!-- ===========================
+         🧾 FECHAMENTO DO DIA
+    ============================ -->
+    <div class="form-card">
+      <h2>Fechamento do Dia</h2>
+
+      <label>Quantidade de entregas</label>
+      <input id="entregas" type="number" placeholder="Ex: 24" />
+
+      <label>Dinheiro recebido (R$)</label>
+      <input id="dinheiro" type="number" step="0.01" placeholder="Ex: 50.00" />
+
+      <label>Consumo na lanchonete (R$)</label>
+      <input id="consumo" type="number" step="0.01" placeholder="Ex: 18.00" />
+
+      <button id="btnSalvar">Salvar Fechamento</button>
+    </div>
+
+    <!-- ===========================
+         📊 HISTÓRICO
+    ============================ -->
+    <div class="form-card">
+      <h2>Histórico de Fechamentos</h2>
+
+      <div id="listaHistorico">
+        <p>Carregando...</p>
       </div>
     </div>
 
-    <!-- SALDO GERAL -->
-    <div class="admin-card">
-      <h2>Saldo Geral</h2>
-      <p id="saldoGeral" class="admin-value">R$ 0,00</p>
-    </div>
+  </main>
 
-    <!-- DESPESAS -->
-    <div class="admin-card">
-      <h2>Registrar Despesa</h2>
-      <input id="descDespesa" placeholder="Descrição da despesa" />
-      <input id="valorDespesa" type="number" placeholder="Ex: 45.90" />
-      <input id="dataDespesa" type="date" />
-      <button class="admin-btn" id="btnSalvarDespesa">Salvar Despesa</button>
-    </div>
+  <!-- ===========================
+       ✅ JS
+  ============================ -->
+  <script type="module" src="dashboard.js"></script>
 
-    <!-- ESTOQUE -->
-    <div class="admin-card">
-      <h2>Registrar Estoque do Dia</h2>
-
-      <label>Categoria</label>
-      <select id="estoqueCategoria">
-        <option value="frios">Frios</option>
-        <option value="refrigerantes">Refrigerantes</option>
-        <option value="embalagens">Embalagens</option>
-        <option value="paes">Pães</option>
-        <option value="outros">Outros</option>
-      </select>
-
-      <label>Item</label>
-      <select id="estoqueItem"></select>
-
-      <label>Quantidade Restante</label>
-      <input id="estoqueQtd" placeholder="Ex: 12 unidades / 3 kg" />
-
-      <label>Data</label>
-      <input id="estoqueData" type="date" />
-
-      <button class="admin-btn" id="btnSalvarEstoque">Salvar Estoque</button>
-
-      <button class="admin-btn-pdf" id="btnGerarPdfEstoque">
-        📄 Gerar PDF – Estoque do Dia
-      </button>
-    </div>
-
-    <!-- ENTREGAS MANUAIS -->
-    <div class="admin-card">
-      <h2>Registrar Entregas Manuais</h2>
-
-      <label>Motoboy</label>
-      <select id="entregaMotoboy">
-        <option value="lucas_hiago">Lucas Hiago</option>
-      </select>
-
-      <label>Qtd. Entregas</label>
-      <input id="entregaQtd" type="number" placeholder="Ex: 3" />
-
-      <label>Data</label>
-      <input id="entregaData" type="date" />
-
-      <button class="admin-btn" id="btnSalvarEntregaManual">Salvar Registro</button>
-    </div>
-
-  </div>
-
-  <script type="module" src="dashboard-admin.js"></script>
 </body>
 </html>
