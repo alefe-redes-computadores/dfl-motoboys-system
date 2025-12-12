@@ -22,10 +22,7 @@
 
     <div class="admin-header-right">
       <button id="btnRelatorios" class="admin-btn-header azul">Relatórios</button>
-
-      <!-- ⭐ MINI PDV RESTAURADO ⭐ -->
       <button id="btnMiniPDV" class="admin-btn-header verde">Mini PDV</button>
-
       <button id="logoutAdmin" class="admin-btn-header amarelo">Sair</button>
     </div>
   </header>
@@ -35,27 +32,41 @@
   ============================ -->
   <main class="admin-container">
 
+    <!-- ===========================
+         📊 VISÃO GERAL (MINI PDV)
+    ============================ -->
+    <section class="admin-card">
+      <h2>Resumo Financeiro</h2>
+
+      <div class="resumo-saldos">
+
+        <div class="resumo-box">
+          <span class="resumo-titulo">Saldo Operacional (Motoboys)</span>
+          <strong id="saldoGeral" class="admin-value neutral">
+            R$ 0,00
+          </strong>
+        </div>
+
+        <div class="resumo-box">
+          <span class="resumo-titulo">Saldo Financeiro (Caixa)</span>
+          <strong id="saldoFinanceiro" class="admin-value neutral">
+            R$ 0,00
+          </strong>
+          <!-- ⚠️ JS conecta depois -->
+        </div>
+
+      </div>
+    </section>
 
     <!-- ===========================
          🛵 SALDO POR MOTOBOY
     ============================ -->
     <section class="admin-card">
       <h2>Saldo por Motoboy</h2>
-
       <div id="listaMotoboys" class="lista-motoboys">
         <p>Carregando motoboys...</p>
       </div>
     </section>
-
-
-    <!-- ===========================
-         💰 SALDO GERAL
-    ============================ -->
-    <section class="admin-card">
-      <h2>Saldo Geral</h2>
-      <div id="saldoGeral" class="admin-value neutral">R$ 0,00</div>
-    </section>
-
 
     <!-- ===========================
          🧾 DESPESAS
@@ -64,16 +75,14 @@
       <h2>Registrar Despesa</h2>
 
       <input id="descDespesa" placeholder="Descrição da despesa" />
-      <input id="valorDespesa" type="number" placeholder="Ex: 45.90" step="0.01" />
+      <input id="valorDespesa" type="number" step="0.01" placeholder="Ex: 45.90" />
       <input id="dataDespesa" type="date" />
       <button id="btnSalvarDespesa" class="admin-btn amarelo">Salvar Despesa</button>
     </section>
 
-
-
-    <!-- =================================================
-         💸 CAIXA DIÁRIO (NOVO MÓDULO)
-    ================================================== -->
+    <!-- ===========================
+         💸 CAIXA DIÁRIO
+    ============================ -->
     <section class="admin-card">
       <h2>Caixa Diário</h2>
 
@@ -97,34 +106,28 @@
       <input id="caixaDescricao" placeholder="Ex: Venda, sangria, taxa..." />
 
       <label>Valor (R$)</label>
-      <input id="caixaValor" type="number" step="0.01" placeholder="Ex: 39.90" />
+      <input id="caixaValor" type="number" step="0.01" />
 
       <label>Data</label>
       <input id="caixaData" type="date" />
 
-      <button id="btnRegistrarCaixa" class="admin-btn amarelo">Registrar no Caixa</button>
+      <button id="btnRegistrarCaixa" class="admin-btn amarelo">
+        Registrar no Caixa
+      </button>
 
-      <h3 style="margin-top:20px; color:#ffca28;">Resumo do Dia</h3>
+      <h3 class="subtitulo">Resumo do Dia</h3>
 
-      <div id="caixaResumo" 
-          style="
-            background:#1a1a1a;
-            padding:15px;
-            border-radius:10px;
-            margin-bottom:20px;
-            border:1px solid #333;
-          ">
-        <p><strong>Entradas:</strong> <span id="resumoEntradas" style="color:#ffca28;">R$ 0,00</span></p>
-        <p><strong>Saídas:</strong> <span id="resumoSaidas" style="color:#ffca28;">R$ 0,00</span></p>
-        <p><strong>Saldo do Dia:</strong> <span id="resumoSaldoDia" style="color:#ffca28;">R$ 0,00</span></p>
+      <div id="caixaResumo" class="caixa-resumo">
+        <p><strong>Entradas:</strong> <span id="resumoEntradas">R$ 0,00</span></p>
+        <p><strong>Saídas:</strong> <span id="resumoSaidas">R$ 0,00</span></p>
+        <p><strong>Saldo do Dia:</strong> <span id="resumoSaldoDia">R$ 0,00</span></p>
       </div>
 
-      <h3 style="margin-top:20px; color:#ffca28;">Movimentações de Hoje</h3>
+      <h3 class="subtitulo">Movimentações de Hoje</h3>
       <div id="listaCaixaHoje" class="caixa-dia-lista">
         <p>Carregando...</p>
       </div>
     </section>
-
 
     <!-- ===========================
          📦 ESTOQUE
@@ -139,42 +142,42 @@
       <select id="estoqueItem"></select>
 
       <label>Quantidade Restante</label>
-      <input id="estoqueQtd" placeholder="Ex: 12 unidades / 3 kg" />
+      <input id="estoqueQtd" />
 
       <label>Data</label>
       <input id="estoqueData" type="date" />
 
-      <button id="btnSalvarEstoque" class="admin-btn amarelo">Salvar Estoque</button>
+      <button id="btnSalvarEstoque" class="admin-btn amarelo">
+        Salvar Estoque
+      </button>
 
-      <button id="btnGerarPdfEstoque" class="admin-btn azul" style="margin-top: 12px; display: none;">
+      <button id="btnGerarPdfEstoque" class="admin-btn azul" style="display:none;">
         📄 Gerar PDF – Estoque do Dia
       </button>
     </section>
 
-
     <!-- ===========================
          🛵 ENTREGAS / PAGAMENTOS
     ============================ -->
-    <section class="admin-card admin-card-entregas">
+    <section class="admin-card">
       <h2>Registrar Entregas / Pagamento p/ Motoboy</h2>
 
       <label>Motoboy</label>
       <select id="entregaMotoboy">
         <option value="lucas_hiago">Lucas Hiago</option>
         <option value="rodrigo_goncalves">Rodrigo Gonçalves</option>
-        <option value="outro">Outro (preencher manualmente)</option>
+        <option value="outro">Outro</option>
       </select>
 
       <div id="grupoMotoboyOutro" class="hidden">
-        <label>Nome do motoboy</label>
-        <input id="entregaMotoboyOutro" placeholder="Ex: João Motoboy" />
+        <input id="entregaMotoboyOutro" placeholder="Nome do motoboy" />
       </div>
 
       <label>Qtd. Entregas</label>
-      <input id="entregaQtd" type="number" placeholder="Ex: 3" />
+      <input id="entregaQtd" type="number" />
 
-      <label>Valor pago ao motoboy (R$)</label>
-      <input id="valorPagoMotoboy" type="number" step="0.01" placeholder="Ex: 45.90" />
+      <label>Valor pago (R$)</label>
+      <input id="valorPagoMotoboy" type="number" step="0.01" />
 
       <label>Data</label>
       <input id="entregaData" type="date" />
@@ -186,34 +189,27 @@
 
   </main>
 
-
   <!-- ===========================
-       💸 MODAL DE PAGAMENTO
+       💸 MODAL PAGAMENTO
   ============================ -->
   <div id="modalPagamento" class="modal hidden">
     <div class="modal-content">
       <h3>Registrar Pagamento</h3>
-
       <p id="modalNomeMotoboy"></p>
 
-      <label>Valor pago (R$)</label>
-      <input id="modalValorPagamento" type="number" step="0.01" placeholder="Ex: 50.00" />
+      <input id="modalValorPagamento" type="number" step="0.01" />
 
       <button id="confirmarPagamento" class="admin-btn amarelo">Confirmar</button>
       <button id="cancelarPagamento" class="admin-btn azul">Cancelar</button>
     </div>
   </div>
 
-
-  <!-- ===========================
-       📌 JS FINAL
-  ============================ -->
+  <!-- JS -->
   <script type="module" src="./js/dashboard-admin.js"></script>
 
-  <!-- ABRIR MINI PDV -->
   <script>
     document.getElementById("btnMiniPDV")?.addEventListener("click", () => {
-      window.location.href = "pdv.html"; // ajuste aqui se o nome do arquivo for outro
+      window.location.href = "pdv.html";
     });
   </script>
 
