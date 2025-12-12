@@ -75,13 +75,13 @@
     </section>
 
     <!-- ===========================
-         📄 PDF DO DIA
+         📄 RELATÓRIO / PDF
     ============================ -->
     <section class="card">
       <h2>Relatório do Dia</h2>
 
       <p class="card-hint">
-        Gere o PDF com o fechamento do dia para envio à lanchonete.
+        Gere o PDF com o fechamento mais recente para envio à lanchonete.
       </p>
 
       <button id="btnGerarPdf" class="btn-pdf">
@@ -90,12 +90,30 @@
     </section>
 
     <!-- ===========================
-         📊 HISTÓRICO
+         📊 HISTÓRICO + FILTRO
     ============================ -->
     <section class="card">
       <h2>Histórico de Fechamentos</h2>
 
-      <div id="listaHistorico">
+      <!-- 🔍 FILTRO (pronto para JS) -->
+      <div class="historico-filtros">
+        <div>
+          <label for="filtroInicio">Data inicial</label>
+          <input type="date" id="filtroInicio" />
+        </div>
+
+        <div>
+          <label for="filtroFim">Data final</label>
+          <input type="date" id="filtroFim" />
+        </div>
+
+        <button id="btnFiltrarHistorico" class="btn-secondary">
+          Filtrar
+        </button>
+      </div>
+
+      <!-- 📋 LISTA -->
+      <div id="listaHistorico" class="historico-lista">
         <p>Carregando...</p>
       </div>
     </section>
