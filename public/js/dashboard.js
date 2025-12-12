@@ -18,11 +18,12 @@ import {
   addDoc,
   query,
   where,
-  getDocs
+  getDocs,
+  orderBy
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 // ============================================================
-// ⚙️ CONFIG
+// ⚙️ CONFIG — DEFINITIVO
 // ============================================================
 const MOTOBOY_ID = "rodrigo_goncalves";
 
@@ -48,7 +49,7 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 // ============================================================
-// 💰 SALDO ATUAL
+// 💰 SALDO ATUAL (ACUMULADO)
 // ============================================================
 async function carregarSaldoAtual() {
   const ref = doc(db, "motoboys", MOTOBOY_ID);
@@ -57,8 +58,8 @@ async function carregarSaldoAtual() {
   if (!snap.exists()) return;
 
   const saldo = Number(snap.data().saldo || 0);
-
   const el = document.getElementById("saldoAtual");
+
   if (el) {
     el.textContent = `R$ ${saldo.toFixed(2).replace(".", ",")}`;
   }
@@ -66,6 +67,9 @@ async function carregarSaldoAtual() {
 
 // ============================================================
 // 🧮 CÁLCULO AUTOMÁTICO DO GANHO
+// 👉 Regra oficial Rodrigo:
+// • Até 10 entregas = R$100
+// • A partir da 11ª = +R$7 por entrega
 // ============================================================
 function calcularGanho(entregas) {
   if (entregas <= 0) return 0;
@@ -78,9 +82,9 @@ function calcularGanho(entregas) {
 // ============================================================
 document.getElementById("btnSalvar")?.addEventListener("click", async () => {
   try {
-    const entregas = Number(document.getElementById("entregas").value || 0);
-    const dinheiro = Number(document.getElementById("dinheiro").value || 0);
-    const consumo  = Number(document.getElementById("consumo").value || 0);
+    const entregas = Number(document.getElementById("entregas")?.value || 0);
+    const dinheiro = Number(document.getElementById("dinheiro")?.value || 0);
+    const consumo  = Number(document.getElementById("consumo")?.value || 0);
 
     if (entregas <= 0) {
       alert("Informe a quantidade de entregas.");
@@ -101,12 +105,12 @@ document.getElementById("btnSalvar")?.addEventListener("click", async () => {
     const saldoAnterior = Number(snap.data().saldo || 0);
     const saldoFinal = saldoAnterior + saldoDoDia;
 
-    // Atualiza saldo acumulado
+    // 🔒 Atualiza saldo acumulado do motoboy
     await updateDoc(ref, {
       saldo: saldoFinal
     });
 
-    // Salva histórico diário
+    // 🧾 Salva histórico diário (BASE DO PDF FUTURO)
     await addDoc(collection(db, "historicoMotoboy"), {
       motoboyId: MOTOBOY_ID,
       data: new Date().toISOString().slice(0, 10),
@@ -122,8 +126,14 @@ document.getElementById("btnSalvar")?.addEventListener("click", async () => {
 
     alert("Fechamento do dia registrado com sucesso!");
 
+    // Atualiza tela
     await carregarSaldoAtual();
     await carregarHistorico();
+
+    // Limpa campos
+    document.getElementById("entregas").value = "";
+    document.getElementById("dinheiro").value = "";
+    document.getElementById("consumo").value = "";
 
   } catch (e) {
     console.error(e);
@@ -132,7 +142,11 @@ document.getElementById("btnSalvar")?.addEventListener("click", async () => {
 });
 
 // ============================================================
-// 📊 HISTÓRICO (LISTA SIMPLES)
+// 📊 HISTÓRICO DO MOTOBOY (LISTA)
+// 👉 Estrutura pronta para:
+// • Relatório
+// • Exportação PDF
+// • Filtro por período
 // ============================================================
 async function carregarHistorico() {
   const lista = document.getElementById("listaHistorico");
@@ -142,7 +156,8 @@ async function carregarHistorico() {
 
   const q = query(
     collection(db, "historicoMotoboy"),
-    where("motoboyId", "==", MOTOBOY_ID)
+    where("motoboyId", "==", MOTOBOY_ID),
+    orderBy("timestamp", "desc")
   );
 
   const snap = await getDocs(q);
@@ -161,7 +176,9 @@ async function carregarHistorico() {
         <strong>${x.data}</strong><br>
         Entregas: ${x.entregas}<br>
         Ganho: R$ ${x.ganhoEntregas.toFixed(2).replace(".", ",")}<br>
-        Saldo do dia: R$ ${x.saldoDoDia.toFixed(2).replace(".", ",")}
+        Dinheiro recebido: R$ ${x.dinheiroRecebido.toFixed(2).replace(".", ",")}<br>
+        Consumo: R$ ${x.consumo.toFixed(2).replace(".", ",")}<br>
+        <strong>Saldo do dia: R$ ${x.saldoDoDia.toFixed(2).replace(".", ",")}</strong>
       </div>
     `;
   });
