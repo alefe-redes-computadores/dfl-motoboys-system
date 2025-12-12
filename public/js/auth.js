@@ -1,5 +1,6 @@
 // ===============================
-// 🔥 AUTH.JS — Versão Final Corrigida
+// 🔥 AUTH.JS — Versão Final Estável
+// Admin + Motoboy (Rodrigo)
 // ===============================
 
 import { auth } from "./firebase-config-v2.js";
@@ -20,16 +21,31 @@ const ADMINS = [
 ];
 
 // ===============================
+// 🛵 UID DO MOTOBOY (Rodrigo)
+// ===============================
+const MOTOBOY_RODRIGO_UID = "OU5MhGKctxea47kqtrCioNeRdZ73";
+
+// ===============================
 // 🚀 Redirecionamento automático
 // ===============================
 onAuthStateChanged(auth, (user) => {
-  if (!user) return; // não está logado → fica na tela de login
+  if (!user) return; // não logado → permanece no login
 
+  // 🔐 ADMIN
   if (ADMINS.includes(user.uid)) {
     window.location.href = "dashboard-admin.html";
-  } else {
-    window.location.href = "dashboard.html";
+    return;
   }
+
+  // 🛵 MOTOBOY (Rodrigo)
+  if (user.uid === MOTOBOY_RODRIGO_UID) {
+    window.location.href = "dashboard.html";
+    return;
+  }
+
+  // ❌ Qualquer outro usuário (fallback de segurança)
+  alert("Usuário sem permissão de acesso.");
+  auth.signOut();
 });
 
 // ===============================
@@ -48,12 +64,21 @@ document.getElementById("login-form")?.addEventListener("submit", async (e) => {
     const cred = await signInWithEmailAndPassword(auth, email, pass);
     const user = cred.user;
 
-    // Redireciona imediatamente após login
+    // 🔐 ADMIN
     if (ADMINS.includes(user.uid)) {
       window.location.href = "dashboard-admin.html";
-    } else {
-      window.location.href = "dashboard.html";
+      return;
     }
+
+    // 🛵 MOTOBOY (Rodrigo)
+    if (user.uid === MOTOBOY_RODRIGO_UID) {
+      window.location.href = "dashboard.html";
+      return;
+    }
+
+    // ❌ Segurança extra
+    alert("Usuário sem permissão de acesso.");
+    await auth.signOut();
 
   } catch (err) {
     console.error(err);
