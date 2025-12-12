@@ -570,6 +570,10 @@ function abrirModalPagamento(e) {
   pagamentoMotoboyId = btn.dataset.id;
 
   if (modalNomeMotoboy) modalNomeMotoboy.textContent = btn.dataset.nome || "";
+  
+  const inputData = $("modalDataPagamento");
+  if (inputData) inputData.value = todayISO_BR();
+
   modal?.classList.remove("hidden");
 }
 
@@ -577,6 +581,14 @@ cancelarPagamentoBtn?.addEventListener("click", () => {
   modal?.classList.add("hidden");
   pagamentoMotoboyId = null;
   if (inputValorPagamento) inputValorPagamento.value = "";
+});
+
+modal?.addEventListener("click", (e) => {
+  if (e.target === modal) {
+    modal.classList.add("hidden");
+    pagamentoMotoboyId = null;
+    if (inputValorPagamento) inputValorPagamento.value = "";
+  }
 });
 
 confirmarPagamentoBtn?.addEventListener("click", safe(async () => {
