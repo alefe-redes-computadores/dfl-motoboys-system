@@ -6,7 +6,7 @@
   <title>Painel Motoboy – DFL</title>
 
   <!-- ✅ CSS EXCLUSIVO DO PAINEL DO MOTOBOY -->
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="/css/dashboard-motoboy.css" />
 </head>
 
 <body>
@@ -15,43 +15,45 @@
        🔝 HEADER
   ============================ -->
   <header class="dash-header">
-    <img src="./img/logo-dfl.png" class="dash-logo" alt="DFL" />
+    <div class="dash-header-left">
+      <img src="/img/logo-dfl.png" class="dash-logo" alt="DFL" />
 
-    <div class="dash-title">
-      <span>Motoboy</span>
-      <span>Rodrigo Gonçalves</span>
+      <div class="dash-title">
+        <span>Motoboy</span>
+        <span>Rodrigo Gonçalves</span>
+      </div>
     </div>
 
-    <button id="logoutBtn">Sair</button>
+    <button id="logoutBtn" class="btn-logout">Sair</button>
   </header>
 
   <!-- ===========================
        📦 CONTEÚDO
   ============================ -->
-  <main>
+  <main class="dash-container">
 
     <!-- ===========================
          💰 SALDO ATUAL
     ============================ -->
-    <div class="form-card saldo-card">
+    <section class="card saldo-card">
       <h2>Saldo Atual</h2>
       <div id="saldoAtual" class="saldo-valor">R$ 0,00</div>
-    </div>
+    </section>
 
     <!-- ===========================
          🧾 FECHAMENTO DO DIA
     ============================ -->
-    <div class="form-card">
+    <section class="card">
       <h2>Fechamento do Dia</h2>
 
-      <label>Quantidade de entregas</label>
+      <label for="entregas">Quantidade de entregas</label>
       <input
         id="entregas"
         type="number"
         placeholder="Ex: 24"
       />
 
-      <label>Dinheiro recebido (R$)</label>
+      <label for="dinheiro">Dinheiro recebido (R$)</label>
       <input
         id="dinheiro"
         type="number"
@@ -59,7 +61,7 @@
         placeholder="Ex: 50.00"
       />
 
-      <label>Consumo na lanchonete (R$)</label>
+      <label for="consumo">Consumo na lanchonete (R$)</label>
       <input
         id="consumo"
         type="number"
@@ -67,55 +69,43 @@
         placeholder="Ex: 18.00"
       />
 
-      <button id="btnSalvar">
+      <button id="btnSalvar" class="btn-primary">
         Salvar Fechamento
       </button>
-    </div>
+    </section>
 
     <!-- ===========================
          📄 PDF DO DIA
-         (preparado para integração)
     ============================ -->
-    <div class="form-card">
+    <section class="card">
       <h2>Relatório do Dia</h2>
 
-      <p style="opacity: 0.8; font-size: 14px;">
+      <p class="card-hint">
         Gere o PDF com o fechamento do dia para envio à lanchonete.
       </p>
 
-      <button
-        id="btnGerarPdf"
-        style="
-          background:#1e88e5;
-          color:#fff;
-          border:none;
-          border-radius:6px;
-          padding:12px;
-          font-weight:bold;
-          cursor:pointer;
-        "
-      >
+      <button id="btnGerarPdf" class="btn-pdf">
         📄 Gerar PDF do Dia
       </button>
-    </div>
+    </section>
 
     <!-- ===========================
          📊 HISTÓRICO
     ============================ -->
-    <div class="form-card">
+    <section class="card">
       <h2>Histórico de Fechamentos</h2>
 
       <div id="listaHistorico">
         <p>Carregando...</p>
       </div>
-    </div>
+    </section>
 
   </main>
 
   <!-- ===========================
        ✅ JS DO MOTOBOY
   ============================ -->
-  <script type="module" src="./js/dashboard.js"></script>
+  <script type="module" src="/js/dashboard.js"></script>
 
 </body>
 </html>
