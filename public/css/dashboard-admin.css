@@ -561,3 +561,46 @@ body {
     padding: 12px 14px;
   }
 }
+
+/* ===========================
+   🧭 GRUPOS DO PAINEL
+=========================== */
+
+.grupo-visao-geral,
+.grupo-operacional,
+.grupo-financeiro,
+.grupo-controle {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  margin-bottom: 28px;
+}
+
+/* Títulos visuais dos grupos */
+.grupo-operacional::before,
+.grupo-financeiro::before,
+.grupo-controle::before {
+  content: attr(data-title);
+  display: block;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+
+/* Identidade visual sutil */
+.grupo-operacional {
+  border-left: 4px solid #ff9800;
+  padding-left: 12px;
+}
+
+.grupo-financeiro {
+  border-left: 4px solid #4caf50;
+  padding-left: 12px;
+}
+
+.grupo-controle {
+  border-left: 4px solid #1e88e5;
+  padding-left: 12px;
+}
