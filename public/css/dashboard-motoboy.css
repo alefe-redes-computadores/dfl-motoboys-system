@@ -1,0 +1,214 @@
+/* =========================================================
+   🛵 DFL — DASHBOARD MOTOBOY
+   Rodrigo Gonçalves
+   Visual exclusivo • Mobile First • Estável
+========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #0d0d0d;
+  color: #ffffff;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+/* ===========================
+   🔝 HEADER
+=========================== */
+.dash-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #111;
+  padding: 14px 16px;
+  border-bottom: 2px solid #ffca28;
+}
+
+.dash-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dash-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  border: 2px solid #ffca28;
+  background: #000;
+  object-fit: contain;
+}
+
+.dash-title {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.dash-title span:first-child {
+  font-size: 11px;
+  opacity: 0.7;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.dash-title span:last-child {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.btn-logout {
+  background: #ffca28;
+  color: #111;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-logout:active {
+  transform: scale(0.97);
+}
+
+/* ===========================
+   📦 CONTAINER
+=========================== */
+.dash-container {
+  padding: 16px;
+  display: grid;
+  gap: 16px;
+}
+
+/* ===========================
+   🧱 CARDS
+=========================== */
+.card {
+  background: #1a1a1a;
+  border-radius: 14px;
+  padding: 18px;
+  border: 1px solid #2c2c2c;
+}
+
+.card h2 {
+  margin: 0 0 14px;
+  font-size: 18px;
+  color: #ffca28;
+}
+
+.card-hint {
+  font-size: 14px;
+  opacity: 0.8;
+  margin-bottom: 12px;
+}
+
+/* ===========================
+   💰 SALDO
+=========================== */
+.saldo-card {
+  text-align: center;
+}
+
+.saldo-valor {
+  font-size: 34px;
+  font-weight: 800;
+  margin-top: 8px;
+  color: #ffca28;
+}
+
+/* ===========================
+   🧾 FORMULÁRIOS
+=========================== */
+label {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 4px;
+  opacity: 0.9;
+}
+
+input {
+  width: 100%;
+  padding: 11px 12px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background: #0f0f0f;
+  color: #fff;
+  font-size: 15px;
+}
+
+input::placeholder {
+  color: #888;
+}
+
+/* ===========================
+   🔘 BOTÕES
+=========================== */
+button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background: #ffca28;
+  color: #111;
+}
+
+.btn-primary:hover {
+  background: #ffd54f;
+}
+
+.btn-pdf {
+  background: #1e88e5;
+  color: #fff;
+}
+
+.btn-pdf:hover {
+  background: #2196f3;
+}
+
+/* ===========================
+   📊 HISTÓRICO
+=========================== */
+#listaHistorico {
+  display: grid;
+  gap: 10px;
+}
+
+.historico-item {
+  background: #111;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid #2a2a2a;
+}
+
+.historico-item strong {
+  color: #ffca28;
+}
+
+/* ===========================
+   📱 RESPONSIVO
+=========================== */
+@media (min-width: 768px) {
+  .dash-container {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .saldo-valor {
+    font-size: 38px;
+  }
+}
