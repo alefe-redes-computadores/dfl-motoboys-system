@@ -1,62 +1,253 @@
+/* ===========================================================
+🎨 DFL – DASHBOARD ADMIN (CSS OFICIAL – FIXADO)
+=========================================================== */
+
+:root {
+  --bg-body: #050505;
+  --bg-header: #101010;
+  --bg-card: #151515;
+  --bg-input: #111111;
+  --border-card: #262626;
+  --accent: #ffca28;
+  --accent-soft: #ffd95e;
+  --accent-blue: #1e88e5;
+  --danger: #e53935;
+  --success: #43a047;
+  --text-main: #ffffff;
+  --text-muted: #b3b3b3;
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --shadow-soft: 0 12px 35px rgba(0, 0, 0, 0.55);
+}
+
 /* ===========================
-   💸 MODAL DE PAGAMENTO – FIX DEFINITIVO
+🌙 BASE
 =========================== */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0 0 40px 0;
+  background: radial-gradient(circle at top, #141414 0, #050505 45%, #000 100%);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--text-main);
+}
+
+/* ===========================
+🔝 HEADER
+=========================== */
+
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px;
+  background: linear-gradient(90deg, #050505 0, #111111 40%, #050505 100%);
+  border-bottom: 1px solid #262626;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  box-shadow: 0 6px 18px rgba(0,0,0,.6);
+}
+
+.admin-header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.admin-logo {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  border: 2px solid var(--accent);
+  object-fit: cover;
+}
+
+.admin-header-right {
+  display: flex;
+  gap: 10px;
+}
+
+.admin-btn-header {
+  border: none;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-size: .95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-btn-header.azul {
+  background: var(--accent-blue);
+  color: #fff;
+}
+
+.admin-btn-header.amarelo {
+  background: var(--accent);
+  color: #000;
+}
+
+/* ===========================
+🧱 CONTAINER
+=========================== */
+
+.admin-container {
+  max-width: 1200px;
+  margin: 20px auto 0;
+  padding: 0 14px;
+  display: grid;
+  grid-template-columns: 1.2fr 1.2fr;
+  gap: 22px;
+}
+
+.admin-card {
+  background: radial-gradient(circle at top left, #202020, #151515 45%, #101010);
+  padding: 18px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-card);
+  box-shadow: var(--shadow-soft);
+}
+
+.admin-card h2 {
+  margin: 0 0 12px;
+  color: var(--accent);
+}
+
+/* ===========================
+💰 VALORES
+=========================== */
+
+.admin-value {
+  font-size: 2.1rem;
+  font-weight: 700;
+  margin-top: 6px;
+}
+
+.admin-value.neutral { color: var(--accent); }
+.admin-value.positivo { color: var(--success); }
+.admin-value.negativo { color: var(--danger); }
+
+/* ===========================
+🛵 MOTOBOYS
+=========================== */
+
+.lista-motoboys {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.motoboy-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: rgba(0,0,0,.35);
+}
+
+.btnPagar {
+  border: none;
+  border-radius: 999px;
+  padding: 8px 14px;
+  background: var(--danger);
+  color: #fff;
+  cursor: pointer;
+}
+
+/* ===========================
+🧾 FORMULÁRIOS
+=========================== */
+
+.admin-card label {
+  margin-top: 10px;
+  font-size: .86rem;
+  color: var(--text-muted);
+  display: block;
+}
+
+.admin-card input,
+.admin-card select {
+  width: 100%;
+  padding: 9px 11px;
+  border-radius: var(--radius-md);
+  border: 1px solid #333;
+  background: var(--bg-input);
+  color: var(--text-main);
+}
+
+.admin-btn {
+  margin-top: 12px;
+  width: 100%;
+  padding: 10px;
+  border-radius: 999px;
+  border: none;
+  background: var(--accent);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-btn-aux {
+  margin-top: 8px;
+  width: 100%;
+  padding: 9px;
+  border-radius: 999px;
+  background: var(--accent-blue);
+  color: #fff;
+  border: none;
+}
+
+/* ===========================
+💸 MODAL (FUNCIONAL)
+=========================== */
+
+.hidden {
+  display: none !important;
+}
 
 .modal {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
-  display: none; /* 🔑 IMPORTANTE */
+  background: rgba(0,0,0,.7);
+  display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 999;
-}
-
-.modal.show {
-  display: flex;
+  z-index: 100;
 }
 
 .modal-content {
-  background: radial-gradient(circle at top, #202020 0, #151515 60%, #101010 100%);
-  border-radius: 18px;
-  padding: 22px 20px;
+  background: #151515;
+  padding: 18px;
+  border-radius: var(--radius-lg);
+  max-width: 380px;
   width: 92%;
-  max-width: 360px;
-  border: 1px solid #2a2a2a;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
-  animation: modalFadeIn 0.18s ease-out;
 }
 
-@keyframes modalFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px) scale(0.97);
+/* ===========================
+📊 RESUMO FINANCEIRO
+=========================== */
+
+.resumo-saldos {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 16px;
+}
+
+.resumo-box {
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  background: rgba(255,255,255,.04);
+}
+
+/* ===========================
+📱 RESPONSIVO
+=========================== */
+
+@media (max-width: 900px) {
+  .admin-container {
+    grid-template-columns: 1fr;
   }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-.modal-content h3 {
-  margin: 0 0 12px 0;
-  color: var(--accent);
-  text-align: center;
-}
-
-.modal-content p {
-  margin: 0 0 14px 0;
-  text-align: center;
-  font-weight: 600;
-}
-
-.modal-content input {
-  margin-bottom: 14px;
-  text-align: center;
-  font-size: 1.05rem;
-}
-
-.modal-actions {
-  display: flex;
-  gap: 10px;
 }
