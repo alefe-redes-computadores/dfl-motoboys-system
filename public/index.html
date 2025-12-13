@@ -2,19 +2,40 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
+
     <title>DFL – Painel do Motoboy</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <!-- ===========================
-         ✅ PWA
+         📱 VIEWPORT (OBRIGATÓRIO PWA)
     ============================ -->
-    <link rel="manifest" href="./manifest.webmanifest">
-    <meta name="theme-color" content="#ffca28">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
-    <!-- CSS Global -->
-    <link rel="stylesheet" href="./css/style.css" />
+    <!-- ===========================
+         ✅ PWA / MANIFEST
+    ============================ -->
+    <link rel="manifest" href="/manifest.webmanifest" />
 
-    <!-- Estilos Específicos da Tela de Login -->
+    <!-- Cor do app (Android / Chrome) -->
+    <meta name="theme-color" content="#ffca28" />
+
+    <!-- ===========================
+         🧿 ÍCONES (CRÍTICO)
+         → ajuda o Chrome a detectar o app
+    ============================ -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/img/icon-192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/img/icon-512.png" />
+
+    <!-- iOS fallback (não atrapalha Android) -->
+    <link rel="apple-touch-icon" href="/img/icon-192.png" />
+
+    <!-- ===========================
+         🎨 CSS GLOBAL
+    ============================ -->
+    <link rel="stylesheet" href="/css/style.css" />
+
+    <!-- ===========================
+         🎨 ESTILOS DA TELA
+    ============================ -->
     <style>
       :root {
         --motopanel-bg: #050505;
@@ -150,7 +171,7 @@
       <div class="motopanel-card">
 
         <div class="motopanel-logo">
-          <img src="./img/logo-dfl.png" class="motopanel-logo-img" alt="Logo DFL">
+          <img src="/img/logo-dfl.png" class="motopanel-logo-img" alt="Logo DFL">
           <div class="motopanel-logo-text">
             <span>Da Família Lanches</span>
             <span>Painel do Motoboy</span>
@@ -191,17 +212,20 @@
     <!-- ===========================
          🔥 JS
     ============================ -->
-    <script type="module" src="./js/auth.js"></script>
+    <script type="module" src="/js/auth.js"></script>
 
     <!-- ===========================
          ✅ SERVICE WORKER
+         ⚠️ caminho ABSOLUTO (importante)
     ============================ -->
     <script>
       if ("serviceWorker" in navigator) {
-        navigator.serviceWorker
-          .register("./service-worker.js")
-          .then(() => console.log("Service Worker registrado"))
-          .catch(err => console.error("SW erro:", err));
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/service-worker.js")
+            .then(() => console.log("Service Worker registrado"))
+            .catch(err => console.error("SW erro:", err));
+        });
       }
     </script>
   </body>
