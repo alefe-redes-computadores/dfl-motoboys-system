@@ -1,5 +1,5 @@
 // ===============================
-// 🔥 AUTH.JS — Versão Final Estável
+// 🔥 AUTH.JS — VERSÃO BLINDADA
 // Admin + Motoboy (Rodrigo)
 // ===============================
 
@@ -7,11 +7,12 @@ import { auth } from "./firebase-config-v2.js";
 
 import {
   signInWithEmailAndPassword,
-  onAuthStateChanged
+  onAuthStateChanged,
+  signOut
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
 // ===============================
-// 🔐 UIDs de administradores
+// 🔐 UIDs DE ADMINISTRADORES
 // ===============================
 const ADMINS = [
   "6YczX4gLpUStlBVdQOXWc3uEYGG2",
@@ -26,30 +27,52 @@ const ADMINS = [
 const MOTOBOY_RODRIGO_UID = "OU5MhGKctxea47kqtrCioNeRdZ73";
 
 // ===============================
-// 🚀 Redirecionamento automático
+// 📍 Helpers
 // ===============================
-onAuthStateChanged(auth, (user) => {
-  if (!user) return; // não logado → permanece no login
+const isLoginPage = () =>
+  location.pathname.endsWith("index.html") ||
+  location.pathname === "/" ||
+  location.pathname === "";
+
+// ===============================
+// 🚀 CONTROLE GLOBAL DE SESSÃO
+// ===============================
+onAuthStateChanged(auth, async (user) => {
+  const path = location.pathname;
+
+  // ❌ NÃO LOGADO
+  if (!user) {
+    // Se tentar acessar dashboard sem login → volta pro login
+    if (!isLoginPage()) {
+      window.location.replace("index.html");
+    }
+    return;
+  }
 
   // 🔐 ADMIN
   if (ADMINS.includes(user.uid)) {
-    window.location.href = "dashboard-admin.html";
+    if (!path.includes("dashboard-admin.html")) {
+      window.location.replace("dashboard-admin.html");
+    }
     return;
   }
 
-  // 🛵 MOTOBOY (Rodrigo)
+  // 🛵 MOTOBOY
   if (user.uid === MOTOBOY_RODRIGO_UID) {
-    window.location.href = "dashboard.html";
+    if (!path.includes("dashboard.html")) {
+      window.location.replace("dashboard.html");
+    }
     return;
   }
 
-  // ❌ Qualquer outro usuário (fallback de segurança)
+  // ❌ USUÁRIO NÃO AUTORIZADO
   alert("Usuário sem permissão de acesso.");
-  auth.signOut();
+  await signOut(auth);
+  window.location.replace("index.html");
 });
 
 // ===============================
-// 📌 LOGIN DO USUÁRIO
+// 📌 LOGIN
 // ===============================
 document.getElementById("login-form")?.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -66,19 +89,20 @@ document.getElementById("login-form")?.addEventListener("submit", async (e) => {
 
     // 🔐 ADMIN
     if (ADMINS.includes(user.uid)) {
-      window.location.href = "dashboard-admin.html";
+      window.location.replace("dashboard-admin.html");
       return;
     }
 
-    // 🛵 MOTOBOY (Rodrigo)
+    // 🛵 MOTOBOY
     if (user.uid === MOTOBOY_RODRIGO_UID) {
-      window.location.href = "dashboard.html";
+      window.location.replace("dashboard.html");
       return;
     }
 
-    // ❌ Segurança extra
+    // ❌ FALLBACK
     alert("Usuário sem permissão de acesso.");
-    await auth.signOut();
+    await signOut(auth);
+    window.location.replace("index.html");
 
   } catch (err) {
     console.error(err);
