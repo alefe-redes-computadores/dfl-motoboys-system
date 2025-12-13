@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Painel Administrativo – DFL</title>
 
+  <!-- ===========================
+       ✅ PWA
+  ============================ -->
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#ffca28">
+
   <!-- ✅ CSS ABSOLUTO -->
   <link rel="stylesheet" href="/css/dashboard-admin.css" />
 </head>
@@ -120,11 +126,9 @@
         Registrar no Caixa
       </button>
 
-      <!-- ✅ RESUMO DO DIA (CORRIGIDO) -->
       <h3 class="subtitulo">Resumo do Dia</h3>
 
       <div class="resumo-saldos">
-
         <div class="resumo-box">
           <span class="resumo-titulo">💵 Entradas</span>
           <strong id="resumoEntradas" class="admin-value positivo">R$ 0,00</strong>
@@ -139,7 +143,6 @@
           <span class="resumo-titulo">🧮 Saldo do Dia</span>
           <strong id="resumoSaldoDia" class="admin-value neutral">R$ 0,00</strong>
         </div>
-
       </div>
 
       <h3 class="subtitulo">Movimentações de Hoje</h3>
@@ -229,8 +232,22 @@
     </div>
   </div>
 
-  <!-- ✅ JS -->
+  <!-- ===========================
+       ✅ JS
+  ============================ -->
   <script type="module" src="/js/dashboard-admin.js"></script>
+
+  <!-- ===========================
+       ✅ SERVICE WORKER
+  ============================ -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("/service-worker.js")
+        .then(() => console.log("Service Worker registrado"))
+        .catch(err => console.error("SW erro:", err));
+    }
+  </script>
 
 </body>
 </html>
