@@ -1,5 +1,5 @@
 // ===============================
-// 🔥 AUTH.JS — VERSÃO BLINDADA
+// 🔥 AUTH.JS — VERSÃO FINAL ANTI-LOOP
 // Admin + Motoboy (Rodrigo)
 // ===============================
 
@@ -27,40 +27,39 @@ const ADMINS = [
 const MOTOBOY_RODRIGO_UID = "OU5MhGKctxea47kqtrCioNeRdZ73";
 
 // ===============================
-// 📍 Helpers
+// 📍 HELPERS
 // ===============================
-const isLoginPage = () =>
-  location.pathname.endsWith("index.html") ||
-  location.pathname === "/" ||
-  location.pathname === "";
+const page = () => location.pathname.split("/").pop() || "index.html";
+
+const isLoginPage = () => page() === "index.html";
+const isAdminPage = () => page() === "dashboard-admin.html";
+const isMotoboyPage = () => page() === "dashboard.html";
 
 // ===============================
-// 🚀 CONTROLE GLOBAL DE SESSÃO
+// 🔐 PROTEÇÃO DE ROTAS (ANTI-LOOP)
 // ===============================
 onAuthStateChanged(auth, async (user) => {
-  const path = location.pathname;
 
   // ❌ NÃO LOGADO
   if (!user) {
-    // Se tentar acessar dashboard sem login → volta pro login
     if (!isLoginPage()) {
-      window.location.replace("index.html");
+      location.replace("index.html");
     }
     return;
   }
 
   // 🔐 ADMIN
   if (ADMINS.includes(user.uid)) {
-    if (!path.includes("dashboard-admin.html")) {
-      window.location.replace("dashboard-admin.html");
+    if (!isAdminPage()) {
+      location.replace("dashboard-admin.html");
     }
     return;
   }
 
   // 🛵 MOTOBOY
   if (user.uid === MOTOBOY_RODRIGO_UID) {
-    if (!path.includes("dashboard.html")) {
-      window.location.replace("dashboard.html");
+    if (!isMotoboyPage()) {
+      location.replace("dashboard.html");
     }
     return;
   }
@@ -68,45 +67,47 @@ onAuthStateChanged(auth, async (user) => {
   // ❌ USUÁRIO NÃO AUTORIZADO
   alert("Usuário sem permissão de acesso.");
   await signOut(auth);
-  window.location.replace("index.html");
+  location.replace("index.html");
 });
 
 // ===============================
-// 📌 LOGIN
+// 📌 LOGIN (REDIRECT UMA ÚNICA VEZ)
 // ===============================
 document.getElementById("login-form")?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const email = document.getElementById("email").value.trim();
-  const pass  = document.getElementById("password").value.trim();
+  const email = document.getElementById("email")?.value.trim();
+  const pass  = document.getElementById("password")?.value.trim();
   const errorBox = document.getElementById("login-error");
 
   try {
-    errorBox.style.display = "none";
+    if (errorBox) errorBox.style.display = "none";
 
     const cred = await signInWithEmailAndPassword(auth, email, pass);
     const user = cred.user;
 
     // 🔐 ADMIN
     if (ADMINS.includes(user.uid)) {
-      window.location.replace("dashboard-admin.html");
+      location.href = "dashboard-admin.html";
       return;
     }
 
     // 🛵 MOTOBOY
     if (user.uid === MOTOBOY_RODRIGO_UID) {
-      window.location.replace("dashboard.html");
+      location.href = "dashboard.html";
       return;
     }
 
     // ❌ FALLBACK
     alert("Usuário sem permissão de acesso.");
     await signOut(auth);
-    window.location.replace("index.html");
+    location.replace("index.html");
 
   } catch (err) {
     console.error(err);
-    errorBox.innerText = "E-mail ou senha incorretos.";
-    errorBox.style.display = "block";
+    if (errorBox) {
+      errorBox.innerText = "E-mail ou senha incorretos.";
+      errorBox.style.display = "block";
+    }
   }
 });
