@@ -5,6 +5,12 @@
     <title>DFL – Painel do Motoboy</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+    <!-- ===========================
+         ✅ PWA
+    ============================ -->
+    <link rel="manifest" href="./manifest.webmanifest">
+    <meta name="theme-color" content="#ffca28">
+
     <!-- CSS Global -->
     <link rel="stylesheet" href="./css/style.css" />
 
@@ -43,7 +49,6 @@
         border: 1px solid rgba(255,255,255,0.06);
       }
 
-      /* LOGO NOVA (substitui o círculo antigo) */
       .motopanel-logo {
         display: flex;
         align-items: center;
@@ -52,7 +57,7 @@
       }
 
       .motopanel-logo-img {
-        width: 50px;     /* ← TAMANHO IDEAL */
+        width: 50px;
         height: 50px;
         object-fit: contain;
         border-radius: 10px;
@@ -144,7 +149,6 @@
     <div class="motopanel-login-wrapper">
       <div class="motopanel-card">
 
-        <!-- LOGO NOVA -->
         <div class="motopanel-logo">
           <img src="./img/logo-dfl.png" class="motopanel-logo-img" alt="Logo DFL">
           <div class="motopanel-logo-text">
@@ -169,7 +173,9 @@
             <input id="password" name="password" type="password" class="motopanel-input" />
           </div>
 
-          <button id="login-button" type="submit" class="motopanel-button">Entrar</button>
+          <button id="login-button" type="submit" class="motopanel-button">
+            Entrar
+          </button>
 
           <p id="login-error" class="motopanel-error" style="display:none"></p>
         </form>
@@ -182,6 +188,21 @@
       </div>
     </div>
 
+    <!-- ===========================
+         🔥 JS
+    ============================ -->
     <script type="module" src="./js/auth.js"></script>
+
+    <!-- ===========================
+         ✅ SERVICE WORKER
+    ============================ -->
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+          .register("./service-worker.js")
+          .then(() => console.log("Service Worker registrado"))
+          .catch(err => console.error("SW erro:", err));
+      }
+    </script>
   </body>
 </html>
