@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Painel Motoboy – DFL</title>
 
+  <!-- ===========================
+       ✅ PWA
+  ============================ -->
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#ffca28">
+
   <!-- ✅ CSS EXCLUSIVO DO PAINEL DO MOTOBOY -->
   <link rel="stylesheet" href="/css/dashboard-motoboy.css" />
 </head>
@@ -39,7 +45,6 @@
       <h2>Saldo Atual</h2>
       <div id="saldoAtual" class="saldo-valor">R$ 0,00</div>
 
-      <!-- ✅ NOVO: PAGAMENTO -->
       <button id="btnAbrirPagamento" class="btn-secondary" style="margin-top:12px;">
         💵 Registrar Pagamento
       </button>
@@ -139,6 +144,18 @@
        ✅ JS DO MOTOBOY
   ============================ -->
   <script type="module" src="/js/dashboard.js"></script>
+
+  <!-- ===========================
+       ✅ SERVICE WORKER
+  ============================ -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("/service-worker.js")
+        .then(() => console.log("Service Worker registrado"))
+        .catch(err => console.error("SW erro:", err));
+    }
+  </script>
 
 </body>
 </html>
